@@ -1,0 +1,22 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # 风格规范
+    always_declare_return_types: true
+    prefer_single_quotes: true
+    sort_child_properties_last: true
+    unawaited_futures: true
+    avoid_void_async: true
+    lines_longer_than_80_chars: false
+    
+    # 代码质量
+    avoid_print: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    use_key_in_widget_constructors: true
+    prefer_final_locals: true
+    
+    # 命名规范
+    file_names: true
+    package_names: true

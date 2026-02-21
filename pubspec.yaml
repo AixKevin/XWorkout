@@ -1,0 +1,48 @@
+name: xworkout
+description: 轻量级健身记录软件 - 简洁、离线、跨平台
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  
+  # 状态管理
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+  
+  # 数据库
+  drift: ^2.14.0
+  sqlite3_flutter_libs: ^0.5.0
+  
+  # 路由
+  go_router: ^13.0.0
+  
+  # 图标
+  phosphor_flutter: ^2.0.0
+  
+  # 日期处理
+  intl: ^0.19.0
+  
+  # 工具
+  path_provider: ^2.1.1
+  path: ^1.8.3
+  uuid: ^4.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  drift_dev: ^2.14.0
+  build_runner: ^2.4.7
+  riverpod_generator: ^2.3.9
+  custom_lint: ^0.5.7
+  riverpod_lint: ^2.3.7
+
+flutter:
+  uses-material-design: true
