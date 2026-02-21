@@ -6,6 +6,12 @@ import 'package:xworkout/features/training/presentation/providers/plan_provider.
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:xworkout/features/templates/data/plan_templates.dart';
+import 'package:xworkout/features/templates/data/user_template_repository.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:xworkout/features/training/data/plan_repository.dart';
+import 'package:xworkout/features/training/data/exercise_repository.dart';
 
 class PlanDetailScreen extends ConsumerStatefulWidget {
   final String planId;
@@ -289,6 +295,13 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
           CupertinoActionSheetAction(
             onPressed: () async {
               Navigator.pop(context);
+              await _saveAsTemplate(context, plan);
+            },
+            child: const Text('保存为模板'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () async {
+              Navigator.pop(context);
               try {
                 await ref.read(planNotifierProvider.notifier).duplicatePlan(plan.id);
                 if (context.mounted) {
@@ -376,6 +389,119 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveAsTemplate(BuildContext context, WorkoutPlan plan) async {
+    final TextEditingController nameController = TextEditingController(text: plan.name);
+    final TextEditingController descController = TextEditingController();
+
+    final bool? confirm = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('保存为模板'),
+        content: Column(
+          children: [
+            const SizedBox(height: 16),
+            CupertinoTextField(
+              controller: nameController,
+              placeholder: '模板名称',
+            ),
+            const SizedBox(height: 8),
+            CupertinoTextField(
+              controller: descController,
+              placeholder: '描述 (可选)',
+            ),
+          ],
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          CupertinoDialogAction(
+            child: const Text('保存'),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true || !context.mounted) return;
+
+    try {
+      final planRepo = ref.read(workoutPlanRepositoryProvider);
+      final exerciseRepo = ref.read(exerciseRepositoryProvider);
+      
+      final planDays = await planRepo.getPlanDays(plan.id);
+      final List<DayTemplate> dayTemplates = [];
+
+      for (var day in planDays) {
+        final dayExercises = await planRepo.getDayExercises(day.id);
+        final List<ExerciseTemplate> exerciseTemplates = [];
+
+        for (var dayExercise in dayExercises) {
+          final exercise = await exerciseRepo.getExerciseById(dayExercise.exerciseId);
+          if (exercise != null) {
+            exerciseTemplates.add(ExerciseTemplate(
+              name: exercise.name,
+              category: exercise.category ?? '未分类',
+              targetSets: dayExercise.targetSets,
+              targetReps: dayExercise.targetReps,
+              targetWeight: dayExercise.targetWeight,
+            ));
+          }
+        }
+
+        dayTemplates.add(DayTemplate(
+          dayIndex: day.dayIndex,
+          isRestDay: day.isRestDay,
+          exercises: exerciseTemplates,
+        ));
+      }
+
+      final template = PlanTemplate(
+        id: const Uuid().v4(),
+        name: nameController.text.isEmpty ? plan.name : nameController.text,
+        description: descController.text,
+        cycleDays: plan.cycleDays,
+        days: dayTemplates,
+        isCustom: true,
+      );
+
+      await ref.read(userTemplateRepositoryProvider).saveTemplate(template);
+
+      if (context.mounted) {
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('保存成功'),
+            content: const Text('已保存为自定义模板'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('确定'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('保存失败'),
+            content: Text('错误: $e'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('确定'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   void _showDeactivateDialog(BuildContext context, WidgetRef ref, WorkoutPlan plan) {

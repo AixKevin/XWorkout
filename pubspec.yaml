@@ -1,7 +1,7 @@
 name: xworkout
 description: 轻量级健身记录软件 - 简洁、离线、跨平台
 publish_to: 'none'
-version: 2.7.0
+version: 2.8.0
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

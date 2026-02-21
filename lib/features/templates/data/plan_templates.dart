@@ -1,18 +1,59 @@
-import 'package:xworkout/core/database/database.dart';
-import 'package:drift/drift.dart';
-
 class PlanTemplate {
+  final String id;
   final String name;
   final String description;
   final int cycleDays;
   final List<DayTemplate> days;
+  final bool isCustom;
 
   const PlanTemplate({
+    this.id = '',
     required this.name,
     required this.description,
     required this.cycleDays,
     required this.days,
+    this.isCustom = false,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'cycleDays': cycleDays,
+      'days': days.map((day) => day.toJson()).toList(),
+      'isCustom': isCustom,
+    };
+  }
+
+  factory PlanTemplate.fromJson(Map<String, dynamic> json) {
+    return PlanTemplate(
+      id: json['id'] ?? '',
+      name: json['name'] as String,
+      description: json['description'] as String,
+      cycleDays: json['cycleDays'] as int,
+      days: (json['days'] as List).map((e) => DayTemplate.fromJson(e)).toList(),
+      isCustom: json['isCustom'] ?? false,
+    );
+  }
+
+  PlanTemplate copyWith({
+    String? id,
+    String? name,
+    String? description,
+    int? cycleDays,
+    List<DayTemplate>? days,
+    bool? isCustom,
+  }) {
+    return PlanTemplate(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      cycleDays: cycleDays ?? this.cycleDays,
+      days: days ?? this.days,
+      isCustom: isCustom ?? this.isCustom,
+    );
+  }
 }
 
 class DayTemplate {
@@ -25,6 +66,22 @@ class DayTemplate {
     required this.isRestDay,
     required this.exercises,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'dayIndex': dayIndex,
+      'isRestDay': isRestDay,
+      'exercises': exercises.map((e) => e.toJson()).toList(),
+    };
+  }
+
+  factory DayTemplate.fromJson(Map<String, dynamic> json) {
+    return DayTemplate(
+      dayIndex: json['dayIndex'] as int,
+      isRestDay: json['isRestDay'] as bool,
+      exercises: (json['exercises'] as List).map((e) => ExerciseTemplate.fromJson(e)).toList(),
+    );
+  }
 }
 
 class ExerciseTemplate {
@@ -41,10 +98,31 @@ class ExerciseTemplate {
     required this.targetReps,
     this.targetWeight,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'category': category,
+      'targetSets': targetSets,
+      'targetReps': targetReps,
+      'targetWeight': targetWeight,
+    };
+  }
+
+  factory ExerciseTemplate.fromJson(Map<String, dynamic> json) {
+    return ExerciseTemplate(
+      name: json['name'] as String,
+      category: json['category'] as String,
+      targetSets: json['targetSets'] as int,
+      targetReps: json['targetReps'] as int,
+      targetWeight: (json['targetWeight'] as num?)?.toDouble(),
+    );
+  }
 }
 
 const List<PlanTemplate> planTemplates = [
   PlanTemplate(
+    id: 'chest_focus',
     name: '胸部训练计划',
     description: '专注于胸肌的训练计划',
     cycleDays: 3,
@@ -76,6 +154,7 @@ const List<PlanTemplate> planTemplates = [
     ],
   ),
   PlanTemplate(
+    id: 'back_focus',
     name: '背部训练计划',
     description: '专注于背阔肌和核心的训练计划',
     cycleDays: 3,
@@ -107,6 +186,7 @@ const List<PlanTemplate> planTemplates = [
     ],
   ),
   PlanTemplate(
+    id: 'leg_focus',
     name: '腿部训练计划',
     description: '针对大腿和臀部的训练计划',
     cycleDays: 3,
@@ -138,6 +218,7 @@ const List<PlanTemplate> planTemplates = [
     ],
   ),
   PlanTemplate(
+    id: 'full_body',
     name: '全身训练计划',
     description: '简洁高效的全身训练计划',
     cycleDays: 2,
@@ -161,6 +242,7 @@ const List<PlanTemplate> planTemplates = [
     ],
   ),
   PlanTemplate(
+    id: 'dumbbell_home',
     name: '哑铃训练计划',
     description: '适合居家使用的哑铃训练计划',
     cycleDays: 3,

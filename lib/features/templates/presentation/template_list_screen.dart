@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
+import 'package:flutter/material.dart' show Icons, Icon, Material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/features/templates/data/plan_templates.dart';
+import 'package:xworkout/features/templates/data/user_template_repository.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/data/plan_repository.dart';
@@ -20,19 +20,72 @@ final exerciseRepositoryProvider = Provider<ExerciseRepository>((ref) {
   return ExerciseRepository(databaseProvider);
 });
 
+final userTemplatesProvider = StateNotifierProvider<UserTemplatesNotifier, List<PlanTemplate>>((ref) {
+  final repo = ref.watch(userTemplateRepositoryProvider);
+  return UserTemplatesNotifier(repo);
+});
+
+class UserTemplatesNotifier extends StateNotifier<List<PlanTemplate>> {
+  final UserTemplateRepository _repository;
+
+  UserTemplatesNotifier(this._repository) : super([]) {
+    loadTemplates();
+  }
+
+  Future<void> loadTemplates() async {
+    state = await _repository.getUserTemplates();
+  }
+
+  Future<void> addTemplate(PlanTemplate template) async {
+    await _repository.saveTemplate(template);
+    await loadTemplates();
+  }
+
+  Future<void> deleteTemplate(String id) async {
+    await _repository.deleteTemplate(id);
+    await loadTemplates();
+  }
+}
+
 class TemplateListScreen extends ConsumerWidget {
   const TemplateListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userTemplates = ref.watch(userTemplatesProvider);
+
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
-        middle: Text('选择模板'),
+        middle: Text('训练模板'),
       ),
       child: SafeArea(
         child: ListView(
           children: [
             const SizedBox(height: 16),
+            if (userTemplates.isNotEmpty)
+              CupertinoListSection.insetGrouped(
+                header: const Text('我的模板'),
+                children: userTemplates.map((template) {
+                  return CupertinoListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: CupertinoColors.activeGreen.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        color: CupertinoColors.activeGreen,
+                      ),
+                    ),
+                    title: Text(template.name),
+                    subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
+                    trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                    onTap: () => _showTemplateDetail(context, ref, template),
+                  );
+                }).toList(),
+              ),
+            
             CupertinoListSection.insetGrouped(
               header: const Text('推荐模板'),
               children: planTemplates.map((template) {
@@ -43,7 +96,7 @@ class TemplateListScreen extends ConsumerWidget {
                       color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.bar_chart,
                       color: CupertinoColors.activeBlue,
                     ),
@@ -65,7 +118,7 @@ class TemplateListScreen extends ConsumerWidget {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
+        height: MediaQuery.of(context).size.height * 0.85,
         decoration: const BoxDecoration(
           color: CupertinoColors.systemBackground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -97,6 +150,46 @@ class TemplateListScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            if (template.isCustom)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoButton(
+                        color: CupertinoColors.systemRed,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: const Text('删除模板'),
+                        onPressed: () {
+                           showCupertinoDialog(
+                            context: context,
+                            builder: (ctx) => CupertinoAlertDialog(
+                              title: const Text('确认删除'),
+                              content: Text('确定要删除模板"${template.name}"吗？'),
+                              actions: [
+                                CupertinoDialogAction(
+                                  isDestructiveAction: true,
+                                  onPressed: () {
+                                    ref.read(userTemplatesProvider.notifier).deleteTemplate(template.id);
+                                    Navigator.pop(ctx); // Close dialog
+                                    Navigator.pop(context); // Close modal
+                                  },
+                                  child: const Text('删除'),
+                                ),
+                                CupertinoDialogAction(
+                                  isDefaultAction: true,
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: const Text('取消'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Expanded(
               child: ListView(
                 children: [
@@ -137,7 +230,7 @@ class TemplateListScreen extends ConsumerWidget {
                                 subtitle: Text(
                                   '${exercise.targetSets}组 × ${exercise.targetReps}次${exercise.targetWeight != null ? ' × ${exercise.targetWeight}kg' : ''}',
                                 ),
-                                leading: Icon(Icons.fitness_center),
+                                leading: const Icon(Icons.fitness_center),
                               );
                             }).toList(),
                     );
