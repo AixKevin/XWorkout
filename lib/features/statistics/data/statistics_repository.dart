@@ -117,4 +117,120 @@ class StatisticsRepository {
 
     return result;
   }
+
+  // 5. Top Exercises (Most frequent)
+  Future<List<Map<String, dynamic>>> getTopExercises(int limit) async {
+    final query = _db.select(_db.exerciseRecords).join([
+      innerJoin(_db.exercises, _db.exercises.id.equalsExp(_db.exerciseRecords.exerciseId))
+    ]);
+    
+    final result = await (query
+      ..addColumns([_db.exercises.name, _db.exercises.id, _db.exerciseRecords.id.count()])
+      ..groupBy([_db.exercises.id, _db.exercises.name])
+      ..orderBy([OrderingTerm(expression: _db.exerciseRecords.id.count(), mode: OrderingMode.desc)])
+      ..limit(limit)
+    ).get();
+
+    return result.map((row) {
+      return {
+        'name': row.read(_db.exercises.name),
+        'id': row.read(_db.exercises.id),
+        'count': row.read(_db.exerciseRecords.id.count()),
+      };
+    }).toList();
+  }
+
+  // 6. Exercise Stats (Volume & Max Weight)
+  Future<Map<String, dynamic>> getExerciseStats(String exerciseId) async {
+    final records = await (_db.select(_db.exerciseRecords)
+      ..where((t) => t.exerciseId.equals(exerciseId))
+    ).join([
+      innerJoin(_db.dailyRecords, _db.dailyRecords.id.equalsExp(_db.exerciseRecords.dailyRecordId))
+    ]).get();
+
+    // Sort by date
+    records.sort((a, b) {
+      final dateA = a.read(_db.dailyRecords.date)!;
+      final dateB = b.read(_db.dailyRecords.date)!;
+      return dateA.compareTo(dateB);
+    });
+
+    double maxWeight = 0;
+    double totalVolume = 0;
+    final volumeTrend = <Map<String, dynamic>>[];
+    final maxWeightTrend = <Map<String, dynamic>>[];
+
+    for (final row in records) {
+      final record = row.readTable(_db.exerciseRecords);
+      final date = row.readTable(_db.dailyRecords).date;
+
+      final repsList = record.actualReps.split(',').map((e) => int.tryParse(e) ?? 0).toList();
+      final weightList = record.actualWeight.split(',').map((e) => double.tryParse(e) ?? 0.0).toList();
+
+      double dailyVolume = 0;
+      double dailyMaxWeight = 0;
+
+      for (int i = 0; i < repsList.length; i++) {
+        final reps = repsList[i];
+        final weight = i < weightList.length ? weightList[i] : 0.0;
+        
+        if (weight > maxWeight) maxWeight = weight;
+        if (weight > dailyMaxWeight) dailyMaxWeight = weight;
+
+        dailyVolume += (weight > 0 ? reps * weight : reps);
+      }
+      totalVolume += dailyVolume;
+
+      volumeTrend.add({'date': date, 'value': dailyVolume});
+      maxWeightTrend.add({'date': date, 'value': dailyMaxWeight});
+    }
+
+    return {
+      'maxWeight': maxWeight,
+      'totalVolume': totalVolume,
+      'volumeTrend': volumeTrend,
+      'maxWeightTrend': maxWeightTrend,
+      'count': records.length,
+    };
+  }
+
+  // 7. Weekly Goal (Default 3 workouts/week)
+  Future<Map<String, dynamic>> getWeeklyGoalProgress({int target = 3}) async {
+    final count = await getThisWeekWorkouts();
+    return {
+      'current': count,
+      'target': target,
+      'progress': (count / target).clamp(0.0, 1.0),
+    };
+  }
+
+  // 8. Body Weight Trend
+  Future<List<Map<String, dynamic>>> getBodyWeightTrend() async {
+    final records = await (_db.select(_db.dailyRecords)
+      ..where((t) => t.note.isNotNull())
+      ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.asc)])
+    ).get();
+
+    final trend = <Map<String, dynamic>>[];
+    final regex = RegExp(r'(?:weight|体重)[:\s]*(\d+(\.\d+)?)', caseSensitive: false);
+
+    for (final record in records) {
+      if (record.note == null) continue;
+      
+      final match = regex.firstMatch(record.note!);
+      if (match != null) {
+        final weightStr = match.group(1);
+        if (weightStr != null) {
+          final weight = double.tryParse(weightStr);
+          if (weight != null) {
+            trend.add({
+              'date': record.date,
+              'weight': weight,
+            });
+          }
+        }
+      }
+    }
+    return trend;
+  }
 }
