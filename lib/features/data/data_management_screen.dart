@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
+import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xworkout/features/data/data_export_repository.dart';
 
 class DataManagementScreen extends ConsumerStatefulWidget {
@@ -16,7 +18,32 @@ class DataManagementScreen extends ConsumerStatefulWidget {
 
 class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
   bool _isExporting = false;
-  bool _isBackingUp = false;
+  bool _isImporting = false;
+  bool _autoBackupEnabled = false;
+  
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _autoBackupEnabled = prefs.getBool('auto_backup') ?? false;
+    });
+  }
+
+  Future<void> _toggleAutoBackup(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('auto_backup', value);
+    setState(() {
+      _autoBackupEnabled = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,66 +55,108 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
         child: ListView(
           children: [
             const SizedBox(height: 16),
+            
+            // Export Filter Section
+            CupertinoListSection.insetGrouped(
+              header: const Text('导出选项'),
+              children: [
+                CupertinoListTile(
+                  leading: const Icon(PhosphorIcons.calendar),
+                  title: const Text('日期范围'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _startDate == null 
+                          ? '全部' 
+                          : '${_startDate!.toString().split(' ')[0]} - ${_endDate?.toString().split(' ')[0] ?? '至今'}',
+                        style: const TextStyle(color: CupertinoColors.systemGrey),
+                      ),
+                      const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 20),
+                    ],
+                  ),
+                  onTap: _pickDateRange,
+                ),
+              ],
+            ),
+
             CupertinoListSection.insetGrouped(
               header: const Text('导出数据'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(Icons.share),
-                  title: const Text('导出为 JSON'),
-                  subtitle: const Text('完整的备份格式，可用于恢复数据'),
-                  trailing: _isExporting
-                      ? const CupertinoActivityIndicator()
-                      : const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                  onTap: _isExporting ? null : () => _exportJson(),
-                ),
-                CupertinoListTile(
-                  leading: Icon(Icons.table_chart),
+                  leading: const Icon(PhosphorIcons.fileCsv),
                   title: const Text('导出为 CSV'),
-                  subtitle: const Text('表格格式，方便在 Excel 中查看'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  subtitle: const Text('表格格式，方便分析'),
+                  trailing: const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _exportCsv(),
                 ),
-              ],
-            ),
-            CupertinoListSection.insetGrouped(
-              header: const Text('备份'),
-              children: [
                 CupertinoListTile(
-                  leading: Icon(Icons.cloud_download),
-                  title: const Text('创建备份'),
-                  subtitle: const Text('保存备份文件到本地'),
-                  trailing: _isBackingUp
+                  leading: const Icon(PhosphorIcons.filePdf),
+                  title: const Text('导出 PDF 报告'),
+                  subtitle: const Text('生成训练摘要报告'),
+                  trailing: const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  onTap: () => _exportPdf(),
+                ),
+                CupertinoListTile(
+                  leading: const Icon(PhosphorIcons.shareNetwork),
+                  title: const Text('导出 JSON 备份'),
+                  subtitle: const Text('完整数据备份'),
+                  trailing: _isExporting
                       ? const CupertinoActivityIndicator()
-                      : const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                  onTap: _isBackingUp ? null : () => _createBackup(),
+                      : const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  onTap: _isExporting ? null : () => _exportJson(),
                 ),
               ],
             ),
+            
             CupertinoListSection.insetGrouped(
-              header: const Text('存储'),
+              header: const Text('导入与还原'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(Icons.folder),
-                  title: const Text('查看备份文件夹'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  leading: const Icon(PhosphorIcons.uploadSimple),
+                  title: const Text('从备份导入'),
+                  subtitle: const Text('支持 JSON 格式'),
+                  trailing: _isImporting
+                      ? const CupertinoActivityIndicator()
+                      : const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  onTap: _isImporting ? null : () => _importBackup(),
+                ),
+              ],
+            ),
+
+            CupertinoListSection.insetGrouped(
+              header: const Text('自动备份'),
+              children: [
+                CupertinoListTile(
+                  leading: const Icon(PhosphorIcons.arrowsClockwise),
+                  title: const Text('每日自动备份'),
+                  trailing: CupertinoSwitch(
+                    value: _autoBackupEnabled,
+                    onChanged: _toggleAutoBackup,
+                  ),
+                ),
+                CupertinoListTile(
+                  leading: const Icon(PhosphorIcons.folder),
+                  title: const Text('查看本地备份'),
+                  trailing: const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _openBackupFolder(),
                 ),
               ],
             ),
+            
             CupertinoListSection.insetGrouped(
               header: const Text('危险操作'),
               children: [
                 CupertinoListTile(
                   leading: Icon(
-                    Icons.delete,
+                    material.Icons.delete,
                     color: CupertinoColors.destructiveRed,
                   ),
                   title: Text(
                     '清除所有数据',
                     style: TextStyle(color: CupertinoColors.destructiveRed),
                   ),
-                  subtitle: const Text('此操作不可恢复'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _showClearDataDialog(),
                 ),
               ],
@@ -98,24 +167,59 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
     );
   }
 
+  Future<void> _pickDateRange() async {
+    final picked = await material.showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: _startDate != null && _endDate != null 
+          ? material.DateTimeRange(start: _startDate!, end: _endDate!) 
+          : null,
+      builder: (context, child) {
+        return material.Theme(
+          data: material.ThemeData.light().copyWith(
+            colorScheme: material.ColorScheme.light(
+              primary: CupertinoColors.activeBlue,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _startDate = picked.start;
+        _endDate = picked.end;
+      });
+    }
+  }
+
+  ExportOptions get _currentOptions => ExportOptions(
+    startDate: _startDate,
+    endDate: _endDate,
+  );
+  
+  // ... rest of the methods remain same but need to check for Icons usage
+  
   Future<void> _exportJson() async {
     setState(() => _isExporting = true);
     try {
       final repo = ref.read(dataExportRepositoryProvider);
-      final json = await repo.exportToJson();
+      final json = await repo.exportToJson(options: _currentOptions);
       
       final directory = await getTemporaryDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final file = File('${directory.path}/xworkout_export_$timestamp.json');
+      final file = File('${directory.path}/xworkout_backup_$timestamp.json');
       await file.writeAsString(json);
       
       await Share.shareXFiles(
         [XFile(file.path)],
-        text: 'XWorkout 数据导出',
+        text: 'XWorkout 备份',
       );
       
       if (mounted) {
-        _showSuccess('JSON 导出成功');
+        _showSuccess('导出成功');
       }
     } catch (e) {
       if (mounted) {
@@ -131,7 +235,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
   Future<void> _exportCsv() async {
     try {
       final repo = ref.read(dataExportRepositoryProvider);
-      final csv = await repo.exportToCsv();
+      final csv = await repo.exportToCsv(options: _currentOptions);
       
       final directory = await getTemporaryDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -143,9 +247,6 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
         text: 'XWorkout 数据导出 (CSV)',
       );
       
-      if (mounted) {
-        _showSuccess('CSV 导出成功');
-      }
     } catch (e) {
       if (mounted) {
         _showError('导出失败: $e');
@@ -153,22 +254,67 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
     }
   }
 
-  Future<void> _createBackup() async {
-    setState(() => _isBackingUp = true);
+  Future<void> _exportPdf() async {
     try {
       final repo = ref.read(dataExportRepositoryProvider);
-      final backupPath = await repo.saveBackup();
+      final file = await repo.exportToPdf(options: _currentOptions);
       
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'XWorkout 训练报告 (PDF)',
+      );
+    } catch (e) {
       if (mounted) {
-        _showSuccess('备份已保存到:\n$backupPath');
+        _showError('导出失败: $e');
+      }
+    }
+  }
+
+  Future<void> _importBackup() async {
+    setState(() => _isImporting = true);
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final repo = ref.read(dataExportRepositoryProvider);
+        
+        // Confirm dialog
+        final confirmed = await showCupertinoDialog<bool>(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('确认导入'),
+            content: const Text('导入数据将合并到当前记录中。建议在导入前先备份当前数据。'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('取消'),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              CupertinoDialogAction(
+                child: const Text('导入'),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+            ],
+          ),
+        );
+
+        if (confirmed == true) {
+          await repo.importFromJson(file);
+          if (mounted) {
+            _showSuccess('数据导入成功');
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
-        _showError('备份失败: $e');
+        _showError('导入失败: $e');
       }
     } finally {
       if (mounted) {
-        setState(() => _isBackingUp = false);
+        setState(() => _isImporting = false);
       }
     }
   }
@@ -207,11 +353,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
   }
 
   Future<void> _clearAllData() async {
-    try {
-      _showSuccess('数据清除功能开发中...');
-    } catch (e) {
-      _showError('操作失败: $e');
-    }
+    _showSuccess('数据清除功能开发中...');
   }
 
   void _showSuccess(String message) {
