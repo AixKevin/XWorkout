@@ -61,19 +61,19 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
     
     try {
       if (isEditing) {
-        await notifier.updateExercise(
-          widget.exercise!.copyWith(
-            name: name,
-            category: _categoryController.text.trim().isEmpty 
-                ? null 
-                : _categoryController.text.trim(),
-            defaultSets: int.tryParse(_setsController.text) ?? 3,
-            defaultReps: int.tryParse(_repsController.text) ?? 10,
-            defaultWeight: double.tryParse(_weightController.text),
-            note: _noteController.text.trim().isEmpty 
-                ? null 
-                : _noteController.text.trim(),
-          ),
+        await notifier.updateExerciseWithValues(
+          id: widget.exercise!.id,
+          name: name,
+          category: _categoryController.text.trim().isEmpty 
+              ? null 
+              : _categoryController.text.trim(),
+          defaultSets: int.tryParse(_setsController.text) ?? 3,
+          defaultReps: int.tryParse(_repsController.text) ?? 10,
+          defaultWeight: double.tryParse(_weightController.text),
+          note: _noteController.text.trim().isEmpty 
+              ? null 
+              : _noteController.text.trim(),
+          createdAt: widget.exercise!.createdAt,
         );
       } else {
         await notifier.addExercise(
@@ -154,8 +154,8 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Text('保存'),
           onPressed: _save,
+          child: const Text('保存'),
         ),
       ),
       child: SafeArea(
@@ -215,8 +215,8 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: CupertinoButton(
                   color: CupertinoColors.destructiveRed,
-                  child: const Text('删除项目'),
                   onPressed: _delete,
+                  child: const Text('删除项目'),
                 ),
               ),
             ],

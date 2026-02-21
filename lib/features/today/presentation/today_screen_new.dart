@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
 import 'package:xworkout/features/today/data/today_repository.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
+import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/data/exercise_repository.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -45,7 +46,7 @@ class TodayScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            PhosphorIcons.timer(),
+            PhosphorIcons.timer,
             size: 64,
             color: CupertinoColors.systemGrey,
           ),
@@ -119,7 +120,7 @@ class TodayScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(PhosphorIcons.chartBar()),
+              Icon(PhosphorIcons.chartBar),
               const SizedBox(width: 8),
               Text(
                 plan.name,
@@ -156,7 +157,7 @@ class TodayScreen extends ConsumerWidget {
       child: Column(
         children: [
           Icon(
-            PhosphorIcons.bed(),
+            PhosphorIcons.bed,
             size: 64,
             color: CupertinoColors.systemGrey,
           ),
@@ -274,8 +275,8 @@ class TodayScreen extends ConsumerWidget {
                   },
                 ),
               ] else ...[
-                CupertinoButton.filled(
-                  child: const Text('训练中...'),
+                const CupertinoButton.filled(
+                  child: Text('训练中...'),
                   onPressed: null,
                 ),
               ],

@@ -16,7 +16,7 @@ class ExerciseListScreen extends ConsumerWidget {
         middle: const Text('训练项目'),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(PhosphorIcons.plus()),
+          child: Icon(PhosphorIcons.plus),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -35,7 +35,7 @@ class ExerciseListScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      PhosphorIcons.dumbbell(),
+                      PhosphorIcons.barbell,
                       size: 64,
                       color: CupertinoColors.systemGrey,
                     ),

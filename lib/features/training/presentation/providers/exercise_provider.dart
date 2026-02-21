@@ -44,18 +44,66 @@ class ExerciseNotifier extends StateNotifier<AsyncValue<void>> {
   }
   
   Future<void> updateExercise(Exercise exercise) async {
+    await _updateExercise(
+      id: exercise.id,
+      name: exercise.name,
+      category: exercise.category,
+      defaultSets: exercise.defaultSets,
+      defaultReps: exercise.defaultReps,
+      defaultWeight: exercise.defaultWeight,
+      defaultDuration: exercise.defaultDuration,
+      note: exercise.note,
+      createdAt: exercise.createdAt,
+    );
+  }
+  
+  Future<void> updateExerciseWithValues({
+    required String id,
+    required String name,
+    String? category,
+    int defaultSets = 3,
+    int defaultReps = 10,
+    double? defaultWeight,
+    int? defaultDuration,
+    String? note,
+    DateTime? createdAt,
+  }) async {
+    await _updateExercise(
+      id: id,
+      name: name,
+      category: category,
+      defaultSets: defaultSets,
+      defaultReps: defaultReps,
+      defaultWeight: defaultWeight,
+      defaultDuration: defaultDuration,
+      note: note,
+      createdAt: createdAt,
+    );
+  }
+  
+  Future<void> _updateExercise({
+    required String id,
+    required String name,
+    String? category,
+    int defaultSets = 3,
+    int defaultReps = 10,
+    double? defaultWeight,
+    int? defaultDuration,
+    String? note,
+    DateTime? createdAt,
+  }) async {
     state = const AsyncValue.loading();
     try {
       final companion = ExercisesCompanion(
-        id: Value(exercise.id),
-        name: Value(exercise.name),
-        category: Value(exercise.category),
-        defaultSets: Value(exercise.defaultSets),
-        defaultReps: Value(exercise.defaultReps),
-        defaultWeight: Value(exercise.defaultWeight),
-        defaultDuration: Value(exercise.defaultDuration),
-        note: Value(exercise.note),
-        createdAt: Value(exercise.createdAt),
+        id: Value(id),
+        name: Value(name),
+        category: Value(category),
+        defaultSets: Value(defaultSets),
+        defaultReps: Value(defaultReps),
+        defaultWeight: Value(defaultWeight),
+        defaultDuration: Value(defaultDuration),
+        note: Value(note),
+        createdAt: Value(createdAt ?? DateTime.now()),
       );
       await _repository.updateExercise(companion);
       state = const AsyncValue.data(null);

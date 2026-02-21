@@ -18,7 +18,7 @@ class PlanListScreen extends ConsumerWidget {
         middle: const Text('健身计划'),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(PhosphorIcons.plus()),
+          child: Icon(PhosphorIcons.plus),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -37,7 +37,7 @@ class PlanListScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      PhosphorIcons.chartBar(),
+                      PhosphorIcons.chartBar,
                       size: 64,
                       color: CupertinoColors.systemGrey,
                     ),
@@ -78,8 +78,8 @@ class PlanListScreen extends ConsumerWidget {
                   ),
                   leading: Icon(
                     isActive 
-                        ? PhosphorIcons.checkmarkCircle(PhosphorIconsStyle.fill)
-                        : PhosphorIcons.chartBar(),
+                        ? PhosphorIcons.checkCircle
+                        : PhosphorIcons.chartBar,
                     color: isActive ? CupertinoColors.activeGreen : null,
                   ),
                   trailing: const CupertinoListTileChevron(),

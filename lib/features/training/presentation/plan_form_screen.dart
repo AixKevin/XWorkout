@@ -68,8 +68,8 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Text('创建'),
           onPressed: _save,
+          child: const Text('创建'),
         ),
       ),
       child: SafeArea(

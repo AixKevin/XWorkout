@@ -18,7 +18,7 @@ class MoreScreen extends StatelessWidget {
               header: const Text('数据'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.chartLineUp()),
+                  leading: Icon(PhosphorIcons.chartLineUp),
                   title: const Text('历史记录'),
                   subtitle: const Text('查看训练历史'),
                   trailing: const CupertinoListTileChevron(),
@@ -27,7 +27,7 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.export()),
+                  leading: Icon(PhosphorIcons.export),
                   title: const Text('导出数据'),
                   subtitle: const Text('导出训练记录'),
                   trailing: const CupertinoListTileChevron(),
@@ -41,7 +41,7 @@ class MoreScreen extends StatelessWidget {
               header: const Text('应用'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.gear()),
+                  leading: Icon(PhosphorIcons.gear),
                   title: const Text('设置'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () {
@@ -49,7 +49,7 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.info()),
+                  leading: Icon(PhosphorIcons.info),
                   title: const Text('关于'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () {
@@ -59,7 +59,7 @@ class MoreScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 32),
-            Center(
+            const Center(
               child: Text(
                 'XWorkout v1.0.0',
                 style: TextStyle(
@@ -69,7 +69,7 @@ class MoreScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Center(
+            const Center(
               child: Text(
                 '轻量级健身记录软件',
                 style: TextStyle(
@@ -173,7 +173,7 @@ class MoreScreen extends StatelessWidget {
                     children: [
                       CupertinoListTile(
                         title: const Text('清除所有数据'),
-                        trailing: Icon(
+                        trailing: const Icon(
                           CupertinoIcons.trash,
                           color: CupertinoColors.destructiveRed,
                         ),

@@ -12,7 +12,7 @@
 
 ---
 
-## 第一步：安装 Git
+## 第一步：安装 Git ✅
 
 ### Windows
 1. 下载 Git：https://git-scm.com/download/win
@@ -24,7 +24,7 @@
 
 ---
 
-## 第二步：安装 Flutter SDK
+## 第二步：安装 Flutter SDK ✅
 
 ### Windows
 
@@ -57,7 +57,7 @@ source ~/.zshrc
 
 ---
 
-## 第三步：安装 Android Studio
+## 第三步：安装 Android Studio ✅
 
 1. 下载：https://developer.android.com/studio
 2. 安装并启动
@@ -72,7 +72,7 @@ flutter config --android-sdk "C:\Users\你的用户名\AppData\Local\Android\Sdk
 
 ---
 
-## 第四步：验证环境
+## 第四步：验证环境 ✅
 
 ```bash
 flutter doctor
@@ -87,7 +87,7 @@ flutter doctor
 
 ---
 
-## 第五步：克隆项目
+## 第五步：克隆项目 ✅
 
 ```bash
 # 进入工作目录
@@ -102,7 +102,7 @@ cd XWorkout
 
 ---
 
-## 第六步：安装依赖
+## 第六步：安装依赖 ✅
 
 ```bash
 flutter pub get
@@ -112,7 +112,7 @@ flutter pub get
 
 ---
 
-## 第七步：生成数据库代码
+## 第七步：生成数据库代码 ✅
 
 **这是关键步骤！**
 
@@ -144,10 +144,28 @@ flutter run
 
 ### 方法三：连接真机调试
 
+#### 有线连接
 1. 开启手机的 "开发者选项" 和 "USB 调试"
 2. 连接电脑，在手机上确认授权
 3. 运行 `flutter devices` 查看设备列表
 4. 运行 `flutter run -d 设备ID`
+
+#### 无线连接（推荐）
+
+详见 [无线调试配置指南](WIRELESS_DEBUGGING.md)
+
+```bash
+# 1. 先用数据线连接手机
+# 2. 设置 TCP/IP 端口
+adb tcpip 5555
+
+# 3. 获取手机 IP (设置 → 关于手机 → IP 地址)
+# 4. 无线连接
+adb connect 192.168.1.x:5555
+
+# 5. 拔掉数据线，运行
+flutter run
+```
 
 ---
 

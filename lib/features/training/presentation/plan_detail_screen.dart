@@ -116,7 +116,7 @@ class _DayDetailTile extends ConsumerWidget {
                 }).toList(),
               );
             },
-            loading: () => const CupertinoListTile(
+            loading: () => const Center(
               child: CupertinoActivityIndicator(),
             ),
             error: (_, __) => const CupertinoListTile(
@@ -124,7 +124,7 @@ class _DayDetailTile extends ConsumerWidget {
             ),
           ),
           CupertinoListTile(
-            leading: Icon(PhosphorIcons.plus()),
+            leading: Icon(PhosphorIcons.plus),
             title: const Text('添加训练项目'),
             onTap: () {
               _showAddExerciseDialog(context, ref);

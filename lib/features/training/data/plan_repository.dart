@@ -72,6 +72,16 @@ class WorkoutPlanRepository {
     return _db.into(_db.planDays).insert(day);
   }
   
+  Future<int> updatePlanDay(PlanDaysCompanion day) {
+    return (_db.update(_db.planDays)..where((d) => d.id.equals(day.id.value)))
+        .write(day);
+  }
+  
+  Future<int> updatePlanDayRest(String planDayId, bool isRest) {
+    return (_db.update(_db.planDays)..where((d) => d.id.equals(planDayId)))
+        .write(PlanDaysCompanion(isRestDay: Value(isRest)));
+  }
+  
   Future<void> deletePlanDays(String planId) {
     return (_db.delete(_db.planDays)..where((d) => d.planId.equals(planId))).go();
   }

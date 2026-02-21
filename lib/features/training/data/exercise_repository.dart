@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 
 final exerciseRepositoryProvider = Provider<ExerciseRepository>((ref) {

@@ -74,7 +74,7 @@ class PlanNotifier extends StateNotifier<AsyncValue<void>> {
         isRestDay: Value(day.isRestDay),
         note: Value(day.note),
       );
-      await _repository.updatePlan(companion);
+      await _repository.updatePlanDay(companion);
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -84,8 +84,7 @@ class PlanNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> setPlanDayAsRest(String planDayId, bool isRest) async {
     state = const AsyncValue.loading();
     try {
-      await (_repository as dynamic)._db.update(_repository._db.planDays)
-          .write(PlanDaysCompanion(isRestDay: Value(isRest)));
+      await _repository.updatePlanDayRest(planDayId, isRest);
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

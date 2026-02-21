@@ -96,7 +96,7 @@ class TodayNotifier extends StateNotifier<AsyncValue<void>> {
         actualSets: Value(actualSets),
         actualReps: Value(actualReps.join(',')),
         actualWeight: Value(actualWeight.map((w) => w?.toString() ?? '').join(',')),
-        isCompleted: Value(true),
+        isCompleted: const Value(true),
       );
       await _repository.saveExerciseRecord(record);
       state = const AsyncValue.data(null);
