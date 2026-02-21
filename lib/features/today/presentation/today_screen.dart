@@ -3,11 +3,11 @@ import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
 import 'package:xworkout/features/today/data/today_repository.dart';
+import 'package:xworkout/features/today/presentation/exercise_record_screen.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/data/exercise_repository.dart';
 import 'package:xworkout/core/database/database.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:intl/intl.dart';
 
 class TodayScreen extends ConsumerWidget {
@@ -229,6 +229,7 @@ class TodayScreen extends ConsumerWidget {
     final exercisesAsync = ref.watch(todayDayExercisesProvider(todayPlanDay.id));
     final record = todayRecordAsync.valueOrNull;
     final isTraining = record?.status == 'normal';
+    final isCompleted = record?.status == 'completed' || record?.status == 'normal';
     
     return Column(
       children: [
@@ -237,12 +238,33 @@ class TodayScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '今日训练',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '今日训练',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (isCompleted)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: CupertinoColors.activeGreen.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        '已完成',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: CupertinoColors.activeGreen,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 12),
               exercisesAsync.when(
@@ -309,7 +331,34 @@ class TodayScreen extends ConsumerWidget {
                     }
                   },
                 ),
-              ] else if (!isTraining) ...[
+              ] else if (isCompleted) ...[
+                // Training completed - show completion status
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: CupertinoColors.activeGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: CupertinoColors.activeGreen,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '训练已完成',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: CupertinoColors.activeGreen,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else ...[
                 CupertinoButton(
                   color: CupertinoColors.destructiveRed,
                   child: const Text('今天偷懒'),
@@ -325,17 +374,6 @@ class TodayScreen extends ConsumerWidget {
                       _showTrainingStarted(context);
                     }
                   },
-                ),
-              ] else ...[
-                const CupertinoButton.filled(
-                  child: Text('训练中...'),
-                  onPressed: null,
-                ),
-                const SizedBox(height: 12),
-                CupertinoButton(
-                  color: CupertinoColors.activeGreen,
-                  child: const Text('完成训练'),
-                  onPressed: () => _showCompleteDialog(context, ref, todayPlanDay.id),
                 ),
               ],
             ],
@@ -489,7 +527,16 @@ class _ExerciseCard extends ConsumerWidget {
             CupertinoButton(
               padding: EdgeInsets.zero,
               child: const Text('记录'),
-              onPressed: () => _showRecordDialog(context, ref),
+              onPressed: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                    builder: (context) => ExerciseRecordScreen(
+                      dayExercise: dayExercise,
+                      dailyRecordId: dailyRecordId!,
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ],

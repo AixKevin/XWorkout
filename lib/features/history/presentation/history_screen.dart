@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/features/history/data/history_repository.dart';
+import 'package:xworkout/features/history/presentation/history_detail_screen.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
@@ -114,7 +114,11 @@ class _HistoryItem extends StatelessWidget {
       ),
       trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
       onTap: () {
-        // TODO: Navigate to detail
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => HistoryDetailScreen(record: record),
+          ),
+        );
       },
     );
   }
