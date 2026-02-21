@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons, Icon, LinearProgressIndicator;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
@@ -25,12 +26,19 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
   late List<_SetRecord> _sets;
   int _restSeconds = 90;
   double? _personalRecord;
+  final _noteController = TextEditingController();
   
   @override
   void initState() {
     super.initState();
     _initializeSets();
     _loadHistory();
+  }
+  
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
   }
   
   void _initializeSets() {
@@ -66,6 +74,10 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
         final lastWeights = lastRecord.actualWeight.split(',').map((w) => double.tryParse(w)).toList();
         final lastReps = lastRecord.actualReps.split(',').map((r) => int.tryParse(r)).toList();
         
+        if (lastRecord.note != null && lastRecord.note!.isNotEmpty) {
+          _noteController.text = lastRecord.note!;
+        }
+
         setState(() {
           for (int i = 0; i < _sets.length; i++) {
             if (i < lastWeights.length && lastWeights[i] != null) {
@@ -216,6 +228,25 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     },
                   ),
                 ),
+
+                // Quick Notes
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: CupertinoTextField(
+                    controller: _noteController,
+                    placeholder: '添加备注 (例如: 座椅高度5)',
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: Icon(Icons.edit_note, color: CupertinoColors.systemGrey),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.systemBackground,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: CupertinoColors.systemGrey5),
+                    ),
+                  ),
+                ),
                 
                 // Summary
                 Container(
@@ -273,12 +304,14 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
     // Save the records through the provider
     final completedSets = _sets.where((s) => s.isCompleted).toList();
     if (completedSets.isNotEmpty) {
+      HapticFeedback.heavyImpact();
       ref.read(todayNotifierProvider.notifier).saveExerciseRecord(
         dailyRecordId: widget.dailyRecordId,
         exerciseId: widget.dayExercise.exerciseId,
         actualSets: completedSets.length,
         actualReps: completedSets.map((s) => s.actualReps).toList(),
         actualWeight: completedSets.map((s) => s.actualWeight.toDouble()).toList(),
+        note: _noteController.text.isNotEmpty ? _noteController.text : null,
       );
     }
     Navigator.of(context).pop();
@@ -434,8 +467,31 @@ class _SetItem extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return CupertinoListTile(
-      leading: Container(
+    return Dismissible(
+      key: ValueKey(setRecord.setNumber),
+      direction: DismissDirection.horizontal,
+      background: Container(
+        color: CupertinoColors.activeGreen,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.only(left: 16),
+        child: const Icon(Icons.check, color: CupertinoColors.white),
+      ),
+      secondaryBackground: Container(
+        color: setRecord.isCompleted ? CupertinoColors.systemGrey : CupertinoColors.activeGreen,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 16),
+        child: Icon(
+          setRecord.isCompleted ? Icons.undo : Icons.check,
+          color: CupertinoColors.white,
+        ),
+      ),
+      confirmDismiss: (direction) async {
+        await HapticFeedback.lightImpact();
+        onChanged(setRecord.copyWith(isCompleted: !setRecord.isCompleted));
+        return false;
+      },
+      child: CupertinoListTile(
+        leading: Container(
         width: 32,
         height: 32,
         decoration: BoxDecoration(
@@ -504,6 +560,7 @@ class _SetItem extends StatelessWidget {
           onChanged(setRecord.copyWith(isCompleted: !setRecord.isCompleted));
         },
       ),
+    ),
     );
   }
 }

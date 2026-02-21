@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons, Icon, Material;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
@@ -451,19 +452,26 @@ class _DayDetailTile extends ConsumerWidget {
                     },
                   ) ?? '加载中...';
                   
-                  return CupertinoListTile(
-                    title: Text('训练项目: $exerciseName'),
-                    subtitle: Text('${de.targetSets}组 × ${de.targetReps}次'),
-                    trailing: CupertinoButton(
-                      padding: EdgeInsets.zero,
+                  return Dismissible(
+                    key: Key(de.id),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: CupertinoColors.destructiveRed,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 16),
                       child: const Icon(
-                        Icons.remove_circle,
-                        color: CupertinoColors.destructiveRed,
+                        Icons.delete,
+                        color: CupertinoColors.white,
                       ),
-                      onPressed: () {
-                        ref.read(planNotifierProvider.notifier)
-                            .removeExerciseFromDay(de.id);
-                      },
+                    ),
+                    onDismissed: (direction) {
+                      HapticFeedback.mediumImpact();
+                      ref.read(planNotifierProvider.notifier)
+                          .removeExerciseFromDay(de.id);
+                    },
+                    child: CupertinoListTile(
+                      title: Text('训练项目: $exerciseName'),
+                      subtitle: Text('${de.targetSets}组 × ${de.targetReps}次'),
                     ),
                   );
                 }).toList(),

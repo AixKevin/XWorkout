@@ -178,6 +178,7 @@ class TodayNotifier extends StateNotifier<AsyncValue<void>> {
     required int actualSets,
     required List<int> actualReps,
     required List<double?> actualWeight,
+    String? note,
   }) async {
     state = const AsyncValue.loading();
     try {
@@ -189,6 +190,7 @@ class TodayNotifier extends StateNotifier<AsyncValue<void>> {
         actualReps: Value(actualReps.join(',')),
         actualWeight: Value(actualWeight.map((w) => w?.toString() ?? '').join(',')),
         isCompleted: const Value(true),
+        note: Value(note),
       );
       await _repository.saveExerciseRecord(record);
       state = const AsyncValue.data(null);

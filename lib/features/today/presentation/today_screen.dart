@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons, Icon;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
 import 'package:xworkout/features/today/data/today_repository.dart';
@@ -226,6 +227,7 @@ class TodayScreen extends ConsumerWidget {
               color: CupertinoColors.activeBlue,
               child: const Text('撤销偷懒'),
               onPressed: () {
+                HapticFeedback.selectionClick();
                 if (record != null) {
                   ref.read(todayNotifierProvider.notifier).undoSkip(record.id);
                 }
@@ -235,7 +237,10 @@ class TodayScreen extends ConsumerWidget {
             CupertinoButton(
               color: CupertinoColors.destructiveRed,
               child: const Text('今天想偷懒'),
-              onPressed: () => _showSkipDialog(context, ref, null),
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                _showSkipDialog(context, ref, null);
+              },
             ),
           ],
         ],
@@ -349,6 +354,7 @@ class TodayScreen extends ConsumerWidget {
                   color: CupertinoColors.activeBlue,
                   child: const Text('撤销偷懒'),
                   onPressed: () {
+                    HapticFeedback.selectionClick();
                     if (record != null) {
                       ref.read(todayNotifierProvider.notifier).undoSkip(record.id);
                     }
@@ -385,18 +391,57 @@ class TodayScreen extends ConsumerWidget {
                 CupertinoButton(
                   color: CupertinoColors.destructiveRed,
                   child: const Text('今天偷懒'),
-                  onPressed: () => _showSkipDialog(context, ref, null),
-                ),
-                const SizedBox(height: 12),
-                CupertinoButton.filled(
-                  child: const Text('开始训练'),
-                  onPressed: () async {
-                    final recordId = await ref.read(todayNotifierProvider.notifier)
-                        .startTraining(todayPlanDay.id);
-                    if (context.mounted) {
-                      _showTrainingStarted(context);
-                    }
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    _showSkipDialog(context, ref, null);
                   },
+                ),
+                const SizedBox(height: 24),
+                // Quick Start Workout Button
+                Container(
+                  width: double.infinity,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: const LinearGradient(
+                      colors: [CupertinoColors.activeBlue, Color(0xFF0055FF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: CupertinoColors.activeBlue.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.play_arrow_rounded, color: CupertinoColors.white, size: 28),
+                        SizedBox(width: 8),
+                        Text(
+                          '开始训练',
+                          style: TextStyle(
+                            color: CupertinoColors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () async {
+                      HapticFeedback.mediumImpact();
+                      await ref.read(todayNotifierProvider.notifier)
+                          .startTraining(todayPlanDay.id);
+                      if (context.mounted) {
+                        _showTrainingStarted(context);
+                      }
+                    },
+                  ),
                 ),
               ],
             ],
@@ -431,12 +476,14 @@ class TodayScreen extends ConsumerWidget {
           CupertinoDialogAction(
             isDestructiveAction: true,
             child: const Text('确认'),
-            onPressed: () {
-              ref.read(todayNotifierProvider.notifier).skipTraining(
+            onPressed: () async {
+              await ref.read(todayNotifierProvider.notifier).skipTraining(
                 recordId,
                 reasonController.text.trim(),
               );
-              Navigator.of(context).pop();
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             },
           ),
         ],
