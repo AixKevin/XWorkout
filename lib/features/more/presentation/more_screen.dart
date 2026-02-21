@@ -6,6 +6,7 @@ import 'package:xworkout/features/data/data_management_screen.dart';
 import 'package:xworkout/features/statistics/presentation/statistics_screen.dart';
 import 'package:xworkout/features/settings/settings_screen.dart';
 import 'package:xworkout/features/more/data/settings_repository.dart';
+import 'package:xworkout/features/more/presentation/notification_settings_screen.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -75,6 +76,18 @@ class MoreScreen extends ConsumerWidget {
             CupertinoListSection.insetGrouped(
               header: const Text('设置'),
               children: [
+                CupertinoListTile(
+                  leading: const Icon(Icons.notifications),
+                  title: const Text('通知设置'),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const NotificationSettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
                 CupertinoListTile(
                   leading: const Icon(Icons.timer),
                   title: const Text('休息计时器'),
