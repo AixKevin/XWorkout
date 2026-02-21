@@ -22,4 +22,11 @@ class HistoryRepository {
           ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]))
         .watch();
   }
+
+  Stream<List<DailyRecord>> watchRecordsByRange(DateTime start, DateTime end) {
+    return (_db.select(_db.dailyRecords)
+          ..where((t) => t.date.isBetweenValues(start, end))
+          ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]))
+        .watch();
+  }
 }
