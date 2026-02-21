@@ -87,15 +87,19 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                   leading: const Icon(PhosphorIcons.fileCsv),
                   title: const Text('导出为 CSV'),
                   subtitle: const Text('表格格式，方便分析'),
-                  trailing: const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                  onTap: () => _exportCsv(),
+                  trailing: _isExporting
+                      ? const CupertinoActivityIndicator()
+                      : const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  onTap: _isExporting ? null : () => _exportCsv(),
                 ),
                 CupertinoListTile(
                   leading: const Icon(PhosphorIcons.filePdf),
                   title: const Text('导出 PDF 报告'),
                   subtitle: const Text('生成训练摘要报告'),
-                  trailing: const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                  onTap: () => _exportPdf(),
+                  trailing: _isExporting
+                      ? const CupertinoActivityIndicator()
+                      : const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  onTap: _isExporting ? null : () => _exportPdf(),
                 ),
                 CupertinoListTile(
                   leading: const Icon(PhosphorIcons.shareNetwork),
@@ -233,6 +237,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
   }
 
   Future<void> _exportCsv() async {
+    setState(() => _isExporting = true);
     try {
       final repo = ref.read(dataExportRepositoryProvider);
       final csv = await repo.exportToCsv(options: _currentOptions);
@@ -251,10 +256,15 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
       if (mounted) {
         _showError('导出失败: $e');
       }
+    } finally {
+      if (mounted) {
+        setState(() => _isExporting = false);
+      }
     }
   }
 
   Future<void> _exportPdf() async {
+    setState(() => _isExporting = true);
     try {
       final repo = ref.read(dataExportRepositoryProvider);
       final file = await repo.exportToPdf(options: _currentOptions);
@@ -266,6 +276,10 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
     } catch (e) {
       if (mounted) {
         _showError('导出失败: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isExporting = false);
       }
     }
   }

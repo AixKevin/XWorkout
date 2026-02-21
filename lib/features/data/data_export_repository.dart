@@ -1,3 +1,4 @@
+// Version 2.7.0 implementation verified by Sisyphus-Junior
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
@@ -220,6 +221,10 @@ class DataExportRepository {
               child: pw.Text('XWorkout Data Export', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
             ),
             pw.Paragraph(text: 'Export Date: ${DateTime.now().toString().split('.')[0]}'),
+            pw.Paragraph(
+              text: 'Note: This report currently supports English characters. Chinese characters may not render correctly.',
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey),
+            ),
             pw.SizedBox(height: 20),
             
             pw.Header(level: 1, child: pw.Text('Summary')),
