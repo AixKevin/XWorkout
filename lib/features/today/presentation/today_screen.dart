@@ -331,6 +331,12 @@ class TodayScreen extends ConsumerWidget {
                   child: Text('训练中...'),
                   onPressed: null,
                 ),
+                const SizedBox(height: 12),
+                CupertinoButton(
+                  color: CupertinoColors.activeGreen,
+                  child: const Text('完成训练'),
+                  onPressed: () => _showCompleteDialog(context, ref, todayPlanDay.id),
+                ),
               ],
             ],
           ),
@@ -387,6 +393,30 @@ class TodayScreen extends ConsumerWidget {
           CupertinoDialogAction(
             child: const Text('确定'),
             onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _showCompleteDialog(BuildContext context, WidgetRef ref, String planDayId) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('完成训练'),
+        content: const Text('确认完成今天的训练吗？'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: const Text('完成'),
+            onPressed: () {
+              ref.read(todayNotifierProvider.notifier).completeTraining(planDayId);
+              Navigator.of(context).pop();
+            },
           ),
         ],
       ),

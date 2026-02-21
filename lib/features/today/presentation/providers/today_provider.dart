@@ -80,6 +80,20 @@ class TodayNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
   
+  Future<void> completeTraining(String planDayId) async {
+    state = const AsyncValue.loading();
+    try {
+      // Find today's record and mark as completed
+      final record = await _repository.getRecordByDate(DateTime.now());
+      if (record != null) {
+        await _repository.updateRecordStatus(record.id, 'completed');
+      }
+      state = const AsyncValue.data(null);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+  
   Future<void> saveExerciseRecord({
     required String dailyRecordId,
     required String exerciseId,

@@ -91,7 +91,7 @@ class MoreScreen extends StatelessWidget {
             const SizedBox(height: 32),
             const             Center(
               child: Text(
-                'XWorkout v1.7.0',
+                'XWorkout v1.8.0',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
