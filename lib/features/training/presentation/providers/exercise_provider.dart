@@ -9,6 +9,16 @@ final exerciseListProvider = StreamProvider<List<Exercise>>((ref) {
   return repository.watchAllExercises();
 });
 
+final exerciseHistoryProvider = FutureProvider.family<List<ExerciseHistory>, String>((ref, id) {
+  final repository = ref.watch(exerciseRepositoryProvider);
+  return repository.getExerciseHistory(id);
+});
+
+final exerciseMaxWeightProvider = FutureProvider.family<double?, String>((ref, id) {
+  final repository = ref.watch(exerciseRepositoryProvider);
+  return repository.getMaxWeight(id);
+});
+
 class ExerciseNotifier extends StateNotifier<AsyncValue<void>> {
   final ExerciseRepository _repository;
   

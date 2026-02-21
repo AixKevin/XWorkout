@@ -15,11 +15,15 @@ class ExerciseFormScreen extends ConsumerStatefulWidget {
 
 class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
   late TextEditingController _nameController;
-  late TextEditingController _categoryController;
+  String? _selectedCategory;
   late TextEditingController _setsController;
   late TextEditingController _repsController;
   late TextEditingController _weightController;
   late TextEditingController _noteController;
+  
+  final List<String> _categories = [
+    '胸部', '背部', '肩部', '手臂', '腿部', '核心', '有氧', '其他'
+  ];
   
   bool get isEditing => widget.exercise != null;
 
@@ -27,7 +31,7 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.exercise?.name ?? '');
-    _categoryController = TextEditingController(text: widget.exercise?.category ?? '');
+    _selectedCategory = widget.exercise?.category;
     _setsController = TextEditingController(
       text: widget.exercise?.defaultSets.toString() ?? '3',
     );
@@ -43,12 +47,74 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _categoryController.dispose();
     _setsController.dispose();
     _repsController.dispose();
     _weightController.dispose();
     _noteController.dispose();
     super.dispose();
+  }
+
+  void _showCategoryPicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 250,
+        padding: const EdgeInsets.only(top: 6.0),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    child: const Text('取消'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  CupertinoButton(
+                    child: const Text('确定'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  magnification: 1.22,
+                  squeeze: 1.2,
+                  useMagnifier: true,
+                  itemExtent: 32.0,
+                  scrollController: FixedExtentScrollController(
+                    initialItem: (_selectedCategory != null && _categories.contains(_selectedCategory))
+                        ? _categories.indexOf(_selectedCategory!) 
+                        : 0,
+                  ),
+                  onSelectedItemChanged: (int selectedItem) {
+                    setState(() {
+                      _selectedCategory = _categories[selectedItem];
+                    });
+                  },
+                  children: List<Widget>.generate(_categories.length, (int index) {
+                    return Center(
+                      child: Text(
+                        _categories[index],
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _save() async {
@@ -65,9 +131,7 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
         await notifier.updateExerciseWithValues(
           id: widget.exercise!.id,
           name: name,
-          category: _categoryController.text.trim().isEmpty 
-              ? null 
-              : _categoryController.text.trim(),
+          category: _selectedCategory,
           defaultSets: int.tryParse(_setsController.text) ?? 3,
           defaultReps: int.tryParse(_repsController.text) ?? 10,
           defaultWeight: double.tryParse(_weightController.text),
@@ -79,9 +143,7 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
       } else {
         await notifier.addExercise(
           name: name,
-          category: _categoryController.text.trim().isEmpty 
-              ? null 
-              : _categoryController.text.trim(),
+          category: _selectedCategory,
           defaultSets: int.tryParse(_setsController.text) ?? 3,
           defaultReps: int.tryParse(_repsController.text) ?? 10,
           defaultWeight: double.tryParse(_weightController.text),
@@ -184,10 +246,26 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                   placeholder: '项目名称',
                   prefix: const Text('名称'),
                 ),
-                CupertinoTextFormFieldRow(
-                  controller: _categoryController,
-                  placeholder: '如：胸、背、腿等',
-                  prefix: const Text('分类'),
+                GestureDetector(
+                  onTap: () {
+                    if (_selectedCategory == null) {
+                      setState(() {
+                        _selectedCategory = _categories[0];
+                      });
+                    }
+                    _showCategoryPicker();
+                  },
+                  child: CupertinoFormRow(
+                    prefix: const Text('分类'),
+                    child: Text(
+                      _selectedCategory ?? '选择分类',
+                      style: TextStyle(
+                        color: _selectedCategory == null 
+                            ? CupertinoColors.placeholderText 
+                            : CupertinoColors.label,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -3,11 +3,30 @@ import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:xworkout/features/training/presentation/exercise_detail_screen.dart';
 import 'package:xworkout/core/database/database.dart';
 
-class ExerciseListScreen extends ConsumerWidget {
+class ExerciseListScreen extends ConsumerStatefulWidget {
   const ExerciseListScreen({super.key});
+
+  @override
+  ConsumerState<ExerciseListScreen> createState() => _ExerciseListScreenState();
+}
+
+class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String? _selectedCategory;
+
+  final List<String> _categories = [
+    '胸部', '背部', '肩部', '手臂', '腿部', '核心', '有氧', '其他'
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _confirmDelete(BuildContext context, WidgetRef ref, Exercise exercise) {
     showCupertinoDialog(
@@ -34,7 +53,7 @@ class ExerciseListScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final exercisesAsync = ref.watch(exerciseListProvider);
     
     return CupertinoPageScaffold(
@@ -47,7 +66,7 @@ class ExerciseListScreen extends ConsumerWidget {
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -58,80 +77,181 @@ class ExerciseListScreen extends ConsumerWidget {
         ),
       ),
       child: SafeArea(
-        child: exercisesAsync.when(
-          data: (exercises) {
-            if (exercises.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.fitness_center,
-                      size: 64,
-                      color: CupertinoColors.systemGrey,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '暂无训练项目',
-                      style: TextStyle(
-                        fontSize: 17,
-                        color: CupertinoColors.systemGrey,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    CupertinoButton(
-                      child: const Text('添加第一个项目'),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          CupertinoPageRoute(
-                            builder: (context) => const ExerciseFormScreen(),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CupertinoSearchTextField(
+                controller: _searchController,
+                placeholder: '搜索训练项目',
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: _buildCategoryChip('全部', _selectedCategory == null, () {
+                      setState(() {
+                        _selectedCategory = null;
+                      });
+                    }),
+                  ),
+                  ..._categories.map((category) => Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: _buildCategoryChip(category, _selectedCategory == category, () {
+                      setState(() {
+                        _selectedCategory = category;
+                      });
+                    }),
+                  )),
+                ],
+              ),
+            ),
+            Expanded(
+              child: exercisesAsync.when(
+                data: (exercises) {
+                  final filteredExercises = exercises.where((exercise) {
+                    final matchesSearch = exercise.name.toLowerCase().contains(_searchQuery.toLowerCase());
+                    final matchesCategory = _selectedCategory == null || exercise.category == _selectedCategory;
+                    return matchesSearch && matchesCategory;
+                  }).toList();
+
+                  // Sort by category then name
+                  filteredExercises.sort((a, b) {
+                    if (a.category != b.category) {
+                       if (a.category == null) return 1;
+                       if (b.category == null) return -1;
+                       return a.category!.compareTo(b.category!);
+                    }
+                    return a.name.compareTo(b.name);
+                  });
+
+                  if (filteredExercises.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.fitness_center,
+                            size: 64,
+                            color: CupertinoColors.systemGrey,
                           ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              );
-            }
-            
-            return ListView.builder(
-              itemCount: exercises.length,
-              itemBuilder: (context, index) {
-                final exercise = exercises[index];
-                return CupertinoListTile(
-                  title: Text(exercise.name),
-                  subtitle: Text(
-                    '${exercise.defaultSets}组 × ${exercise.defaultReps}次${exercise.defaultWeight != null ? ' ${exercise.defaultWeight}kg' : ''}',
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        child: const Icon(
-                          Icons.delete,
-                          color: CupertinoColors.destructiveRed,
-                          size: 22,
-                        ),
-                        onPressed: () => _confirmDelete(context, ref, exercise),
-                      ),
-                      const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                    ],
-                  ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => ExerciseFormScreen(exercise: exercise),
+                          const SizedBox(height: 16),
+                          Text(
+                            exercises.isEmpty ? '暂无训练项目' : '未找到匹配项目',
+                            style: const TextStyle(
+                              fontSize: 17,
+                              color: CupertinoColors.systemGrey,
+                            ),
+                          ),
+                          if (exercises.isEmpty) ...[
+                            const SizedBox(height: 8),
+                            CupertinoButton(
+                              child: const Text('添加第一个项目'),
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  CupertinoPageRoute(
+                                    builder: (context) => const ExerciseFormScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ],
                       ),
                     );
-                  },
-                );
-              },
-            );
-          },
-          loading: () => const Center(child: CupertinoActivityIndicator()),
-          error: (error, stack) => Center(
-            child: Text('加载失败: $error'),
+                  }
+                  
+                  return ListView.builder(
+                    itemCount: filteredExercises.length,
+                    itemBuilder: (context, index) {
+                      final exercise = filteredExercises[index];
+                      // Show header if category changes
+                      final bool showHeader = index == 0 || 
+                          exercise.category != filteredExercises[index - 1].category;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (showHeader)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                              child: Text(
+                                exercise.category ?? '未分类',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: CupertinoColors.systemGrey,
+                                ),
+                              ),
+                            ),
+                          CupertinoListTile(
+                            title: Text(exercise.name),
+                            subtitle: Text(
+                              '${exercise.defaultSets}组 × ${exercise.defaultReps}次${exercise.defaultWeight != null ? ' ${exercise.defaultWeight}kg' : ''}',
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  child: const Icon(
+                                    Icons.delete,
+                                    color: CupertinoColors.destructiveRed,
+                                    size: 22,
+                                  ),
+                                  onPressed: () => _confirmDelete(context, ref, exercise),
+                                ),
+                                const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                              ],
+                            ),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                CupertinoPageRoute(
+                                  builder: (context) => ExerciseDetailScreen(exercise: exercise),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                loading: () => const Center(child: CupertinoActivityIndicator()),
+                error: (error, stack) => Center(
+                  child: Text('加载失败: $error'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryChip(String label, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? CupertinoColors.activeBlue : CupertinoColors.systemGrey6,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? CupertinoColors.white : CupertinoColors.black,
+            fontSize: 14,
           ),
         ),
       ),
