@@ -131,6 +131,36 @@ class TodayRecordRepository {
   Future<void> updateExerciseRecord(ExerciseRecordsCompanion record) {
     return _db.update(_db.exerciseRecords).replace(record);
   }
+
+  // Get the last record for a specific exercise (for auto-fill)
+  Future<ExerciseRecord?> getLastExerciseRecord(String exerciseId) {
+    final query = _db.select(_db.exerciseRecords).join([
+      innerJoin(_db.dailyRecords, _db.dailyRecords.id.equalsExp(_db.exerciseRecords.dailyRecordId)),
+    ])
+      ..where(_db.exerciseRecords.exerciseId.equals(exerciseId))
+      ..orderBy([OrderingTerm.desc(_db.dailyRecords.date)])
+      ..limit(1);
+
+    return query.map((row) => row.readTable(_db.exerciseRecords)).getSingleOrNull();
+  }
+
+  // Get personal record (max weight) for a specific exercise
+  Future<double> getPersonalRecord(String exerciseId) async {
+    final records = await (_db.select(_db.exerciseRecords)
+      ..where((r) => r.exerciseId.equals(exerciseId)))
+        .get();
+    
+    double maxWeight = 0;
+    for (final record in records) {
+      if (record.actualWeight.isNotEmpty) {
+        final weights = record.actualWeight.split(',').map((w) => double.tryParse(w) ?? 0.0).toList();
+        for (final w in weights) {
+          if (w > maxWeight) maxWeight = w;
+        }
+      }
+    }
+    return maxWeight;
+  }
   
   // 撤销偷懒
   Future<void> undoSkip(String recordId) async {

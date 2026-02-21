@@ -6,9 +6,8 @@ import 'package:xworkout/features/today/data/today_repository.dart';
 import 'package:xworkout/features/today/presentation/exercise_record_screen.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
-import 'package:xworkout/features/training/data/exercise_repository.dart';
 import 'package:xworkout/core/database/database.dart';
-import 'package:intl/intl.dart';
+import 'dart:ui';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -119,10 +118,11 @@ class TodayScreen extends ConsumerWidget {
         final todayPlanDay = planDays[dayIndex];
         
         final isRestDay = todayPlanDay.isRestDay;
+        final workoutDuration = ref.watch(workoutDurationProvider);
         
         return ListView(
           children: [
-            _buildPlanHeader(plan, cycleDay, isRestDay),
+            _buildPlanHeader(plan, cycleDay, isRestDay, workoutDuration),
             if (isRestDay)
               _buildRestDayView(context, ref, todayRecordAsync)
             else
@@ -135,7 +135,7 @@ class TodayScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildPlanHeader(WorkoutPlan plan, int cycleDay, bool isRestDay) {
+  Widget _buildPlanHeader(WorkoutPlan plan, int cycleDay, bool isRestDay, Duration duration) {
     return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.all(16),
@@ -147,16 +147,31 @@ class TodayScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Icon(Icons.bar_chart),
-              const SizedBox(width: 8),
-              Text(
-                plan.name,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                children: [
+                   Icon(Icons.bar_chart),
+                  const SizedBox(width: 8),
+                  Text(
+                    plan.name,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
+              if (duration > Duration.zero)
+                Text(
+                  '已训练 ${_formatDuration(duration)}',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: CupertinoColors.activeGreen,
+                    fontWeight: FontWeight.w600,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 8),
@@ -170,6 +185,14 @@ class TodayScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+  
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = twoDigits(duration.inHours);
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return duration.inHours > 0 ? '$hours:$minutes:$seconds' : '$minutes:$seconds';
   }
   
   Widget _buildRestDayView(
@@ -436,30 +459,6 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
-  void _showCompleteDialog(BuildContext context, WidgetRef ref, String planDayId) {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('完成训练'),
-        content: const Text('确认完成今天的训练吗？'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('取消'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            child: const Text('完成'),
-            onPressed: () {
-              ref.read(todayNotifierProvider.notifier).completeTraining(planDayId);
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _ExerciseCard extends ConsumerWidget {
@@ -539,63 +538,6 @@ class _ExerciseCard extends ConsumerWidget {
               },
             ),
           ],
-        ],
-      ),
-    );
-  }
-  
-  void _showRecordDialog(BuildContext context, WidgetRef ref) {
-    final setsController = TextEditingController(text: dayExercise.targetSets.toString());
-    final repsController = TextEditingController(text: dayExercise.targetReps.toString());
-    final weightController = TextEditingController(
-      text: dayExercise.targetWeight?.toString() ?? '',
-    );
-    
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('记录训练'),
-        content: Column(
-          children: [
-            CupertinoTextField(
-              controller: setsController,
-              placeholder: '组数',
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 8),
-            CupertinoTextField(
-              controller: repsController,
-              placeholder: '次数',
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 8),
-            CupertinoTextField(
-              controller: weightController,
-              placeholder: '重量(kg)',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-          ],
-        ),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('取消'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          CupertinoDialogAction(
-            child: const Text('保存'),
-            onPressed: () {
-              if (dailyRecordId != null) {
-                ref.read(todayNotifierProvider.notifier).saveExerciseRecord(
-                  dailyRecordId: dailyRecordId!,
-                  exerciseId: dayExercise.exerciseId,
-                  actualSets: int.tryParse(setsController.text) ?? dayExercise.targetSets,
-                  actualReps: [int.tryParse(repsController.text) ?? dayExercise.targetReps],
-                  actualWeight: [double.tryParse(weightController.text)],
-                );
-              }
-              Navigator.of(context).pop();
-            },
-          ),
         ],
       ),
     );

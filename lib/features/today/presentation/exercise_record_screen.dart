@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
+import 'dart:async';
+import 'dart:ui';
 
 class ExerciseRecordScreen extends ConsumerStatefulWidget {
   final DayExercise dayExercise;
@@ -21,10 +23,17 @@ class ExerciseRecordScreen extends ConsumerStatefulWidget {
 
 class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
   late List<_SetRecord> _sets;
+  int _restSeconds = 90;
+  double? _personalRecord;
   
   @override
   void initState() {
     super.initState();
+    _initializeSets();
+    _loadHistory();
+  }
+  
+  void _initializeSets() {
     // Initialize with target sets
     _sets = List.generate(
       widget.dayExercise.targetSets,
@@ -37,6 +46,40 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
         isCompleted: false,
       ),
     );
+  }
+  
+  Future<void> _loadHistory() async {
+    // Load PR
+    try {
+      final pr = await ref.read(personalRecordProvider(widget.dayExercise.exerciseId).future);
+      setState(() {
+        _personalRecord = pr;
+      });
+    } catch (e) {
+      debugPrint('Error loading PR: $e');
+    }
+
+    // Auto-fill from last session
+    try {
+      final lastRecord = await ref.read(lastExerciseRecordProvider(widget.dayExercise.exerciseId).future);
+      if (lastRecord != null && mounted) {
+        final lastWeights = lastRecord.actualWeight.split(',').map((w) => double.tryParse(w)).toList();
+        final lastReps = lastRecord.actualReps.split(',').map((r) => int.tryParse(r)).toList();
+        
+        setState(() {
+          for (int i = 0; i < _sets.length; i++) {
+            if (i < lastWeights.length && lastWeights[i] != null) {
+              _sets[i] = _sets[i].copyWith(actualWeight: lastWeights[i]!);
+            }
+            if (i < lastReps.length && lastReps[i] != null) {
+              _sets[i] = _sets[i].copyWith(actualReps: lastReps[i]!);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Error auto-filling: $e');
+    }
   }
   
   @override
@@ -68,107 +111,140 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
         ),
       ),
       child: SafeArea(
-        child: ListView(
+        child: Stack(
           children: [
-            // Target info
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: CupertinoColors.systemGrey6,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _InfoItem(
-                    label: '目标组数',
-                    value: '${widget.dayExercise.targetSets}组',
+            ListView(
+              children: [
+                // Target info
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: CupertinoColors.systemGrey6,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  _InfoItem(
-                    label: '目标次数',
-                    value: '${widget.dayExercise.targetReps}次',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _InfoItem(
+                        label: '目标组数',
+                        value: '${widget.dayExercise.targetSets}组',
+                      ),
+                      _InfoItem(
+                        label: '目标次数',
+                        value: '${widget.dayExercise.targetReps}次',
+                      ),
+                      if (widget.dayExercise.targetWeight != null)
+                        _InfoItem(
+                          label: '目标重量',
+                          value: '${widget.dayExercise.targetWeight}kg',
+                        ),
+                    ],
                   ),
-                  if (widget.dayExercise.targetWeight != null)
-                    _InfoItem(
-                      label: '目标重量',
-                      value: '${widget.dayExercise.targetWeight}kg',
-                    ),
-                ],
-              ),
-            ),
-            
-            // Sets list
-            CupertinoListSection.insetGrouped(
-              header: const Text('每组记录'),
-              children: _sets.asMap().entries.map((entry) {
-                final index = entry.key;
-                final set = entry.value;
-                return _SetItem(
-                  setRecord: set,
-                  onChanged: (updated) {
-                    setState(() {
-                      _sets[index] = updated;
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-            
-            // Add set button
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: CupertinoButton(
-                color: CupertinoColors.activeBlue,
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add),
-                    SizedBox(width: 8),
-                    Text('添加一组'),
-                  ],
                 ),
-                onPressed: () {
-                  setState(() {
-                    _sets.add(_SetRecord(
-                      setNumber: _sets.length + 1,
-                      targetReps: widget.dayExercise.targetReps,
-                      targetWeight: widget.dayExercise.targetWeight ?? 0,
-                      actualReps: widget.dayExercise.targetReps,
-                      actualWeight: widget.dayExercise.targetWeight ?? 0,
-                      isCompleted: false,
-                    ));
-                  });
-                },
-              ),
-            ),
-            
-            // Summary
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: _getCompletionColor().withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '已完成 ${_sets.where((s) => s.isCompleted).length} / ${_sets.length} 组',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: _getCompletionColor(),
+                
+                // PR Badge
+                if (_personalRecord != null && _personalRecord! > 0)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.emoji_events, color: CupertinoColors.systemYellow, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          '历史最佳: ${_personalRecord}kg',
+                          style: const TextStyle(
+                            color: CupertinoColors.systemYellow,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: _sets.isEmpty ? 0 : _sets.where((s) => s.isCompleted).length / _sets.length,
-                    backgroundColor: CupertinoColors.systemGrey5,
-                    valueColor: AlwaysStoppedAnimation(_getCompletionColor()),
+                
+                // Sets list
+                CupertinoListSection.insetGrouped(
+                  header: const Text('每组记录'),
+                  children: _sets.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final set = entry.value;
+                    final isPR = _personalRecord != null && set.actualWeight > _personalRecord!;
+                    
+                    return _SetItem(
+                      setRecord: set,
+                      isPR: isPR,
+                      onChanged: (updated) {
+                        setState(() {
+                          _sets[index] = updated;
+                        });
+                        
+                        // Check for completion to trigger timer
+                        if (updated.isCompleted && !set.isCompleted) {
+                          _showRestTimerDialog();
+                        }
+                      },
+                    );
+                  }).toList(),
+                ),
+                
+                // Add set button
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: CupertinoButton(
+                    color: CupertinoColors.activeBlue,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add),
+                        SizedBox(width: 8),
+                        Text('添加一组'),
+                      ],
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        // Inherit values from last set
+                        final lastSet = _sets.last;
+                        _sets.add(_SetRecord(
+                          setNumber: _sets.length + 1,
+                          targetReps: widget.dayExercise.targetReps,
+                          targetWeight: widget.dayExercise.targetWeight ?? 0,
+                          actualReps: lastSet.actualReps,
+                          actualWeight: lastSet.actualWeight,
+                          isCompleted: false,
+                        ));
+                      });
+                    },
                   ),
-                ],
-              ),
+                ),
+                
+                // Summary
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: _getCompletionColor().withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        '已完成 ${_sets.where((s) => s.isCompleted).length} / ${_sets.length} 组',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: _getCompletionColor(),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      LinearProgressIndicator(
+                        value: _sets.isEmpty ? 0 : _sets.where((s) => s.isCompleted).length / _sets.length,
+                        backgroundColor: CupertinoColors.systemGrey5,
+                        valueColor: AlwaysStoppedAnimation(_getCompletionColor()),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -183,6 +259,16 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
     return CupertinoColors.activeGreen;
   }
   
+  void _showRestTimerDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => _RestTimerDialog(
+        initialSeconds: _restSeconds,
+        onSkip: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
   void _saveRecords() {
     // Save the records through the provider
     final completedSets = _sets.where((s) => s.isCompleted).toList();
@@ -196,6 +282,112 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
       );
     }
     Navigator.of(context).pop();
+  }
+}
+
+class _RestTimerDialog extends StatefulWidget {
+  final int initialSeconds;
+  final VoidCallback onSkip;
+  
+  const _RestTimerDialog({
+    required this.initialSeconds,
+    required this.onSkip,
+  });
+  
+  @override
+  State<_RestTimerDialog> createState() => _RestTimerDialogState();
+}
+
+class _RestTimerDialogState extends State<_RestTimerDialog> {
+  late int _remainingSeconds;
+  Timer? _timer;
+  
+  @override
+  void initState() {
+    super.initState();
+    _remainingSeconds = widget.initialSeconds;
+    _startTimer();
+  }
+  
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds > 0) {
+        setState(() {
+          _remainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: const Text('休息一下'),
+      content: Column(
+        children: [
+          const SizedBox(height: 16),
+          Text(
+            _formatTime(_remainingSeconds),
+            style: const TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(height: 16),
+          LinearProgressIndicator(
+            value: _remainingSeconds / widget.initialSeconds,
+            backgroundColor: CupertinoColors.systemGrey5,
+            valueColor: const AlwaysStoppedAnimation(CupertinoColors.activeBlue),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: const Text('+30s'),
+                onPressed: () {
+                  setState(() {
+                    _remainingSeconds += 30;
+                  });
+                },
+              ),
+              const SizedBox(width: 24),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: const Text('-10s'),
+                onPressed: () {
+                  setState(() {
+                    if (_remainingSeconds > 10) _remainingSeconds -= 10;
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        CupertinoDialogAction(
+          child: const Text('跳过'),
+          onPressed: widget.onSkip,
+        ),
+      ],
+    );
+  }
+  
+  String _formatTime(int seconds) {
+    final m = (seconds ~/ 60).toString().padLeft(2, '0');
+    final s = (seconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 }
 
@@ -231,9 +423,14 @@ class _InfoItem extends StatelessWidget {
 
 class _SetItem extends StatelessWidget {
   final _SetRecord setRecord;
+  final bool isPR;
   final Function(_SetRecord) onChanged;
   
-  const _SetItem({required this.setRecord, required this.onChanged});
+  const _SetItem({
+    required this.setRecord, 
+    this.isPR = false,
+    required this.onChanged,
+  });
   
   @override
   Widget build(BuildContext context) {
@@ -283,6 +480,10 @@ class _SetItem extends StatelessWidget {
               onChanged: (value) {
                 onChanged(setRecord.copyWith(actualWeight: double.tryParse(value) ?? 0));
               },
+              suffix: isPR ? const Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Icon(Icons.emoji_events, color: CupertinoColors.systemYellow, size: 16),
+              ) : null,
             ),
           ),
           const Padding(
