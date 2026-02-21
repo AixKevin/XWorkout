@@ -24,6 +24,11 @@ final dayExercisesProvider = StreamProvider.family<List<DayExercise>, String>((r
   return repository.watchDayExercises(planDayId);
 });
 
+final planStatsProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, planId) {
+  final repository = ref.watch(workoutPlanRepositoryProvider);
+  return repository.getPlanCompletionStats(planId);
+});
+
 class PlanNotifier extends StateNotifier<AsyncValue<void>> {
   final WorkoutPlanRepository _repository;
   
@@ -166,6 +171,18 @@ class PlanNotifier extends StateNotifier<AsyncValue<void>> {
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<String> duplicatePlan(String planId) async {
+    state = const AsyncValue.loading();
+    try {
+      final newPlanId = await _repository.duplicatePlan(planId);
+      state = const AsyncValue.data(null);
+      return newPlanId;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
     }
   }
 }

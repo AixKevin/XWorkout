@@ -1,22 +1,31 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
+import 'package:flutter/material.dart' show Icons, Icon, Material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/core/database/database.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-class PlanDetailScreen extends ConsumerWidget {
+class PlanDetailScreen extends ConsumerStatefulWidget {
   final String planId;
   
   const PlanDetailScreen({super.key, required this.planId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlanDetailScreen> createState() => _PlanDetailScreenState();
+}
+
+class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
+  int _selectedViewIndex = 0; // 0: List, 1: Calendar
+
+  @override
+  Widget build(BuildContext context) {
     final planAsync = ref.watch(planListProvider);
-    final planDaysAsync = ref.watch(planDaysProvider(planId));
+    final planDaysAsync = ref.watch(planDaysProvider(widget.planId));
+    final planStatsAsync = ref.watch(planStatsProvider(widget.planId));
     
     final plan = planAsync.valueOrNull?.firstWhere(
-      (p) => p.id == planId,
+      (p) => p.id == widget.planId,
       orElse: () => throw Exception('Plan not found'),
     );
     
@@ -31,104 +40,296 @@ class PlanDetailScreen extends ConsumerWidget {
         trailing: plan != null
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: Text(
-                  plan.isActive ? '已激活' : '激活',
-                  style: TextStyle(
-                    color: plan.isActive 
-                        ? CupertinoColors.activeGreen 
-                        : CupertinoColors.activeBlue,
-                  ),
-                ),
-                onPressed: () {
-                  if (plan.isActive) {
-                    _showDeactivateDialog(context, ref, plan);
-                  } else {
-                    ref.read(planNotifierProvider.notifier).activatePlan(planId);
-                  }
-                },
+                child: const Icon(Icons.more_horiz),
+                onPressed: () => _showActionSheet(context, plan),
               )
             : null,
       ),
       child: SafeArea(
-        child: planDaysAsync.when(
-          data: (days) {
-            return ListView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: CupertinoSlidingSegmentedControl<int>(
+                  children: const {
+                    0: Text('列表视图'),
+                    1: Text('日历视图'),
+                  },
+                  groupValue: _selectedViewIndex,
+                  onValueChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedViewIndex = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ),
+            Expanded(
+              child: planDaysAsync.when(
+                data: (days) {
+                  return _selectedViewIndex == 0
+                      ? _buildListView(context, plan, days, planStatsAsync)
+                      : _buildCalendarView(context, plan, days);
+                },
+                loading: () => const Center(child: CupertinoActivityIndicator()),
+                error: (error, stack) => Center(
+                  child: Text('加载失败: $error'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListView(
+    BuildContext context, 
+    WorkoutPlan? plan, 
+    List<PlanDay> days,
+    AsyncValue<Map<String, dynamic>> planStatsAsync,
+  ) {
+    return ListView(
+      children: [
+        // Plan info header
+        if (plan != null)
+          Container(
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: CupertinoColors.systemGrey6,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Plan info header
-                if (plan != null)
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: CupertinoColors.systemGrey6,
-                      borderRadius: BorderRadius.circular(12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '起始日期',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: CupertinoColors.systemGrey,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              '起始日期',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: CupertinoColors.systemGrey,
-                              ),
-                            ),
                             CupertinoButton(
                               padding: EdgeInsets.zero,
-                              minSize: 0,
                               child: const Text('修改'),
                               onPressed: () => _showDatePicker(context, ref, plan),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${plan.startDate.year}-${plan.startDate.month.toString().padLeft(2, '0')}-${plan.startDate.day.toString().padLeft(2, '0')}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '循环周期: ${plan.cycleDays}天',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: CupertinoColors.systemGrey,
-                          ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${plan.startDate.year}-${plan.startDate.month.toString().padLeft(2, '0')}-${plan.startDate.day.toString().padLeft(2, '0')}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      '循环周期: ${plan.cycleDays}天',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    planStatsAsync.when(
+                      data: (stats) {
+                         final rate = ((stats['rate'] as double) * 100).toStringAsFixed(0);
+                         final completed = stats['completed'];
+                         final total = stats['total'];
+                          return Text(
+                           '完成率: $rate% ($completed/$total次)',
+                           style: const TextStyle(
+                             fontSize: 14,
+                             color: CupertinoColors.systemGrey,
+                           ),
+                         );
+                      },
+                      loading: () => const CupertinoActivityIndicator(radius: 8),
+                      error: (_, __) => const SizedBox(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        // Training days
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            '训练日',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: CupertinoColors.systemGrey,
+            ),
+          ),
+        ),
+        ...days.map((day) {
+          return _DayDetailTile(
+            planId: widget.planId,
+            day: day,
+            dayNumber: days.indexOf(day) + 1,
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildCalendarView(BuildContext context, WorkoutPlan? plan, List<PlanDay> days) {
+    if (plan == null) return const SizedBox();
+
+    return Material(
+      color: CupertinoColors.systemBackground.resolveFrom(context),
+      child: TableCalendar(
+        firstDay: plan.startDate.subtract(const Duration(days: 365)),
+        lastDay: plan.startDate.add(const Duration(days: 365 * 2)),
+        focusedDay: DateTime.now(),
+        calendarFormat: CalendarFormat.month,
+        headerStyle: const HeaderStyle(
+          formatButtonVisible: false,
+          titleCentered: true,
+        ),
+        calendarBuilders: CalendarBuilders(
+          markerBuilder: (context, date, events) {
+            if (date.isBefore(plan.startDate)) return null;
+            
+            final dayDiff = date.difference(plan.startDate).inDays;
+            if (dayDiff < 0) return null;
+            
+            final dayIndex = dayDiff % plan.cycleDays;
+            final normalizedDayIndex = dayIndex < 0 ? dayIndex + plan.cycleDays : dayIndex;
+            
+            final planDay = days.firstWhere(
+              (d) => d.dayIndex == normalizedDayIndex,
+              orElse: () => days.first,
+            );
+            
+            if (planDay.isRestDay) {
+              return Positioned(
+                bottom: 1,
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: CupertinoColors.systemGrey,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              );
+            } else {
+              return Positioned(
+                bottom: 1,
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: CupertinoColors.activeBlue,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              );
+            }
+          },
+          defaultBuilder: (context, date, focusedDay) {
+            if (isSameDay(date, DateTime.now())) {
+               return Container(
+                margin: const EdgeInsets.all(6.0),
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  color: CupertinoColors.systemGrey5,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  '${date.day}',
+                  style: const TextStyle(color: CupertinoColors.activeBlue),
+                ),
+              );
+            }
+            return null;
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showActionSheet(BuildContext context, WorkoutPlan plan) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              if (plan.isActive) {
+                _showDeactivateDialog(context, ref, plan);
+              } else {
+                ref.read(planNotifierProvider.notifier).activatePlan(plan.id);
+              }
+            },
+            child: Text(
+              plan.isActive ? '停用计划' : '激活计划',
+              style: TextStyle(
+                color: plan.isActive ? CupertinoColors.destructiveRed : CupertinoColors.activeBlue,
+              ),
+            ),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await ref.read(planNotifierProvider.notifier).duplicatePlan(plan.id);
+                if (context.mounted) {
+                   await showCupertinoDialog(
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                      title: const Text('复制成功'),
+                      content: const Text('计划已成功复制'),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: const Text('确定'),
+                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
-                  ),
-                // Training days
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
-                    '训练日',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: CupertinoColors.systemGrey,
-                    ),
-                  ),
-                ),
-                ...days.map((day) {
-                  return _DayDetailTile(
-                    planId: planId,
-                    day: day,
-                    dayNumber: days.indexOf(day) + 1,
                   );
-                }),
-              ],
-            );
-          },
-          loading: () => const Center(child: CupertinoActivityIndicator()),
-          error: (error, stack) => Center(
-            child: Text('加载失败: $error'),
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  await showCupertinoDialog(
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                      title: const Text('复制失败'),
+                      content: Text(e.toString()),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: const Text('确定'),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('复制计划'),
           ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          isDefaultAction: true,
+          child: const Text('取消'),
         ),
       ),
     );
@@ -276,7 +477,7 @@ class _DayDetailTile extends ConsumerWidget {
             ),
           ),
           CupertinoListTile(
-            leading: Icon(Icons.add),
+            leading: const Icon(Icons.add),
             title: const Text('添加训练项目'),
             onTap: () {
               _showAddExerciseDialog(context, ref);
