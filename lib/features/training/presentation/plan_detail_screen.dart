@@ -26,9 +26,20 @@ class PlanDetailScreen extends ConsumerWidget {
         trailing: plan != null
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: Text(plan.isActive ? '已激活' : '激活'),
+                child: Text(
+                  plan.isActive ? '已激活' : '激活',
+                  style: TextStyle(
+                    color: plan.isActive 
+                        ? CupertinoColors.activeGreen 
+                        : CupertinoColors.activeBlue,
+                  ),
+                ),
                 onPressed: () {
-                  ref.read(planNotifierProvider.notifier).activatePlan(planId);
+                  if (plan.isActive) {
+                    _showDeactivateDialog(context, ref, plan);
+                  } else {
+                    ref.read(planNotifierProvider.notifier).activatePlan(planId);
+                  }
                 },
               )
             : null,
@@ -56,6 +67,30 @@ class PlanDetailScreen extends ConsumerWidget {
       ),
     );
   }
+  
+  void _showDeactivateDialog(BuildContext context, WidgetRef ref, WorkoutPlan plan) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('取消激活'),
+        content: Text('确定要取消激活"${plan.name}"吗？'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text('确认'),
+            onPressed: () {
+              ref.read(planNotifierProvider.notifier).activatePlan(planId);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _DayDetailTile extends ConsumerWidget {
@@ -68,10 +103,11 @@ class _DayDetailTile extends ConsumerWidget {
     required this.day,
     required this.dayNumber,
   });
-
+  
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final exercisesAsync = ref.watch(dayExercisesProvider(day.id));
+    final allExercisesAsync = ref.watch(exerciseListProvider);
     
     return CupertinoListSection.insetGrouped(
       header: Text('第 $dayNumber 天${day.isRestDay ? ' · 休息日' : ''}'),
@@ -98,8 +134,16 @@ class _DayDetailTile extends ConsumerWidget {
               }
               return Column(
                 children: exercises.map((de) {
+                  // Look up exercise name from all exercises
+                  final exerciseName = allExercisesAsync.whenOrNull(
+                    data: (exercises) {
+                      final exercise = exercises.where((e) => e.id == de.exerciseId).firstOrNull;
+                      return exercise?.name ?? '未知项目';
+                    },
+                  ) ?? '加载中...';
+                  
                   return CupertinoListTile(
-                    title: Text('训练项目: ${de.exerciseId}'),
+                    title: Text('训练项目: $exerciseName'),
                     subtitle: Text('${de.targetSets}组 × ${de.targetReps}次'),
                     trailing: CupertinoButton(
                       padding: EdgeInsets.zero,

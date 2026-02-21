@@ -32,6 +32,7 @@ class PlanNotifier extends StateNotifier<AsyncValue<void>> {
   Future<String> createPlan({
     required String name,
     required int cycleDays,
+    DateTime? startDate,
   }) async {
     state = const AsyncValue.loading();
     try {
@@ -41,7 +42,7 @@ class PlanNotifier extends StateNotifier<AsyncValue<void>> {
         name: Value(name),
         cycleDays: Value(cycleDays),
         isActive: const Value(false),
-        startDate: Value(DateTime.now()),
+        startDate: Value(startDate ?? DateTime.now()),
         createdAt: Value(DateTime.now()),
       );
       await _repository.insertPlan(plan);

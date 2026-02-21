@@ -12,6 +12,7 @@ class PlanFormScreen extends ConsumerStatefulWidget {
 class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
   final _nameController = TextEditingController();
   int _cycleDays = 3;
+  DateTime _startDate = DateTime.now();
 
   @override
   void dispose() {
@@ -30,6 +31,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
       await ref.read(planNotifierProvider.notifier).createPlan(
         name: name,
         cycleDays: _cycleDays,
+        startDate: _startDate,
       );
       
       if (mounted) {
@@ -123,6 +125,57 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                   ),
                 ),
               ],
+            ),
+            CupertinoFormSection.insetGrouped(
+              header: const Text('起始日期'),
+              children: [
+                CupertinoListTile(
+                  title: const Text('开始日期'),
+                  additionalInfo: Text(
+                    '${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')}',
+                  ),
+                  trailing: const CupertinoListTileChevron(),
+                  onTap: () => _showDatePicker(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  void _showDatePicker(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => Container(
+        height: 300,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CupertinoButton(
+                  child: const Text('取消'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                CupertinoButton(
+                  child: const Text('确定'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.date,
+                initialDateTime: _startDate,
+                onDateTimeChanged: (date) {
+                  setState(() {
+                    _startDate = date;
+                  });
+                },
+              ),
             ),
           ],
         ),
