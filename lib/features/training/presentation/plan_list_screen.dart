@@ -55,7 +55,7 @@ class PlanListScreen extends ConsumerWidget {
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(PhosphorIcons.plus),
+          child: Icon(CupertinoIcons.plus),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -74,7 +74,7 @@ class PlanListScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      PhosphorIcons.chartBar,
+                      CupertinoIcons.chart_bar_square,
                       size: 64,
                       color: CupertinoColors.systemGrey,
                     ),
@@ -115,8 +115,8 @@ class PlanListScreen extends ConsumerWidget {
                   ),
                   leading: Icon(
                     isActive 
-                        ? PhosphorIcons.checkCircle
-                        : PhosphorIcons.chartBar,
+                        ? CupertinoIcons.check_mark_circled_solid
+                        : CupertinoIcons.chart_bar_square,
                     color: isActive ? CupertinoColors.activeGreen : null,
                   ),
                   trailing: Row(

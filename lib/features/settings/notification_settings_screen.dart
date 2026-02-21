@@ -48,7 +48,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     header: const Text('提醒开关'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(PhosphorIcons.bell),
+                        leading: Icon(CupertinoIcons.bell),
                         title: const Text('启用训练提醒'),
                         trailing: CupertinoSwitch(
                           value: _notificationsEnabled,
@@ -88,7 +88,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       children: [
                         CupertinoListTile(
                           leading: Icon(
-                            PhosphorIcons.checkCircle,
+                            CupertinoIcons.check_mark_circled_solid,
                             color: CupertinoColors.activeGreen,
                           ),
                           title: const Text('保存设置'),

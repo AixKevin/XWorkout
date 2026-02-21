@@ -31,7 +31,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('导出数据'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.export),
+                  leading: Icon(CupertinoIcons.share),
                   title: const Text('导出为 JSON'),
                   subtitle: const Text('完整的备份格式，可用于恢复数据'),
                   trailing: _isExporting
@@ -40,7 +40,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                   onTap: _isExporting ? null : () => _exportJson(),
                 ),
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.table),
+                  leading: Icon(CupertinoIcons.table),
                   title: const Text('导出为 CSV'),
                   subtitle: const Text('表格格式，方便在 Excel 中查看'),
                   trailing: const CupertinoListTileChevron(),
@@ -52,7 +52,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('备份'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.floppyDisk),
+                  leading: Icon(CupertinoIcons.cloud_download),
                   title: const Text('创建备份'),
                   subtitle: const Text('保存备份文件到本地'),
                   trailing: _isBackingUp
@@ -66,7 +66,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('存储'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.folder),
+                  leading: Icon(CupertinoIcons.folder),
                   title: const Text('查看备份文件夹'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () => _openBackupFolder(),
@@ -78,7 +78,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               children: [
                 CupertinoListTile(
                   leading: Icon(
-                    PhosphorIcons.trash,
+                    CupertinoIcons.trash,
                     color: CupertinoColors.destructiveRed,
                   ),
                   title: Text(

@@ -43,7 +43,7 @@ class TemplateListScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      PhosphorIcons.chartBar,
+                      CupertinoIcons.chart_bar_square,
                       color: CupertinoColors.activeBlue,
                     ),
                   ),
@@ -127,7 +127,7 @@ class TemplateListScreen extends ConsumerWidget {
                           ? [
                               const CupertinoListTile(
                                 title: Text('休息'),
-                                leading: Icon(PhosphorIcons.bed),
+                                leading: Icon(CupertinoIcons.bed_double),
                               ),
                             ]
                           : day.exercises.map((exercise) {
@@ -136,7 +136,7 @@ class TemplateListScreen extends ConsumerWidget {
                                 subtitle: Text(
                                   '${exercise.targetSets}组 × ${exercise.targetReps}次${exercise.targetWeight != null ? ' × ${exercise.targetWeight}kg' : ''}',
                                 ),
-                                leading: Icon(PhosphorIcons.barbell),
+                                leading: Icon(CupertinoIcons.sportscourt),
                               );
                             }).toList(),
                     );

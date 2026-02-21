@@ -34,7 +34,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '总训练',
                       provider: totalWorkoutsProvider,
-                      icon: PhosphorIcons.barbell,
+                      icon: CupertinoIcons.sportscourt,
                       color: CupertinoColors.activeBlue,
                       unit: '次',
                     ),
@@ -44,7 +44,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '本周',
                       provider: thisWeekWorkoutsProvider,
-                      icon: PhosphorIcons.calendarCheck,
+                      icon: CupertinoIcons.calendar_badge_plus,
                       color: CupertinoColors.activeGreen,
                       unit: '次',
                     ),
@@ -58,7 +58,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '当前连胜',
                       provider: currentStreakProvider,
-                      icon: PhosphorIcons.fire,
+                      icon: CupertinoIcons.flame,
                       color: CupertinoColors.activeOrange,
                       unit: '天',
                     ),

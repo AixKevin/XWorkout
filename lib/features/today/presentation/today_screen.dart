@@ -46,7 +46,7 @@ class TodayScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            PhosphorIcons.timer,
+            CupertinoIcons.timer,
             size: 64,
             color: CupertinoColors.systemGrey,
           ),
@@ -88,7 +88,7 @@ class TodayScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  PhosphorIcons.chartBar,
+                  CupertinoIcons.chart_bar_square,
                   size: 64,
                   color: CupertinoColors.systemGrey,
                 ),
@@ -147,7 +147,7 @@ class TodayScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-               Icon(PhosphorIcons.chartBar),
+               Icon(CupertinoIcons.chart_bar_square),
               const SizedBox(width: 8),
               Text(
                 plan.name,
@@ -184,7 +184,7 @@ class TodayScreen extends ConsumerWidget {
       child: Column(
         children: [
           Icon(
-            PhosphorIcons.bed,
+            CupertinoIcons.bed_double,
             size: 64,
             color: CupertinoColors.systemGrey,
           ),

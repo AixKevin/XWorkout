@@ -168,7 +168,7 @@ class _DayDetailTile extends ConsumerWidget {
             ),
           ),
           CupertinoListTile(
-            leading: Icon(PhosphorIcons.plus),
+            leading: Icon(CupertinoIcons.plus),
             title: const Text('添加训练项目'),
             onTap: () {
               _showAddExerciseDialog(context, ref);

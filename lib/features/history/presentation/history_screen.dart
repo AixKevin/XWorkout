@@ -24,7 +24,7 @@ class HistoryScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(PhosphorIcons.notebook, size: 64, color: CupertinoColors.systemGrey),
+                    Icon(CupertinoIcons.book, size: 64, color: CupertinoColors.systemGrey),
                     SizedBox(height: 16),
                     Text('暂无训练记录', style: TextStyle(color: CupertinoColors.systemGrey)),
                   ],
@@ -79,15 +79,15 @@ class _HistoryItem extends StatelessWidget {
 
     if (isSkipped) {
       statusColor = CupertinoColors.systemRed;
-      statusIcon = PhosphorIcons.prohibit;
+      statusIcon = CupertinoIcons.nosign;
       statusText = '请假';
     } else if (isCompleted) {
       statusColor = CupertinoColors.activeGreen;
-      statusIcon = PhosphorIcons.checkCircle;
+      statusIcon = CupertinoIcons.check_mark_circled_solid;
       statusText = '完成';
     } else {
       statusColor = CupertinoColors.systemGrey;
-      statusIcon = PhosphorIcons.circle;
+      statusIcon = CupertinoIcons.circle;
       statusText = record.status;
     }
 

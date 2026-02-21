@@ -59,7 +59,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('外观'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(PhosphorIcons.moon),
+                        leading: Icon(CupertinoIcons.moon),
                         title: const Text('深色模式'),
                         trailing: CupertinoSwitch(
                           value: _isDarkMode,
@@ -72,21 +72,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('训练'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(PhosphorIcons.barbell),
+                        leading: Icon(CupertinoIcons.sportscourt),
                         title: const Text('重量单位'),
                         additionalInfo: Text(_weightUnit.toUpperCase()),
                         trailing: const CupertinoListTileChevron(),
                         onTap: () => _showWeightUnitPicker(),
                       ),
                       CupertinoListTile(
-                        leading: Icon(PhosphorIcons.listDashes),
+                        leading: Icon(CupertinoIcons.list_bullet),
                         title: const Text('默认组数'),
                         additionalInfo: Text('$_defaultSets 组'),
                         trailing: const CupertinoListTileChevron(),
                         onTap: () => _showSetsPicker(),
                       ),
                       CupertinoListTile(
-                        leading: Icon(PhosphorIcons.numberSquareOne),
+                        leading: Icon(CupertinoIcons.number_square),
                         title: const Text('默认次数'),
                         additionalInfo: Text('$_defaultReps 次'),
                         trailing: const CupertinoListTileChevron(),
@@ -98,12 +98,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('关于'),
                     children: [
                       const CupertinoListTile(
-                        leading: Icon(PhosphorIcons.info),
+                        leading: Icon(CupertinoIcons.info),
                         title: Text('版本'),
                         additionalInfo: Text('1.7.0'),
                       ),
                       CupertinoListTile(
-                        leading: Icon(PhosphorIcons.code),
+                        leading: Icon(CupertinoIcons.doc_text),
                         title: const Text('开源许可'),
                         trailing: const CupertinoListTileChevron(),
                         onTap: () => _showLicenses(),

@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/features/history/presentation/history_screen.dart';
 import 'package:xworkout/features/data/data_management_screen.dart';
 import 'package:xworkout/features/statistics/presentation/statistics_screen.dart';
@@ -23,7 +22,7 @@ class MoreScreen extends StatelessWidget {
               header: const Text('数据'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.chartLineUp),
+                  leading: Icon(CupertinoIcons.graph_square),
                   title: const Text('历史记录'),
                   subtitle: const Text('查看训练历史'),
                   trailing: const CupertinoListTileChevron(),
@@ -36,7 +35,7 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.chartBar),
+                  leading: Icon(CupertinoIcons.chart_bar_square),
                   title: const Text('统计'),
                   subtitle: const Text('训练数据分析'),
                   trailing: const CupertinoListTileChevron(),
@@ -49,7 +48,7 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.database),
+                  leading: Icon(CupertinoIcons.square_stack_3d_up),
                   title: const Text('数据管理'),
                   subtitle: const Text('导出、备份数据'),
                   trailing: const CupertinoListTileChevron(),
@@ -67,7 +66,7 @@ class MoreScreen extends StatelessWidget {
               header: const Text('应用'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.gear),
+                  leading: Icon(CupertinoIcons.gear),
                   title: const Text('设置'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () {
@@ -79,7 +78,7 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.info),
+                  leading: Icon(CupertinoIcons.info),
                   title: const Text('关于'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () {
@@ -186,7 +185,7 @@ class MoreScreen extends StatelessWidget {
                     header: const Text('训练'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(PhosphorIcons.bell),
+                        leading: Icon(CupertinoIcons.bell),
                         title: const Text('训练提醒'),
                         trailing: const CupertinoListTileChevron(),
                         onTap: () {
