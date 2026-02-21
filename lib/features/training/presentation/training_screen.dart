@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:xworkout/features/training/presentation/exercise_list_screen.dart';
 import 'package:xworkout/features/training/presentation/plan_list_screen.dart';
+import 'package:xworkout/features/history/presentation/history_screen.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class TrainingScreen extends StatelessWidget {
@@ -61,7 +62,11 @@ class TrainingScreen extends StatelessWidget {
                   subtitle: const Text('查看训练历史'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () {
-                    // TODO: Navigate to history
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const HistoryScreen(),
+                      ),
+                    );
                   },
                 ),
               ],

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/plan_form_screen.dart';
 import 'package:xworkout/features/training/presentation/plan_detail_screen.dart';
+import 'package:xworkout/features/templates/presentation/template_list_screen.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/core/database/database.dart';
 
@@ -41,6 +42,17 @@ class PlanListScreen extends ConsumerWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('健身计划'),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Text('模板'),
+          onPressed: () {
+            Navigator.of(context).push(
+              CupertinoPageRoute(
+                builder: (context) => const TemplateListScreen(),
+              ),
+            );
+          },
+        ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(PhosphorIcons.plus),

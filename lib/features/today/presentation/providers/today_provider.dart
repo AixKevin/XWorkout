@@ -112,6 +112,23 @@ final todayNotifierProvider = StateNotifierProvider<TodayNotifier, AsyncValue<vo
 
 // 计算今天是周期的第几天
 int calculateCycleDay(WorkoutPlan plan) {
-  final daysSinceStart = DateTime.now().difference(plan.startDate).inDays;
+  final now = DateTime.now();
+  final startDate = DateTime(plan.startDate.year, plan.startDate.month, plan.startDate.day);
+  final today = DateTime(now.year, now.month, now.day);
+  
+  // 计算从开始日期到今天的天数
+  final daysSinceStart = today.difference(startDate).inDays;
+  
+  // 如果开始日期在今天之后，返回第1天
+  if (daysSinceStart < 0) {
+    return 1;
+  }
+  
+  // 如果是开始日期当天，返回第1天
+  if (daysSinceStart == 0) {
+    return 1;
+  }
+  
+  // 计算周期中的第几天 (1 到 cycleDays)
   return (daysSinceStart % plan.cycleDays) + 1;
 }

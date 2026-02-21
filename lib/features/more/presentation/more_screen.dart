@@ -1,5 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:xworkout/features/history/presentation/history_screen.dart';
+import 'package:xworkout/features/data/data_management_screen.dart';
+import 'package:xworkout/features/statistics/presentation/statistics_screen.dart';
+import 'package:xworkout/features/settings/notification_settings_screen.dart';
+import 'package:xworkout/features/settings/settings_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
@@ -23,16 +28,37 @@ class MoreScreen extends StatelessWidget {
                   subtitle: const Text('查看训练历史'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () {
-                    _showComingSoon(context);
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const HistoryScreen(),
+                      ),
+                    );
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.export),
-                  title: const Text('导出数据'),
-                  subtitle: const Text('导出训练记录'),
+                  leading: Icon(PhosphorIcons.chartBar),
+                  title: const Text('统计'),
+                  subtitle: const Text('训练数据分析'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () {
-                    _showComingSoon(context);
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const StatisticsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                CupertinoListTile(
+                  leading: Icon(PhosphorIcons.database),
+                  title: const Text('数据管理'),
+                  subtitle: const Text('导出、备份数据'),
+                  trailing: const CupertinoListTileChevron(),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const DataManagementScreen(),
+                      ),
+                    );
                   },
                 ),
               ],
@@ -45,7 +71,11 @@ class MoreScreen extends StatelessWidget {
                   title: const Text('设置'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () {
-                    _showSettings(context);
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const SettingsScreen(),
+                      ),
+                    );
                   },
                 ),
                 CupertinoListTile(
@@ -59,9 +89,9 @@ class MoreScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 32),
-            const Center(
+            const             Center(
               child: Text(
-                'XWorkout v1.0.0',
+                'XWorkout v1.7.0',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -156,9 +186,16 @@ class MoreScreen extends StatelessWidget {
                     header: const Text('训练'),
                     children: [
                       CupertinoListTile(
+                        leading: Icon(PhosphorIcons.bell),
                         title: const Text('训练提醒'),
                         trailing: const CupertinoListTileChevron(),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(
+                            CupertinoPageRoute(
+                              builder: (context) => const NotificationSettingsScreen(),
+                            ),
+                          );
+                        },
                       ),
                       CupertinoListTile(
                         title: const Text('默认组数'),
@@ -224,7 +261,7 @@ class MoreScreen extends StatelessWidget {
           children: [
             SizedBox(height: 16),
             Text('XWorkout'),
-            Text('版本: 1.0.0'),
+            Text('版本: 1.7.0'),
             SizedBox(height: 8),
             Text('轻量级健身记录软件'),
             Text('简洁、离线、跨平台'),
