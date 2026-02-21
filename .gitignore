@@ -40,3 +40,11 @@ coverage/
 *.swp
 *.swo
 *~
+
+# OpenCode 工具文件
+.sisyphus/
+AGENTS.md
+PROMPT.md
+docs/SETUP.md
+setup-windows.bat
+.gitattributes
