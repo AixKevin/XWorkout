@@ -58,6 +58,12 @@ class WorkoutPlanRepository {
         .write(const WorkoutPlansCompanion(isActive: Value(false)));
   }
   
+  Future<void> updatePlanStartDate(String planId, DateTime startDate) async {
+    await (_db.update(_db.workoutPlans)
+          ..where((p) => p.id.equals(planId)))
+        .write(WorkoutPlansCompanion(startDate: Value(startDate)));
+  }
+  
   // PlanDay operations
   Future<List<PlanDay>> getPlanDays(String planId) {
     return (_db.select(_db.planDays)

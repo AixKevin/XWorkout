@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/core/database/database.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class PlanDetailScreen extends ConsumerWidget {
   final String planId;
@@ -47,16 +47,77 @@ class PlanDetailScreen extends ConsumerWidget {
       child: SafeArea(
         child: planDaysAsync.when(
           data: (days) {
-            return ListView.builder(
-              itemCount: days.length,
-              itemBuilder: (context, index) {
-                final day = days[index];
-                return _DayDetailTile(
-                  planId: planId,
-                  day: day,
-                  dayNumber: index + 1,
-                );
-              },
+            return ListView(
+              children: [
+                // Plan info header
+                if (plan != null)
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.systemGrey6,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              '起始日期',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: CupertinoColors.systemGrey,
+                              ),
+                            ),
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              minSize: 0,
+                              child: const Text('修改'),
+                              onPressed: () => _showDatePicker(context, ref, plan),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${plan.startDate.year}-${plan.startDate.month.toString().padLeft(2, '0')}-${plan.startDate.day.toString().padLeft(2, '0')}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '循环周期: ${plan.cycleDays}天',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: CupertinoColors.systemGrey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                // Training days
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    '训练日',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: CupertinoColors.systemGrey,
+                    ),
+                  ),
+                ),
+                ...days.map((day) {
+                  return _DayDetailTile(
+                    planId: planId,
+                    day: day,
+                    dayNumber: days.indexOf(day) + 1,
+                  );
+                }),
+              ],
             );
           },
           loading: () => const Center(child: CupertinoActivityIndicator()),
@@ -68,12 +129,54 @@ class PlanDetailScreen extends ConsumerWidget {
     );
   }
   
+  void _showDatePicker(BuildContext context, WidgetRef ref, WorkoutPlan plan) {
+    DateTime selectedDate = plan.startDate;
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => Container(
+        height: 300,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CupertinoButton(
+                  child: const Text('取消'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                CupertinoButton(
+                  child: const Text('确定'),
+                  onPressed: () async {
+                    await ref.read(planNotifierProvider.notifier).updatePlanStartDate(plan.id, selectedDate);
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ],
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.date,
+                initialDateTime: plan.startDate,
+                onDateTimeChanged: (date) {
+                  selectedDate = date;
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showDeactivateDialog(BuildContext context, WidgetRef ref, WorkoutPlan plan) {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: const Text('取消激活'),
-        content: Text('确定要取消激活"${plan.name}"吗？'),
+        title: const Text('确认停用'),
+        content: Text('确定要停用"${plan.name}"吗？'),
         actions: [
           CupertinoDialogAction(
             child: const Text('取消'),
@@ -81,10 +184,10 @@ class PlanDetailScreen extends ConsumerWidget {
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('确认'),
-            onPressed: () {
-              ref.read(planNotifierProvider.notifier).deactivatePlan();
+            child: const Text('停用'),
+            onPressed: () async {
               Navigator.of(context).pop();
+              await ref.read(planNotifierProvider.notifier).deactivatePlan();
             },
           ),
         ],
@@ -148,7 +251,7 @@ class _DayDetailTile extends ConsumerWidget {
                     trailing: CupertinoButton(
                       padding: EdgeInsets.zero,
                       child: const Icon(
-                        CupertinoIcons.minus_circle,
+                        Icons.remove_circle,
                         color: CupertinoColors.destructiveRed,
                       ),
                       onPressed: () {
@@ -168,7 +271,7 @@ class _DayDetailTile extends ConsumerWidget {
             ),
           ),
           CupertinoListTile(
-            leading: Icon(CupertinoIcons.plus),
+            leading: Icon(Icons.add),
             title: const Text('添加训练项目'),
             onTap: () {
               _showAddExerciseDialog(context, ref);

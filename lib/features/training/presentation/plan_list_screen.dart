@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/plan_form_screen.dart';
@@ -55,7 +56,7 @@ class PlanListScreen extends ConsumerWidget {
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.plus),
+          child: Icon(Icons.add),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -74,7 +75,7 @@ class PlanListScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      CupertinoIcons.chart_bar_square,
+                      Icons.bar_chart,
                       size: 64,
                       color: CupertinoColors.systemGrey,
                     ),
@@ -115,8 +116,8 @@ class PlanListScreen extends ConsumerWidget {
                   ),
                   leading: Icon(
                     isActive 
-                        ? CupertinoIcons.check_mark_circled_solid
-                        : CupertinoIcons.chart_bar_square,
+                        ? Icons.check_circle
+                        : Icons.bar_chart,
                     color: isActive ? CupertinoColors.activeGreen : null,
                   ),
                   trailing: Row(
@@ -125,13 +126,13 @@ class PlanListScreen extends ConsumerWidget {
                       CupertinoButton(
                         padding: EdgeInsets.zero,
                         child: const Icon(
-                          CupertinoIcons.delete,
+                          Icons.delete,
                           color: CupertinoColors.destructiveRed,
                           size: 22,
                         ),
                         onPressed: () => _confirmDeletePlan(context, ref, plan),
                       ),
-                      const CupertinoListTileChevron(),
+                      const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                     ],
                   ),
                   onTap: () {

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:xworkout/features/training/presentation/exercise_list_screen.dart';
 import 'package:xworkout/features/training/presentation/plan_list_screen.dart';
 import 'package:xworkout/features/history/presentation/history_screen.dart';
@@ -20,10 +21,10 @@ class TrainingScreen extends StatelessWidget {
               header: const Text('训练项目'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.sportscourt),
+                  leading: Icon(Icons.fitness_center),
                   title: const Text('我的训练项目'),
                   subtitle: const Text('自定义训练项目'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -38,10 +39,10 @@ class TrainingScreen extends StatelessWidget {
               header: const Text('健身计划'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.chart_bar_square),
+                  leading: Icon(Icons.bar_chart),
                   title: const Text('我的健身计划'),
                   subtitle: const Text('设置训练周期'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -56,10 +57,10 @@ class TrainingScreen extends StatelessWidget {
               header: const Text('记录'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.graph_square),
+                  leading: Icon(Icons.show_chart),
                   title: const Text('历史记录'),
                   subtitle: const Text('查看训练历史'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(

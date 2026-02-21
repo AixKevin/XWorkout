@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Icon, IconData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -34,7 +35,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '总训练',
                       provider: totalWorkoutsProvider,
-                      icon: CupertinoIcons.sportscourt,
+                      icon: Icons.fitness_center,
                       color: CupertinoColors.activeBlue,
                       unit: '次',
                     ),
@@ -44,7 +45,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '本周',
                       provider: thisWeekWorkoutsProvider,
-                      icon: CupertinoIcons.calendar_badge_plus,
+                      icon: Icons.calendar_today,
                       color: CupertinoColors.activeGreen,
                       unit: '次',
                     ),
@@ -58,7 +59,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '当前连胜',
                       provider: currentStreakProvider,
-                      icon: CupertinoIcons.flame,
+                      icon: Icons.local_fire_department,
                       color: CupertinoColors.activeOrange,
                       unit: '天',
                     ),

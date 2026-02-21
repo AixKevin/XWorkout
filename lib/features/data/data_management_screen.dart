@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -31,19 +32,19 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('导出数据'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.share),
+                  leading: Icon(Icons.share),
                   title: const Text('导出为 JSON'),
                   subtitle: const Text('完整的备份格式，可用于恢复数据'),
                   trailing: _isExporting
                       ? const CupertinoActivityIndicator()
-                      : const CupertinoListTileChevron(),
+                      : const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: _isExporting ? null : () => _exportJson(),
                 ),
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.table),
+                  leading: Icon(Icons.table_chart),
                   title: const Text('导出为 CSV'),
                   subtitle: const Text('表格格式，方便在 Excel 中查看'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _exportCsv(),
                 ),
               ],
@@ -52,12 +53,12 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('备份'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.cloud_download),
+                  leading: Icon(Icons.cloud_download),
                   title: const Text('创建备份'),
                   subtitle: const Text('保存备份文件到本地'),
                   trailing: _isBackingUp
                       ? const CupertinoActivityIndicator()
-                      : const CupertinoListTileChevron(),
+                      : const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: _isBackingUp ? null : () => _createBackup(),
                 ),
               ],
@@ -66,9 +67,9 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('存储'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.folder),
+                  leading: Icon(Icons.folder),
                   title: const Text('查看备份文件夹'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _openBackupFolder(),
                 ),
               ],
@@ -78,7 +79,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               children: [
                 CupertinoListTile(
                   leading: Icon(
-                    CupertinoIcons.trash,
+                    Icons.delete,
                     color: CupertinoColors.destructiveRed,
                   ),
                   title: Text(
@@ -86,7 +87,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                     style: TextStyle(color: CupertinoColors.destructiveRed),
                   ),
                   subtitle: const Text('此操作不可恢复'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _showClearDataDialog(),
                 ),
               ],

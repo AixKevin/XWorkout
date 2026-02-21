@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:xworkout/features/history/presentation/history_screen.dart';
 import 'package:xworkout/features/data/data_management_screen.dart';
 import 'package:xworkout/features/statistics/presentation/statistics_screen.dart';
@@ -22,10 +23,10 @@ class MoreScreen extends StatelessWidget {
               header: const Text('数据'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.graph_square),
+                  leading: Icon(Icons.show_chart),
                   title: const Text('历史记录'),
                   subtitle: const Text('查看训练历史'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -35,10 +36,10 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.chart_bar_square),
+                  leading: Icon(Icons.bar_chart),
                   title: const Text('统计'),
                   subtitle: const Text('训练数据分析'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -48,10 +49,10 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.square_stack_3d_up),
+                  leading: Icon(Icons.data_usage),
                   title: const Text('数据管理'),
                   subtitle: const Text('导出、备份数据'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -66,9 +67,9 @@ class MoreScreen extends StatelessWidget {
               header: const Text('应用'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.gear),
+                  leading: Icon(Icons.settings),
                   title: const Text('设置'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -78,9 +79,9 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: Icon(CupertinoIcons.info),
+                  leading: Icon(Icons.info),
                   title: const Text('关于'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     _showAbout(context);
                   },
@@ -185,9 +186,9 @@ class MoreScreen extends StatelessWidget {
                     header: const Text('训练'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(CupertinoIcons.bell),
+                        leading: Icon(Icons.notifications),
                         title: const Text('训练提醒'),
-                        trailing: const CupertinoListTileChevron(),
+                        trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                         onTap: () {
                           Navigator.of(context).push(
                             CupertinoPageRoute(
@@ -199,7 +200,7 @@ class MoreScreen extends StatelessWidget {
                       CupertinoListTile(
                         title: const Text('默认组数'),
                         additionalInfo: const Text('3'),
-                        trailing: const CupertinoListTileChevron(),
+                        trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                         onTap: () {},
                       ),
                     ],
@@ -210,7 +211,7 @@ class MoreScreen extends StatelessWidget {
                       CupertinoListTile(
                         title: const Text('清除所有数据'),
                         trailing: const Icon(
-                          CupertinoIcons.trash,
+                          Icons.delete,
                           color: CupertinoColors.destructiveRed,
                         ),
                         onTap: () {

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/features/templates/data/plan_templates.dart';
@@ -43,13 +44,13 @@ class TemplateListScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      CupertinoIcons.chart_bar_square,
+                      Icons.bar_chart,
                       color: CupertinoColors.activeBlue,
                     ),
                   ),
                   title: Text(template.name),
                   subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _showTemplateDetail(context, ref, template),
                 );
               }).toList(),
@@ -127,7 +128,7 @@ class TemplateListScreen extends ConsumerWidget {
                           ? [
                               const CupertinoListTile(
                                 title: Text('休息'),
-                                leading: Icon(CupertinoIcons.bed_double),
+                                leading: Icon(Icons.hotel),
                               ),
                             ]
                           : day.exercises.map((exercise) {
@@ -136,7 +137,7 @@ class TemplateListScreen extends ConsumerWidget {
                                 subtitle: Text(
                                   '${exercise.targetSets}组 × ${exercise.targetReps}次${exercise.targetWeight != null ? ' × ${exercise.targetWeight}kg' : ''}',
                                 ),
-                                leading: Icon(CupertinoIcons.sportscourt),
+                                leading: Icon(Icons.fitness_center),
                               );
                             }).toList(),
                     );

@@ -148,6 +148,16 @@ class PlanNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
   
+  Future<void> updatePlanStartDate(String planId, DateTime startDate) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.updatePlanStartDate(planId, startDate);
+      state = const AsyncValue.data(null);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+  
   Future<void> deletePlan(String planId) async {
     state = const AsyncValue.loading();
     try {

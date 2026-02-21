@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
@@ -41,7 +42,7 @@ class ExerciseListScreen extends ConsumerWidget {
         middle: const Text('训练项目'),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.plus),
+          child: Icon(Icons.add),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -60,7 +61,7 @@ class ExerciseListScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      CupertinoIcons.sportscourt,
+                      Icons.fitness_center,
                       size: 64,
                       color: CupertinoColors.systemGrey,
                     ),
@@ -103,13 +104,13 @@ class ExerciseListScreen extends ConsumerWidget {
                       CupertinoButton(
                         padding: EdgeInsets.zero,
                         child: const Icon(
-                          CupertinoIcons.delete,
+                          Icons.delete,
                           color: CupertinoColors.destructiveRed,
                           size: 22,
                         ),
                         onPressed: () => _confirmDelete(context, ref, exercise),
                       ),
-                      const CupertinoListTileChevron(),
+                      const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                     ],
                   ),
                   onTap: () {
