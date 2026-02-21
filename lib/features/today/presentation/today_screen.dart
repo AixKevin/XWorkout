@@ -248,9 +248,33 @@ class TodayScreen extends ConsumerWidget {
               exercisesAsync.when(
                 data: (exercises) {
                   if (exercises.isEmpty) {
-                    return const Text(
-                      '暂无训练项目，请在计划中配置',
-                      style: TextStyle(color: CupertinoColors.systemGrey),
+                    return Container(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.fitness_center,
+                            size: 48,
+                            color: CupertinoColors.systemGrey,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            '暂无训练项目',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            '请在计划中添加训练项目',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: CupertinoColors.systemGrey,
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   }
                   
@@ -270,7 +294,7 @@ class TodayScreen extends ConsumerWidget {
             ],
           ),
         ),
-        const Spacer(),
+        const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -398,6 +422,15 @@ class _ExerciseCard extends ConsumerWidget {
         children: [
           exerciseAsync.when(
             data: (exercises) {
+              if (exercises.isEmpty) {
+                return const Text(
+                  '未知训练项目',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
+              }
               final exercise = exercises.firstWhere(
                 (e) => e.id == dayExercise.exerciseId,
                 orElse: () => exercises.first,

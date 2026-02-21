@@ -40,6 +40,11 @@ class ExerciseListScreen extends ConsumerWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('训练项目'),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(Icons.add),

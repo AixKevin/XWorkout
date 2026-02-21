@@ -23,6 +23,11 @@ class PlanDetailScreen extends ConsumerWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(plan?.name ?? '计划详情'),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         trailing: plan != null
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
