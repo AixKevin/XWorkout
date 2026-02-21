@@ -3,9 +3,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:xworkout/core/database/database.dart';
 
 class ExerciseListScreen extends ConsumerWidget {
   const ExerciseListScreen({super.key});
+
+  void _confirmDelete(BuildContext context, WidgetRef ref, Exercise exercise) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('确认删除'),
+        content: Text('确定要删除"${exercise.name}"吗？'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text('删除'),
+            onPressed: () {
+              ref.read(exerciseNotifierProvider.notifier).deleteExercise(exercise.id);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -72,7 +97,21 @@ class ExerciseListScreen extends ConsumerWidget {
                   subtitle: Text(
                     '${exercise.defaultSets}组 × ${exercise.defaultReps}次${exercise.defaultWeight != null ? ' ${exercise.defaultWeight}kg' : ''}',
                   ),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        child: const Icon(
+                          CupertinoIcons.delete,
+                          color: CupertinoColors.destructiveRed,
+                          size: 22,
+                        ),
+                        onPressed: () => _confirmDelete(context, ref, exercise),
+                      ),
+                      const CupertinoListTileChevron(),
+                    ],
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(

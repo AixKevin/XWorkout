@@ -53,6 +53,11 @@ class WorkoutPlanRepository {
     });
   }
   
+  Future<void> deactivatePlan() async {
+    await _db.update(_db.workoutPlans)
+        .write(const WorkoutPlansCompanion(isActive: Value(false)));
+  }
+  
   // PlanDay operations
   Future<List<PlanDay>> getPlanDays(String planId) {
     return (_db.select(_db.planDays)

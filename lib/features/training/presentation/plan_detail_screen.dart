@@ -83,7 +83,7 @@ class PlanDetailScreen extends ConsumerWidget {
             isDestructiveAction: true,
             child: const Text('确认'),
             onPressed: () {
-              ref.read(planNotifierProvider.notifier).activatePlan(planId);
+              ref.read(planNotifierProvider.notifier).deactivatePlan();
               Navigator.of(context).pop();
             },
           ),

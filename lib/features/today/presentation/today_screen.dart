@@ -82,13 +82,40 @@ class TodayScreen extends ConsumerWidget {
     
     return planDaysAsync.when(
       data: (planDays) {
-        final todayPlanDay = planDays.isNotEmpty && cycleDay <= planDays.length
-            ? planDays[cycleDay - 1]
-            : null;
-        
-        if (todayPlanDay == null) {
-          return _buildNoPlanView(context);
+        if (planDays.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  PhosphorIcons.chartBar,
+                  size: 64,
+                  color: CupertinoColors.systemGrey,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  '暂无训练日',
+                  style: TextStyle(
+                    fontSize: 17,
+                    color: CupertinoColors.systemGrey,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  '请在计划中添加训练日',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: CupertinoColors.systemGrey,
+                  ),
+                ),
+              ],
+            ),
+          );
         }
+        
+        // Get today's plan day - cycleDay is 1-indexed
+        final dayIndex = (cycleDay - 1) % planDays.length;
+        final todayPlanDay = planDays[dayIndex];
         
         final isRestDay = todayPlanDay.isRestDay;
         

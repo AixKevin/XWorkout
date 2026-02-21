@@ -4,9 +4,34 @@ import 'package:xworkout/features/training/presentation/providers/plan_provider.
 import 'package:xworkout/features/training/presentation/plan_form_screen.dart';
 import 'package:xworkout/features/training/presentation/plan_detail_screen.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:xworkout/core/database/database.dart';
 
 class PlanListScreen extends ConsumerWidget {
   const PlanListScreen({super.key});
+  
+  void _confirmDeletePlan(BuildContext context, WidgetRef ref, WorkoutPlan plan) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('确认删除'),
+        content: Text('确定要删除计划"${plan.name}"吗？此操作不可恢复。'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text('删除'),
+            onPressed: () {
+              ref.read(planNotifierProvider.notifier).deletePlan(plan.id);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -82,7 +107,21 @@ class PlanListScreen extends ConsumerWidget {
                         : PhosphorIcons.chartBar,
                     color: isActive ? CupertinoColors.activeGreen : null,
                   ),
-                  trailing: const CupertinoListTileChevron(),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        child: const Icon(
+                          CupertinoIcons.delete,
+                          color: CupertinoColors.destructiveRed,
+                          size: 22,
+                        ),
+                        onPressed: () => _confirmDeletePlan(context, ref, plan),
+                      ),
+                      const CupertinoListTileChevron(),
+                    ],
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(

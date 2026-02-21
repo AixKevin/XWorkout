@@ -152,10 +152,24 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
           child: const Text('取消'),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: _save,
-          child: const Text('保存'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isEditing)
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: _delete,
+                child: const Icon(
+                  CupertinoIcons.delete,
+                  color: CupertinoColors.destructiveRed,
+                ),
+              ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: _save,
+              child: const Text('保存'),
+            ),
+          ],
         ),
       ),
       child: SafeArea(
