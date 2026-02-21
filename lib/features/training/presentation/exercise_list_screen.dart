@@ -5,6 +5,8 @@ import 'package:xworkout/features/training/presentation/providers/exercise_provi
 import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
 import 'package:xworkout/features/training/presentation/exercise_detail_screen.dart';
 import 'package:xworkout/core/database/database.dart';
+import 'package:xworkout/shared/widgets/async_value_widget.dart';
+import 'package:xworkout/shared/widgets/empty_state.dart';
 
 class ExerciseListScreen extends ConsumerStatefulWidget {
   const ExerciseListScreen({super.key});
@@ -116,7 +118,8 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
               ),
             ),
             Expanded(
-              child: exercisesAsync.when(
+              child: AsyncValueWidget<List<Exercise>>(
+                value: exercisesAsync,
                 data: (exercises) {
                   final filteredExercises = exercises.where((exercise) {
                     final matchesSearch = exercise.name.toLowerCase().contains(_searchQuery.toLowerCase());
@@ -135,39 +138,27 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                   });
 
                   if (filteredExercises.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.fitness_center,
-                            size: 64,
-                            color: CupertinoColors.systemGrey,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            exercises.isEmpty ? '暂无训练项目' : '未找到匹配项目',
-                            style: const TextStyle(
-                              fontSize: 17,
-                              color: CupertinoColors.systemGrey,
+                    if (exercises.isEmpty) {
+                      return EmptyStateWidget(
+                        icon: Icons.fitness_center,
+                        title: '暂无训练项目',
+                        message: '添加您的第一个训练项目',
+                        actionLabel: '添加项目',
+                        onAction: () {
+                          Navigator.of(context).push(
+                            CupertinoPageRoute(
+                              builder: (context) => const ExerciseFormScreen(),
                             ),
-                          ),
-                          if (exercises.isEmpty) ...[
-                            const SizedBox(height: 8),
-                            CupertinoButton(
-                              child: const Text('添加第一个项目'),
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  CupertinoPageRoute(
-                                    builder: (context) => const ExerciseFormScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ],
-                      ),
-                    );
+                          );
+                        },
+                      );
+                    } else {
+                      return const EmptyStateWidget(
+                        icon: Icons.search_off,
+                        title: '未找到匹配项目',
+                        message: '尝试调整搜索关键词或分类',
+                      );
+                    }
                   }
                   
                   return ListView.builder(
@@ -226,10 +217,6 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                     },
                   );
                 },
-                loading: () => const Center(child: CupertinoActivityIndicator()),
-                error: (error, stack) => Center(
-                  child: Text('加载失败: $error'),
-                ),
               ),
             ),
           ],
@@ -250,7 +237,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? CupertinoColors.white : CupertinoColors.black,
+            color: isSelected ? CupertinoColors.white : CupertinoColors.label,
             fontSize: 14,
           ),
         ),

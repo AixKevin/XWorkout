@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon, IconData, Material, Colors;
+import 'package:flutter/material.dart' show Icons, Icon, IconData, Material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/features/history/data/history_repository.dart';
 import 'package:xworkout/features/history/presentation/history_detail_screen.dart';
+import 'package:xworkout/shared/widgets/async_value_widget.dart';
+import 'package:xworkout/shared/widgets/empty_state.dart';
 
 enum ViewMode { list, calendar }
 
@@ -55,18 +57,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         ),
       ),
       child: SafeArea(
-        child: historyAsync.when(
+        child: AsyncValueWidget<List<DailyRecord>>(
+          value: historyAsync,
           data: (records) {
             if (records.isEmpty && _viewMode == ViewMode.list) {
-              return const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.book, size: 64, color: CupertinoColors.systemGrey),
-                    SizedBox(height: 16),
-                    Text('暂无训练记录', style: TextStyle(color: CupertinoColors.systemGrey)),
-                  ],
-                ),
+              return const EmptyStateWidget(
+                icon: Icons.book,
+                title: '暂无训练记录',
               );
             }
 
@@ -74,8 +71,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 ? _buildListView(records)
                 : _buildCalendarView(records);
           },
-          loading: () => const Center(child: CupertinoActivityIndicator()),
-          error: (error, stack) => Center(child: Text('加载失败: $error')),
         ),
       ),
     );
@@ -149,21 +144,21 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   if (record.status == 'rest') return null;
 
                   Color? bgColor;
-                  Color textColor = Colors.black;
+                  Color textColor = CupertinoColors.label;
 
                   if (record.status == 'skipped') {
                     bgColor = CupertinoColors.systemOrange;
-                    textColor = Colors.white;
+                    textColor = CupertinoColors.white;
                   } else if (record.status == 'completed' || record.status == 'normal') {
                     bgColor = CupertinoColors.activeGreen;
-                    textColor = Colors.white;
+                    textColor = CupertinoColors.white;
                   } else if (record.status == 'in_progress') {
                      bgColor = CupertinoColors.activeBlue;
-                     textColor = Colors.white;
+                     textColor = CupertinoColors.white;
                   } else {
                      // Default to blue for other statuses if not rest
                      bgColor = CupertinoColors.activeBlue;
-                     textColor = Colors.white;
+                     textColor = CupertinoColors.white;
                   }
                   
                   if (bgColor != null) {
@@ -210,7 +205,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     ),
                     child: Text(
                       day.day.toString(),
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: CupertinoColors.white),
                     ),
                   );
                 },

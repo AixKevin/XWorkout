@@ -5,8 +5,9 @@ import 'package:xworkout/features/training/presentation/providers/plan_provider.
 import 'package:xworkout/features/training/presentation/plan_form_screen.dart';
 import 'package:xworkout/features/training/presentation/plan_detail_screen.dart';
 import 'package:xworkout/features/templates/presentation/template_list_screen.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/core/database/database.dart';
+import 'package:xworkout/shared/widgets/async_value_widget.dart';
+import 'package:xworkout/shared/widgets/empty_state.dart';
 
 class PlanListScreen extends ConsumerWidget {
   const PlanListScreen({super.key});
@@ -67,39 +68,22 @@ class PlanListScreen extends ConsumerWidget {
         ),
       ),
       child: SafeArea(
-        child: plansAsync.when(
+        child: AsyncValueWidget<List<WorkoutPlan>>(
+          value: plansAsync,
           data: (plans) {
             if (plans.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.bar_chart,
-                      size: 64,
-                      color: CupertinoColors.systemGrey,
+              return EmptyStateWidget(
+                icon: Icons.fitness_center,
+                title: '暂无健身计划',
+                message: '创建您的第一个健身计划开始训练',
+                actionLabel: '创建计划',
+                onAction: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const PlanFormScreen(),
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '暂无健身计划',
-                      style: TextStyle(
-                        fontSize: 17,
-                        color: CupertinoColors.systemGrey,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    CupertinoButton(
-                      child: const Text('创建第一个计划'),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          CupertinoPageRoute(
-                            builder: (context) => const PlanFormScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                  );
+                },
               );
             }
             
@@ -146,10 +130,6 @@ class PlanListScreen extends ConsumerWidget {
               },
             );
           },
-          loading: () => const Center(child: CupertinoActivityIndicator()),
-          error: (error, stack) => Center(
-            child: Text('加载失败: $error'),
-          ),
         ),
       ),
     );

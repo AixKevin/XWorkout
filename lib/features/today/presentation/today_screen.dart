@@ -8,7 +8,8 @@ import 'package:xworkout/features/today/presentation/exercise_record_screen.dart
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/core/database/database.dart';
-import 'dart:ui';
+import 'package:xworkout/shared/widgets/async_value_widget.dart';
+import 'package:xworkout/shared/widgets/empty_state.dart';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -24,53 +25,25 @@ class TodayScreen extends ConsumerWidget {
         middle: Text(formatDate(selectedDate)),
       ),
       child: SafeArea(
-        child: activePlanAsync.when(
+        child: AsyncValueWidget<WorkoutPlan?>(
+          value: activePlanAsync,
           data: (plan) {
             if (plan == null) {
-              return _buildNoPlanView(context);
+              return const EmptyStateWidget(
+                icon: Icons.timer,
+                title: '暂无激活的计划',
+                message: '请先在「训练」页面创建并激活健身计划',
+              );
             }
             
             return _buildTodayContent(context, ref, plan, todayRecordAsync);
           },
-          loading: () => const Center(child: CupertinoActivityIndicator()),
-          error: (error, stack) => Center(
-            child: Text('加载失败: $error'),
-          ),
         ),
       ),
     );
   }
   
-  Widget _buildNoPlanView(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.timer,
-            size: 64,
-            color: CupertinoColors.systemGrey,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            '暂无激活的计划',
-            style: TextStyle(
-              fontSize: 17,
-              color: CupertinoColors.systemGrey,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            '请先在「训练」页面创建并激活健身计划',
-            style: TextStyle(
-              fontSize: 13,
-              color: CupertinoColors.systemGrey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
   
   Widget _buildTodayContent(
     BuildContext context,
@@ -81,36 +54,14 @@ class TodayScreen extends ConsumerWidget {
     final cycleDay = calculateCycleDay(plan);
     final planDaysAsync = ref.watch(planDaysProvider(plan.id));
     
-    return planDaysAsync.when(
+    return AsyncValueWidget<List<PlanDay>>(
+      value: planDaysAsync,
       data: (planDays) {
         if (planDays.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.bar_chart,
-                  size: 64,
-                  color: CupertinoColors.systemGrey,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  '暂无训练日',
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: CupertinoColors.systemGrey,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  '请在计划中添加训练日',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: CupertinoColors.systemGrey,
-                  ),
-                ),
-              ],
-            ),
+          return const EmptyStateWidget(
+            icon: Icons.bar_chart,
+            title: '暂无训练日',
+            message: '请在计划中添加训练日',
           );
         }
         
@@ -122,6 +73,7 @@ class TodayScreen extends ConsumerWidget {
         final workoutDuration = ref.watch(workoutDurationProvider);
         
         return ListView(
+          padding: const EdgeInsets.only(bottom: 100),
           children: [
             _buildPlanHeader(plan, cycleDay, isRestDay, workoutDuration),
             if (isRestDay)
@@ -131,8 +83,6 @@ class TodayScreen extends ConsumerWidget {
           ],
         );
       },
-      loading: () => const Center(child: CupertinoActivityIndicator()),
-      error: (e, _) => Center(child: Text('加载失败: $e')),
     );
   }
   
@@ -295,36 +245,14 @@ class TodayScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              exercisesAsync.when(
+              AsyncValueWidget<List<DayExercise>>(
+                value: exercisesAsync,
                 data: (exercises) {
                   if (exercises.isEmpty) {
-                    return Container(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        children: [
-                          const Icon(
-                            Icons.fitness_center,
-                            size: 48,
-                            color: CupertinoColors.systemGrey,
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            '暂无训练项目',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            '请在计划中添加训练项目',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: CupertinoColors.systemGrey,
-                            ),
-                          ),
-                        ],
-                      ),
+                    return const EmptyStateWidget(
+                      icon: Icons.fitness_center,
+                      title: '暂无训练项目',
+                      message: '请在计划中添加训练项目',
                     );
                   }
                   
@@ -338,8 +266,6 @@ class TodayScreen extends ConsumerWidget {
                     }).toList(),
                   );
                 },
-                loading: () => const CupertinoActivityIndicator(),
-                error: (e, _) => Text('加载失败: $e'),
               ),
             ],
           ),
