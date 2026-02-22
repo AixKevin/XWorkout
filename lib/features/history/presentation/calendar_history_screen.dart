@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' hide HeaderStyle;
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -22,11 +23,12 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
     final sessionsAsync = ref.watch(workoutSessionsProvider);
     final typesAsync = ref.watch(workoutTypesProvider);
 
-    return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
+    return Scaffold(
+      appBar: const CupertinoNavigationBar(
         middle: Text('日历视图'),
+        backgroundColor: CupertinoColors.systemBackground,
       ),
-      child: SafeArea(
+      body: SafeArea(
         child: sessionsAsync.when(
           data: (sessions) => _buildCalendar(sessions, typesAsync),
           loading: () => const Center(child: CupertinoActivityIndicator()),
