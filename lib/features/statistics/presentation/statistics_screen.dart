@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon, IconData, CircularProgressIndicator;
+import 'package:flutter/material.dart' show CircularProgressIndicator;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:xworkout/features/statistics/data/statistics_repository.dart';
@@ -169,7 +169,7 @@ class _WeeklyGoalCard extends ConsumerWidget {
                     ),
                   ),
                   Icon(
-                    progress >= 1.0 ? Icons.check : Icons.directions_run,
+                    progress >= 1.0 ? CupertinoIcons.checkmark_alt : CupertinoIcons.waveform_path,
                     color: progress >= 1.0 ? CupertinoColors.activeGreen : CupertinoColors.systemGrey,
                   ),
                 ],
@@ -561,7 +561,7 @@ class _ExerciseStatsSheet extends ConsumerWidget {
                             child: _StatBox(
                               title: '最大重量', 
                               value: '${maxWeight.toStringAsFixed(1)} kg',
-                              icon: Icons.vertical_align_top,
+                              icon: CupertinoIcons.arrow_up_to_line,
                               color: CupertinoColors.systemRed,
                             ),
                           ),
@@ -570,7 +570,7 @@ class _ExerciseStatsSheet extends ConsumerWidget {
                             child: _StatBox(
                               title: '总容量', 
                               value: '${(totalVolume / 1000).toStringAsFixed(1)}k kg',
-                              icon: Icons.layers,
+                              icon: CupertinoIcons.layers_fill,
                               color: CupertinoColors.systemPurple,
                             ),
                           ),
