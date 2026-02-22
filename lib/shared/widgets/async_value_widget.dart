@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AsyncValueWidget<T> extends StatelessWidget {
@@ -36,9 +37,9 @@ class AsyncValueWidget<T> extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
-                      CupertinoIcons.exclamationmark_triangle_fill,
+                      Icons.warning,
                       size: 48,
-                      color: CupertinoColors.systemRed,
+                      color: Colors.red,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -53,7 +54,7 @@ class AsyncValueWidget<T> extends StatelessWidget {
                       e.toString(),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: CupertinoColors.secondaryLabel,
+                        color: Colors.grey,
                       ),
                     ),
                     if (onRetry != null) ...[

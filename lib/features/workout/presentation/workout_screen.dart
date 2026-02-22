@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database_provider.dart';
@@ -151,7 +152,7 @@ class _TypeCard extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
-              const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.white),
+              const Icon(Icons.chevron_right, color: Colors.white),
               const SizedBox(width: 20),
             ],
           ),
@@ -176,13 +177,13 @@ class _TypeCard extends ConsumerWidget {
   IconData _getTypeIcon(String name) {
     switch (name) {
       case '胸部':
-        return CupertinoIcons.circle_grid_hex_fill;
+        return Icons.grid_view;
       case '背部':
-        return CupertinoIcons.person_fill;
+        return Icons.person;
       case '腿部':
-        return CupertinoIcons.hare_fill; // Using hare for running/legs as close enough or just person_2_fill
+        return Icons.directions_run;
       default:
-        return CupertinoIcons.circle_grid_hex_fill;
+        return Icons.grid_view;
     }
   }
 
@@ -278,7 +279,7 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(CupertinoIcons.add, color: CupertinoColors.white),
+                    Icon(Icons.add, color: Colors.white),
                     SizedBox(width: 8),
                     Text('添加动作', style: TextStyle(color: CupertinoColors.white)),
                   ],
@@ -437,7 +438,7 @@ class _LastTrainingReference extends ConsumerWidget {
             ),
             child: const Row(
               children: [
-                Icon(CupertinoIcons.info_circle, color: CupertinoColors.systemGrey),
+                Icon(Icons.info_outline, color: Colors.grey),
                 SizedBox(width: 8),
                 Text('暂无同类型历史记录', style: TextStyle(color: CupertinoColors.systemGrey)),
               ],
@@ -537,7 +538,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> with SingleTicke
           },
           child: Row(
             children: [
-              const Icon(CupertinoIcons.doc_text, color: CupertinoColors.systemBlue),
+              const Icon(Icons.description, color: Colors.blue),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -561,7 +562,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> with SingleTicke
               ),
               const Spacer(),
               Icon(
-                _isExpanded ? CupertinoIcons.chevron_up : CupertinoIcons.chevron_down,
+                _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                 color: CupertinoColors.systemBlue,
                 size: 20,
               ),
@@ -641,7 +642,7 @@ class _ExerciseCardState extends State<_ExerciseCard> {
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   minSize: 24,
-                  child: const Icon(CupertinoIcons.add_circled, color: CupertinoColors.activeBlue),
+                  child: const Icon(Icons.add_circle, color: Colors.blue),
                   onPressed: widget.onAddSet,
                 ),
               ],
@@ -706,7 +707,7 @@ class _ExerciseCardState extends State<_ExerciseCard> {
                           child: CupertinoButton(
                             padding: EdgeInsets.zero,
                             minSize: 24,
-                            child: const Icon(CupertinoIcons.delete, color: CupertinoColors.destructiveRed, size: 20),
+                            child: Icon(Icons.delete_outline, color: Colors.red, size: 20),
                             onPressed: () => widget.onDeleteSet(set.id),
                           ),
                         ),
@@ -798,7 +799,7 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
                     return CupertinoListTile(
                       title: Text(exercise.name),
                       subtitle: exercise.category != null ? Text(exercise.category!) : null,
-                      trailing: const Icon(CupertinoIcons.add),
+                      trailing: const Icon(Icons.add),
                       onTap: () => _addExercise(exercise.id),
                     );
                   },
