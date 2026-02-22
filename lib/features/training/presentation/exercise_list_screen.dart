@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xworkout/features/workout/data/workout_providers.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
 import 'package:xworkout/features/training/presentation/exercise_detail_screen.dart';
@@ -20,9 +21,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   String _searchQuery = '';
   String? _selectedCategory;
 
-  final List<String> _categories = [
-    '胸部', '背部', '腿部'
-  ];
+
 
   @override
   void dispose() {
@@ -54,9 +53,19 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     );
   }
 
+  List<String> _getCategories(AsyncValue<List<WorkoutType>> typesAsync) {
+    return typesAsync.when(
+      data: (types) => ['全部', ...types.map((t) => t.name)],
+      loading: () => ['全部'],
+      error: (_, __) => ['全部'],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final exercisesAsync = ref.watch(exerciseListProvider);
+    final workoutTypesAsync = ref.watch(workoutTypesProvider);
+    final categories = _getCategories(workoutTypesAsync);
     
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -106,7 +115,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                       });
                     }),
                   ),
-                  ..._categories.map((category) => Padding(
+                  ...categories.skip(1).map((category) => Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: _buildCategoryChip(category, _selectedCategory == category, () {
                       setState(() {
