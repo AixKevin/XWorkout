@@ -72,12 +72,12 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         middle: const Text('训练项目'),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Text('返回'),
+          child: const Icon(CupertinoIcons.back, size: 28),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.add),
+          child: const Icon(CupertinoIcons.add),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -163,7 +163,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                       );
                     } else {
                       return const EmptyStateWidget(
-                        icon: Icons.search,
+                        icon: CupertinoIcons.search,
                         title: '未找到匹配项目',
                         message: '尝试调整搜索关键词或分类',
                       );
@@ -204,13 +204,13 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                                 CupertinoButton(
                                   padding: EdgeInsets.zero,
                                   child: const Icon(
-                                    Icons.delete,
+                                    CupertinoIcons.delete,
                                     color: Colors.red,
                                     size: 22,
                                   ),
                                   onPressed: () => _confirmDelete(context, ref, exercise),
                                 ),
-                                const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                                const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                               ],
                             ),
                             onTap: () {
