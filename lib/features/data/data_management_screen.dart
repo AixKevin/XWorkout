@@ -3,7 +3,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,7 +60,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('导出选项'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(PhosphorIcons.calendar),
+                  leading: const Icon(CupertinoIcons.calendar),
                   title: const Text('日期范围'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -84,7 +83,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('导出数据'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(PhosphorIcons.fileCsv),
+                  leading: const Icon(CupertinoIcons.doc),
                   title: const Text('导出为 CSV'),
                   subtitle: const Text('表格格式，方便分析'),
                   trailing: _isExporting
@@ -93,7 +92,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                   onTap: _isExporting ? null : () => _exportCsv(),
                 ),
                 CupertinoListTile(
-                  leading: const Icon(PhosphorIcons.filePdf),
+                  leading: const Icon(CupertinoIcons.book),
                   title: const Text('导出 PDF 报告'),
                   subtitle: const Text('生成训练摘要报告'),
                   trailing: _isExporting
@@ -102,7 +101,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                   onTap: _isExporting ? null : () => _exportPdf(),
                 ),
                 CupertinoListTile(
-                  leading: const Icon(PhosphorIcons.shareNetwork),
+                  leading: const Icon(CupertinoIcons.share),
                   title: const Text('导出 JSON 备份'),
                   subtitle: const Text('完整数据备份'),
                   trailing: _isExporting
@@ -117,7 +116,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               header: const Text('导入与还原'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(PhosphorIcons.uploadSimple),
+                  leading: const Icon(CupertinoIcons.cloud_upload),
                   title: const Text('从备份导入'),
                   subtitle: const Text('支持 JSON 格式'),
                   trailing: _isImporting
