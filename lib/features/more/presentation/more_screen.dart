@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:xworkout/features/history/presentation/history_screen.dart';
+import 'package:xworkout/features/history/presentation/workout_history_screen.dart';
 import 'package:xworkout/features/data/data_management_screen.dart';
-import 'package:xworkout/features/statistics/presentation/statistics_screen.dart';
 import 'package:xworkout/features/settings/settings_screen.dart';
 import 'package:xworkout/features/more/data/settings_repository.dart';
-import 'package:xworkout/features/more/presentation/notification_settings_screen.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 
 class MoreScreen extends ConsumerWidget {
@@ -26,10 +23,10 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('数据'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(Icons.show_chart),
+                  leading: const Icon(CupertinoIcons.time),
                   title: const Text('历史记录'),
                   subtitle: const Text('查看训练历史'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -39,23 +36,19 @@ class MoreScreen extends ConsumerWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(Icons.bar_chart),
+                  leading: const Icon(CupertinoIcons.chart_bar),
                   title: const Text('统计'),
                   subtitle: const Text('训练数据分析'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => const StatisticsScreen(),
-                      ),
-                    );
+                    // TODO: Navigate to simplified statistics
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(Icons.data_usage),
+                  leading: const Icon(CupertinoIcons.floppy_disk),
                   title: const Text('数据管理'),
                   subtitle: const Text('导出、备份数据'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -65,9 +58,9 @@ class MoreScreen extends ConsumerWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(Icons.restore),
+                  leading: const Icon(CupertinoIcons.arrow_counterclockwise),
                   title: const Text('重置设置'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     _showResetSettingsDialog(context, ref);
                   },
@@ -78,29 +71,17 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('设置'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(Icons.notifications),
-                  title: const Text('通知设置'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => const NotificationSettingsScreen(),
-                      ),
-                    );
-                  },
-                ),
-                CupertinoListTile(
-                  leading: const Icon(Icons.display_settings),
+                  leading: const Icon(CupertinoIcons.device_phone_portrait),
                   title: const Text('显示设置'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     _showDisplaySettings(context, ref);
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(Icons.settings),
+                  leading: const Icon(CupertinoIcons.settings),
                   title: const Text('通用设置'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -115,9 +96,9 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('应用'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(Icons.info),
+                  leading: const Icon(CupertinoIcons.info),
                   title: const Text('关于'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     _showAbout(context);
                   },
@@ -295,7 +276,7 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
                     CupertinoListTile(
                       title: const Text('默认时长'),
                       additionalInfo: Text('$_duration 秒'),
-                      trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3),
+                      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
                       onTap: () => _showDurationPicker(),
                     ),
                   ],
@@ -451,19 +432,19 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
                     CupertinoListTile(
                       title: const Text('重量单位'),
                       additionalInfo: Text(_weightUnit.toUpperCase()),
-                      trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3),
+                      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
                       onTap: () => _showWeightUnitPicker(),
                     ),
                     CupertinoListTile(
                       title: const Text('日期格式'),
                       additionalInfo: Text(_dateFormat),
-                      trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3),
+                      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
                       onTap: () => _showDateFormatPicker(),
                     ),
                     CupertinoListTile(
                       title: const Text('每周首日'),
                       additionalInfo: Text(_firstDay == 1 ? '周一' : '周日'),
-                      trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3),
+                      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
                       onTap: () => _showFirstDayPicker(),
                     ),
                   ],

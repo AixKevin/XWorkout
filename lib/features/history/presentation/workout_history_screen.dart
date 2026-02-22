@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:xworkout/core/database/database_provider.dart';
@@ -52,7 +51,7 @@ class HistoryScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.history, size: 64, color: CupertinoColors.systemGrey),
+                          Icon(CupertinoIcons.clock, size: 64, color: CupertinoColors.systemGrey),
                           SizedBox(height: 16),
                           Text('暂无训练记录', style: TextStyle(color: CupertinoColors.systemGrey)),
                           SizedBox(height: 8),
@@ -243,7 +242,7 @@ class _SessionCard extends StatelessWidget {
                   color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.fitness_center, color: CupertinoColors.activeBlue),
+                child: const Icon(CupertinoIcons.circle_grid_hex_fill, color: CupertinoColors.activeBlue),
               ),
               const SizedBox(width: 12),
               Expanded(

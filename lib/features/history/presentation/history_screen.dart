@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon, IconData, Material;
+import 'package:flutter/material.dart' show Material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -62,7 +62,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           data: (records) {
             if (records.isEmpty && _viewMode == ViewMode.list) {
               return const EmptyStateWidget(
-                icon: Icons.book,
+                  icon: CupertinoIcons.book,
                 title: '暂无训练记录',
               );
             }
@@ -268,15 +268,15 @@ class _HistoryItem extends StatelessWidget {
 
     if (isSkipped) {
       statusColor = CupertinoColors.systemRed;
-      statusIcon = Icons.cancel;
+      statusIcon = CupertinoIcons.xmark_circle_fill;
       statusText = '请假';
     } else if (isCompleted) {
       statusColor = CupertinoColors.activeGreen;
-      statusIcon = Icons.check_circle;
+      statusIcon = CupertinoIcons.checkmark_circle_fill;
       statusText = '完成';
     } else {
       statusColor = CupertinoColors.systemGrey;
-      statusIcon = Icons.radio_button_unchecked;
+      statusIcon = CupertinoIcons.circle;
       statusText = record.status;
     }
 
@@ -300,7 +300,7 @@ class _HistoryItem extends StatelessWidget {
           fontSize: 13,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
       onTap: () {
         Navigator.of(context).push(
           CupertinoPageRoute(

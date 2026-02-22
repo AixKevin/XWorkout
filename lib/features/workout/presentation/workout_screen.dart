@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon, Divider, ExpansionTile;
+import 'package:flutter/material.dart' show Icons, Icon, Divider, ExpansionTile, Material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 import 'package:xworkout/features/workout/data/workout_providers.dart';
@@ -176,13 +176,13 @@ class _TypeCard extends ConsumerWidget {
   IconData _getTypeIcon(String name) {
     switch (name) {
       case '胸部':
-        return Icons.fitness_center;
+        return CupertinoIcons.circle_grid_hex_fill;
       case '背部':
-        return Icons.accessibility_new;
+        return CupertinoIcons.person_fill;
       case '腿部':
-        return Icons.directions_run;
+        return CupertinoIcons.hare_fill; // Using hare for running/legs as close enough or just person_2_fill
       default:
-        return Icons.fitness_center;
+        return CupertinoIcons.circle_grid_hex_fill;
     }
   }
 
@@ -470,16 +470,9 @@ class _LastTrainingReference extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: CupertinoColors.systemBlue.withValues(alpha: 0.3)),
       ),
-      child: ExpansionTile(
-        leading: const Icon(CupertinoIcons.doc_text, color: CupertinoColors.systemBlue),
-        title: const Text(
-          '上次训练参考',
-          style: TextStyle(color: CupertinoColors.systemBlue, fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          '${sets.length}组动作',
-          style: const TextStyle(fontSize: 12),
-        ),
+      child: _ExpandableSection(
+        title: '上次训练参考',
+        subtitle: '${sets.length}组动作',
         children: groupedSets.entries.map((entry) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -500,6 +493,75 @@ class _LastTrainingReference extends ConsumerWidget {
           );
         }).toList(),
       ),
+    );
+  }
+}
+
+class _ExpandableSection extends StatefulWidget {
+  final String title;
+  final String subtitle;
+  final List<Widget> children;
+
+  const _ExpandableSection({
+    required this.title,
+    required this.subtitle,
+    required this.children,
+  });
+
+  @override
+  State<_ExpandableSection> createState() => _ExpandableSectionState();
+}
+
+class _ExpandableSectionState extends State<_ExpandableSection> with SingleTickerProviderStateMixin {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CupertinoButton(
+          padding: const EdgeInsets.all(16),
+          onPressed: () {
+            setState(() {
+              _isExpanded = !_isExpanded;
+            });
+          },
+          child: Row(
+            children: [
+              const Icon(CupertinoIcons.doc_text, color: CupertinoColors.systemBlue),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      color: CupertinoColors.systemBlue,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    widget.subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: CupertinoColors.systemGrey,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Icon(
+                _isExpanded ? CupertinoIcons.chevron_up : CupertinoIcons.chevron_down,
+                color: CupertinoColors.systemBlue,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+        if (_isExpanded)
+          Column(children: widget.children),
+      ],
     );
   }
 }

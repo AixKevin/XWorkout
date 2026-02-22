@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/plan_form_screen.dart';
@@ -57,7 +56,7 @@ class PlanListScreen extends ConsumerWidget {
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(Icons.add),
+          child: const Icon(CupertinoIcons.add),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -73,7 +72,7 @@ class PlanListScreen extends ConsumerWidget {
           data: (plans) {
             if (plans.isEmpty) {
               return EmptyStateWidget(
-                icon: Icons.fitness_center,
+                icon: CupertinoIcons.circle_grid_hex_fill,
                 title: '暂无健身计划',
                 message: '创建您的第一个健身计划开始训练',
                 actionLabel: '创建计划',
@@ -100,8 +99,8 @@ class PlanListScreen extends ConsumerWidget {
                   ),
                   leading: Icon(
                     isActive 
-                        ? Icons.check_circle
-                        : Icons.bar_chart,
+                        ? CupertinoIcons.check_mark_circled_solid
+                        : CupertinoIcons.chart_bar,
                     color: isActive ? CupertinoColors.activeGreen : null,
                   ),
                   trailing: Row(
@@ -110,13 +109,13 @@ class PlanListScreen extends ConsumerWidget {
                       CupertinoButton(
                         padding: EdgeInsets.zero,
                         child: const Icon(
-                          Icons.delete,
+                          CupertinoIcons.delete,
                           color: CupertinoColors.destructiveRed,
                           size: 22,
                         ),
                         onPressed: () => _confirmDeletePlan(context, ref, plan),
                       ),
-                      const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                      const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                     ],
                   ),
                   onTap: () {

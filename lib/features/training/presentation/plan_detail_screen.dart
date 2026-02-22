@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon, Material;
+import 'package:flutter/material.dart' show Material;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
@@ -41,13 +41,13 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
         middle: Text(plan?.name ?? '计划详情'),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.arrow_back_ios),
+          child: const Icon(CupertinoIcons.back),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: plan != null
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: const Icon(Icons.more_horiz),
+                child: const Icon(CupertinoIcons.ellipsis),
                 onPressed: () => _showActionSheet(context, plan),
               )
             : null,
@@ -586,7 +586,7 @@ class _DayDetailTile extends ConsumerWidget {
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 16),
                       child: const Icon(
-                        Icons.delete,
+                        CupertinoIcons.delete,
                         color: CupertinoColors.white,
                       ),
                     ),
@@ -611,7 +611,7 @@ class _DayDetailTile extends ConsumerWidget {
             ),
           ),
           CupertinoListTile(
-            leading: const Icon(Icons.add),
+            leading: const Icon(CupertinoIcons.add),
             title: const Text('添加训练项目'),
             onTap: () {
               _showAddExerciseDialog(context, ref);

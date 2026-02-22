@@ -12,7 +12,7 @@ final currentStreakProvider = FutureProvider.autoDispose<int>((ref) => ref.watch
 final volumeTrendProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) => ref.watch(statisticsRepositoryProvider).getVolumeTrend(30));
 final topExercisesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) => ref.watch(statisticsRepositoryProvider).getTopExercises(5));
 final weeklyGoalProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) => ref.watch(statisticsRepositoryProvider).getWeeklyGoalProgress(target: 3));
-final bodyWeightTrendProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) => ref.watch(statisticsRepositoryProvider).getBodyWeightTrend());
+
 final exerciseStatsProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, String>((ref, exerciseId) => ref.watch(statisticsRepositoryProvider).getExerciseStats(exerciseId));
 
 class StatisticsScreen extends ConsumerWidget {
@@ -42,7 +42,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '总训练',
                       provider: totalWorkoutsProvider,
-                      icon: Icons.fitness_center,
+                      icon: CupertinoIcons.circle_grid_hex_fill,
                       color: CupertinoColors.activeBlue,
                       unit: '次',
                     ),
@@ -52,7 +52,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '当前连胜',
                       provider: currentStreakProvider,
-                      icon: Icons.local_fire_department,
+                      icon: CupertinoIcons.flame_fill,
                       color: CupertinoColors.activeOrange,
                       unit: '天',
                     ),
@@ -100,10 +100,7 @@ class StatisticsScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               const _TopExercisesList(),
 
-              const SizedBox(height: 24),
-              const _SectionHeader('体重变化'),
-              const SizedBox(height: 12),
-              const _BodyWeightChart(),
+
               
               const SizedBox(height: 40),
             ],
@@ -379,47 +376,7 @@ class _TopExercisesList extends ConsumerWidget {
   }
 }
 
-class _BodyWeightChart extends ConsumerWidget {
-  const _BodyWeightChart();
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final trendAsync = ref.watch(bodyWeightTrendProvider);
-
-    return Container(
-      height: 250,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: CupertinoColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: trendAsync.when(
-        data: (data) {
-          if (data.isEmpty) {
-             return const Center(child: Text('暂无体重记录\n(请在每日记录备注中填写 "Weight: 70kg")', textAlign: TextAlign.center));
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-               const Text('体重 (kg)', style: TextStyle(fontSize: 14, color: CupertinoColors.secondaryLabel)),
-               const SizedBox(height: 16),
-               Expanded(
-                 child: _SimpleLineChart(
-                   data: data, 
-                   yKey: 'weight', 
-                   color: CupertinoColors.activeOrange,
-                   showPoints: true,
-                 ),
-               ),
-            ],
-          );
-        },
-        loading: () => const Center(child: CupertinoActivityIndicator()),
-        error: (e, _) => Center(child: Text('加载失败: $e')),
-      ),
-    );
-  }
-}
 
 class _SimpleLineChart extends StatelessWidget {
   final List<Map<String, dynamic>> data;

@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
@@ -63,12 +62,12 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         middle: const Text('训练项目'),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.arrow_back_ios),
+          child: const Icon(CupertinoIcons.back),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.add),
+          child: const Icon(CupertinoIcons.add),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -140,7 +139,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                   if (filteredExercises.isEmpty) {
                     if (exercises.isEmpty) {
                       return EmptyStateWidget(
-                        icon: Icons.fitness_center,
+                        icon: CupertinoIcons.circle_grid_hex_fill,
                         title: '暂无训练项目',
                         message: '添加您的第一个训练项目',
                         actionLabel: '添加项目',
@@ -154,7 +153,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                       );
                     } else {
                       return const EmptyStateWidget(
-                        icon: Icons.search_off,
+                        icon: CupertinoIcons.search,
                         title: '未找到匹配项目',
                         message: '尝试调整搜索关键词或分类',
                       );
@@ -195,13 +194,13 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                                 CupertinoButton(
                                   padding: EdgeInsets.zero,
                                   child: const Icon(
-                                    Icons.delete,
+                                    CupertinoIcons.delete,
                                     color: CupertinoColors.destructiveRed,
                                     size: 22,
                                   ),
                                   onPressed: () => _confirmDelete(context, ref, exercise),
                                 ),
-                                const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                                const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                               ],
                             ),
                             onTap: () {
@@ -224,7 +223,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
       ),
     );
   }
-
+}
   Widget _buildCategoryChip(String label, bool isSelected, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
