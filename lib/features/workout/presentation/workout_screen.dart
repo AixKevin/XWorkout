@@ -290,34 +290,7 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
 
     return Column(
       children: [
-        // 顶部信息
-        Container(
-          padding: const EdgeInsets.all(16),
-          color: CupertinoColors.systemGrey6,
-          child: Row(
-            children: [
-              workoutTypesAsync.when(
-                data: (types) {
-                  final type = types.where((t) => t.id == widget.session.typeId).firstOrNull;
-                  return Text(type?.name ?? '训练', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold));
-                },
-                loading: () => const Text('加载中...'),
-                error: (_, __) => const Text('训练'),
-              ),
-              const Spacer(),
-              Text(
-                '${DateTime.now().month}月${DateTime.now().day}日',
-                style: const TextStyle(color: CupertinoColors.systemGrey),
-              ),
-            ],
-          ),
-        ),
-
-        // 上次训练参考
-        _LastTrainingReference(sessionId: widget.session.id),
-
-        // 训练动作列表
-        // 训练动作列表
+        // 训练动作列表（包含顶部内容）
         Expanded(
           child: setsAsync.when(
             data: (sets) => _buildExerciseList(sets, exercisesAsync, workoutTypesAsync),
