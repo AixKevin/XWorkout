@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/history/presentation/workout_history_screen.dart';
 import 'package:xworkout/features/history/presentation/calendar_history_screen.dart';
@@ -24,10 +26,10 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('数据'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.calendar),
+                  leading: const Icon(Icons.calendar_today),
                   title: const Text('日历视图'),
                   subtitle: const Text('按日期查看训练'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -37,10 +39,10 @@ class MoreScreen extends ConsumerWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.floppy_disk),
+                  leading: const Icon(Icons.save),
                   title: const Text('数据管理'),
                   subtitle: const Text('导出、备份数据'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -50,9 +52,9 @@ class MoreScreen extends ConsumerWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.arrow_counterclockwise),
+                  leading: const Icon(Icons.refresh),
                   title: const Text('重置设置'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showResetSettingsDialog(context, ref);
                   },
@@ -63,17 +65,17 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('设置'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.device_phone_portrait),
+                  leading: const Icon(Icons.phone_android),
                   title: const Text('显示设置'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showDisplaySettings(context, ref);
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.settings),
+                  leading: const Icon(Icons.settings),
                   title: const Text('通用设置'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -88,9 +90,9 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('应用'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.info),
+                  leading: const Icon(Icons.info),
                   title: const Text('关于'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showAbout(context);
                   },
