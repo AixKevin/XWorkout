@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/templates/data/plan_templates.dart';
 import 'package:xworkout/features/templates/data/user_template_repository.dart';
@@ -69,17 +70,17 @@ class TemplateListScreen extends ConsumerWidget {
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: CupertinoColors.activeGreen.withValues(alpha: 0.1),
+                        color: Colors.green.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        CupertinoIcons.person_fill,
-                        color: CupertinoColors.activeGreen,
+                        Icons.person,
+                        color: Colors.green,
                       ),
                     ),
                     title: Text(template.name),
                     subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                    trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                    trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
                     onTap: () => _showTemplateDetail(context, ref, template),
                   );
                 }).toList(),
@@ -92,17 +93,17 @@ class TemplateListScreen extends ConsumerWidget {
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
+                      color: Colors.blue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
-                      CupertinoIcons.graph_square_fill,
-                      color: CupertinoColors.activeBlue,
+                      Icons.bar_chart,
+                      color: Colors.blue,
                     ),
                   ),
                   title: Text(template.name),
                   subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
                   onTap: () => _showTemplateDetail(context, ref, template),
                 );
               }).toList(),
@@ -156,7 +157,7 @@ class TemplateListScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: CupertinoButton(
-                        color: CupertinoColors.systemRed,
+                        color: Colors.red,
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: const Text('删除模板'),
                         onPressed: () {
@@ -220,7 +221,7 @@ class TemplateListScreen extends ConsumerWidget {
                           ? [
                                 const CupertinoListTile(
                                 title: Text('休息'),
-                                leading: Icon(CupertinoIcons.bed_double_fill),
+                                leading: Icon(Icons.hotel),
                               ),
                             ]
                           : day.exercises.map((exercise) {
@@ -229,7 +230,7 @@ class TemplateListScreen extends ConsumerWidget {
                                 subtitle: Text(
                                   '${exercise.targetSets}组 × ${exercise.targetReps}次${exercise.targetWeight != null ? ' × ${exercise.targetWeight}kg' : ''}',
                                 ),
-                                leading: const Icon(CupertinoIcons.circle_grid_hex_fill),
+                                leading: const Icon(Icons.grid_view),
                               );
                             }).toList(),
                     );

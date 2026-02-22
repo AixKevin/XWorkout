@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show LinearProgressIndicator;
+import 'package:flutter/material.dart' show LinearProgressIndicator, Icons, Colors;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database.dart';
@@ -113,7 +113,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
         ),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.xmark),
+          child: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: CupertinoButton(
@@ -161,12 +161,12 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
-                        const Icon(CupertinoIcons.star_fill, color: CupertinoColors.systemYellow, size: 20),
+                        const Icon(Icons.star, color: Colors.amber, size: 20),
                         const SizedBox(width: 8),
                         Text(
                           '历史最佳: ${_personalRecord}kg',
                           style: const TextStyle(
-                            color: CupertinoColors.systemYellow,
+                            color: Colors.amber,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -203,11 +203,11 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: CupertinoButton(
-                    color: CupertinoColors.activeBlue,
+                    color: Colors.blue,
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(CupertinoIcons.add),
+                        Icon(Icons.add),
                         SizedBox(width: 8),
                         Text('添加一组'),
                       ],
@@ -237,7 +237,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     placeholder: '添加备注 (例如: 座椅高度5)',
                     prefix: const Padding(
                       padding: EdgeInsets.only(left: 8),
-                      child: Icon(CupertinoIcons.pencil, color: CupertinoColors.systemGrey),
+                      child: Icon(Icons.edit, color: Colors.grey),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                     decoration: BoxDecoration(
@@ -269,7 +269,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                       const SizedBox(height: 8),
                       LinearProgressIndicator(
                         value: _sets.isEmpty ? 0 : _sets.where((s) => s.isCompleted).length / _sets.length,
-                        backgroundColor: CupertinoColors.systemGrey5,
+                        backgroundColor: Colors.grey[200],
                         valueColor: AlwaysStoppedAnimation(_getCompletionColor()),
                       ),
                     ],
@@ -285,9 +285,9 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
   
   Color _getCompletionColor() {
     final completed = _sets.where((s) => s.isCompleted).length;
-    if (completed == 0) return CupertinoColors.systemGrey;
-    if (completed < _sets.length) return CupertinoColors.systemYellow;
-    return CupertinoColors.activeGreen;
+    if (completed == 0) return Colors.grey;
+    if (completed < _sets.length) return Colors.amber;
+    return Colors.green;
   }
   
   void _showRestTimerDialog() {
@@ -378,8 +378,8 @@ class _RestTimerDialogState extends State<_RestTimerDialog> {
           const SizedBox(height: 16),
           LinearProgressIndicator(
             value: _remainingSeconds / widget.initialSeconds,
-            backgroundColor: CupertinoColors.systemGrey5,
-            valueColor: const AlwaysStoppedAnimation(CupertinoColors.activeBlue),
+            backgroundColor: Colors.grey[200],
+            valueColor: const AlwaysStoppedAnimation(Colors.blue),
           ),
           const SizedBox(height: 16),
           Row(
@@ -438,7 +438,7 @@ class _InfoItem extends StatelessWidget {
           label,
           style: const TextStyle(
             fontSize: 13,
-            color: CupertinoColors.systemGrey,
+            color: Colors.grey,
           ),
         ),
         const SizedBox(height: 4),
@@ -471,18 +471,18 @@ class _SetItem extends StatelessWidget {
       key: ValueKey(setRecord.setNumber),
       direction: DismissDirection.horizontal,
       background: Container(
-        color: CupertinoColors.activeGreen,
+        color: Colors.green,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 16),
-        child: const Icon(CupertinoIcons.checkmark, color: CupertinoColors.white),
+        child: const Icon(Icons.check, color: Colors.white),
       ),
       secondaryBackground: Container(
-        color: setRecord.isCompleted ? CupertinoColors.systemGrey : CupertinoColors.activeGreen,
+        color: setRecord.isCompleted ? Colors.grey : Colors.green,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 16),
         child: Icon(
-          setRecord.isCompleted ? CupertinoIcons.arrow_counterclockwise : CupertinoIcons.checkmark,
-          color: CupertinoColors.white,
+          setRecord.isCompleted ? Icons.replay : Icons.check,
+          color: Colors.white,
         ),
       ),
       confirmDismiss: (direction) async {
@@ -496,8 +496,8 @@ class _SetItem extends StatelessWidget {
         height: 32,
         decoration: BoxDecoration(
           color: setRecord.isCompleted 
-              ? CupertinoColors.activeGreen 
-              : CupertinoColors.systemGrey5,
+              ? Colors.green 
+              : Colors.grey[200],
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -506,8 +506,8 @@ class _SetItem extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.w600,
               color: setRecord.isCompleted 
-                  ? CupertinoColors.white 
-                  : CupertinoColors.systemGrey,
+                  ? Colors.white 
+                  : Colors.grey,
             ),
           ),
         ),
@@ -538,7 +538,7 @@ class _SetItem extends StatelessWidget {
               },
               suffix: isPR ? const Padding(
                 padding: EdgeInsets.only(right: 8.0),
-                child: Icon(CupertinoIcons.star_fill, color: CupertinoColors.systemYellow, size: 16),
+                child: Icon(Icons.star, color: Colors.amber, size: 16),
               ) : null,
             ),
           ),
@@ -551,10 +551,10 @@ class _SetItem extends StatelessWidget {
       trailing: CupertinoButton(
         padding: EdgeInsets.zero,
         child: Icon(
-          setRecord.isCompleted ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle,
+          setRecord.isCompleted ? Icons.check_circle : Icons.circle_outlined,
           color: setRecord.isCompleted 
-              ? CupertinoColors.activeGreen 
-              : CupertinoColors.systemGrey,
+              ? Colors.green 
+              : Colors.grey,
         ),
         onPressed: () {
           onChanged(setRecord.copyWith(isCompleted: !setRecord.isCompleted));

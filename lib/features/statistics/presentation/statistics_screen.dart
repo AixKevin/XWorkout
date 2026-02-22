@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show CircularProgressIndicator;
+import 'package:flutter/material.dart' show CircularProgressIndicator, Icons, Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:xworkout/features/statistics/data/statistics_repository.dart';
@@ -42,7 +42,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '总训练',
                       provider: totalWorkoutsProvider,
-                      icon: CupertinoIcons.circle_grid_hex_fill,
+                      icon: Icons.grid_view,
                       color: CupertinoColors.activeBlue,
                       unit: '次',
                     ),
@@ -52,7 +52,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '当前连胜',
                       provider: currentStreakProvider,
-                      icon: CupertinoIcons.flame_fill,
+                      icon: Icons.local_fire_department,
                       color: CupertinoColors.activeOrange,
                       unit: '天',
                     ),
@@ -169,7 +169,7 @@ class _WeeklyGoalCard extends ConsumerWidget {
                     ),
                   ),
                   Icon(
-                    progress >= 1.0 ? CupertinoIcons.checkmark_alt : CupertinoIcons.waveform_path,
+                    progress >= 1.0 ? Icons.check : Icons.show_chart,
                     color: progress >= 1.0 ? CupertinoColors.activeGreen : CupertinoColors.systemGrey,
                   ),
                 ],
@@ -355,7 +355,7 @@ class _TopExercisesList extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey4),
+                    const Icon(Icons.chevron_right, color: Colors.grey),
                   ],
                 ),
               ),
@@ -539,7 +539,7 @@ class _ExerciseStatsSheet extends ConsumerWidget {
                 Text(exerciseName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(CupertinoIcons.xmark_circle_fill, color: CupertinoColors.systemGrey3),
+                  child: const Icon(Icons.close, color: Colors.grey),
                 ),
               ],
             ),
@@ -561,7 +561,7 @@ class _ExerciseStatsSheet extends ConsumerWidget {
                             child: _StatBox(
                               title: '最大重量', 
                               value: '${maxWeight.toStringAsFixed(1)} kg',
-                              icon: CupertinoIcons.arrow_up_to_line,
+                              icon: Icons.vertical_align_top,
                               color: CupertinoColors.systemRed,
                             ),
                           ),
@@ -570,7 +570,7 @@ class _ExerciseStatsSheet extends ConsumerWidget {
                             child: _StatBox(
                               title: '总容量', 
                               value: '${(totalVolume / 1000).toStringAsFixed(1)}k kg',
-                              icon: CupertinoIcons.layers_fill,
+                              icon: Icons.layers,
                               color: CupertinoColors.systemPurple,
                             ),
                           ),

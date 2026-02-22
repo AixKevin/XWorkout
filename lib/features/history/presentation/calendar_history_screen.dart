@@ -1,11 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' hide HeaderStyle;
+import 'package:flutter/material.dart' show Icons, Colors, Scaffold;
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 import 'package:xworkout/features/workout/data/workout_providers.dart';
-import 'package:xworkout/features/workout/data/workout_repository.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 
 class CalendarHistoryScreen extends ConsumerStatefulWidget {
@@ -73,10 +72,10 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                   margin: const EdgeInsets.all(4),
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                    color: CupertinoColors.activeGreen,
+                    color: Colors.green,
                     shape: BoxShape.circle,
                   ),
-                  child: Text(day.day.toString(), style: const TextStyle(color: CupertinoColors.white)),
+                  child: Text(day.day.toString(), style: const TextStyle(color: Colors.white)),
                 );
               },
               selectedBuilder: (context, day, focusedDay) {
@@ -84,10 +83,10 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                   margin: const EdgeInsets.all(4),
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                    color: CupertinoColors.activeBlue,
+                    color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
-                  child: Text(day.day.toString(), style: const TextStyle(color: CupertinoColors.white)),
+                  child: Text(day.day.toString(), style: const TextStyle(color: Colors.white)),
                 );
               },
               todayBuilder: (context, day, focusedDay) {
@@ -95,10 +94,10 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                   margin: const EdgeInsets.all(4),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: CupertinoColors.activeBlue.withValues(alpha: 0.3),
+                    color: Colors.blue.withValues(alpha: 0.3),
                     shape: BoxShape.circle,
                   ),
-                  child: Text(day.day.toString(), style: const TextStyle(color: CupertinoColors.activeBlue)),
+                  child: Text(day.day.toString(), style: const TextStyle(color: Colors.blue)),
                 );
               },
             ),
@@ -126,7 +125,7 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
 
   Widget _buildDayDetail(List<WorkoutSession> sessions, AsyncValue<List<WorkoutType>> typesAsync) {
     if (sessions.isEmpty) {
-      return const Center(child: Text('当天无训练记录', style: TextStyle(color: CupertinoColors.systemGrey)));
+      return const Center(child: Text('当天无训练记录', style: TextStyle(color: Colors.grey)));
     }
 
     return typesAsync.when(
@@ -155,7 +154,7 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                       color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(CupertinoIcons.sportscourt, color: CupertinoColors.activeBlue),
+                    child: const Icon(Icons.fitness_center, color: Colors.blue),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -163,13 +162,13 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(type?.name ?? '训练', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
-                        Text(DateFormat('HH:mm').format(session.date), style: const TextStyle(color: CupertinoColors.systemGrey, fontSize: 14)),
+                        Text(DateFormat('HH:mm').format(session.date), style: const TextStyle(color: Colors.grey, fontSize: 14)),
                         if (session.note != null && session.note!.isNotEmpty)
-                          Text(session.note!, style: const TextStyle(color: CupertinoColors.systemGrey2, fontSize: 13)),
+                          Text(session.note!, style: const TextStyle(color: Colors.grey, fontSize: 13)),
                       ],
                     ),
                   ),
-                  const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+                  const Icon(Icons.chevron_right, color: Colors.grey),
                 ],
               ),
             ),
@@ -261,7 +260,7 @@ class _ExerciseDetailCard extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               children: [
-                SizedBox(width: 30, child: Text('${set.setNumber}.', style: const TextStyle(color: CupertinoColors.systemGrey))),
+                SizedBox(width: 30, child: Text('${set.setNumber}.', style: const TextStyle(color: Colors.grey))),
                 Expanded(child: Text('${set.weight.isEmpty ? "-" : set.weight} × ${set.reps}次', style: const TextStyle(fontSize: 15))),
               ],
             ),

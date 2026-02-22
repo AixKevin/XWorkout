@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:xworkout/core/database/database_provider.dart';
@@ -51,11 +52,11 @@ class HistoryScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(CupertinoIcons.clock, size: 64, color: CupertinoColors.systemGrey),
+                          Icon(Icons.access_time, size: 64, color: Colors.grey),
                           SizedBox(height: 16),
-                          Text('暂无训练记录', style: TextStyle(color: CupertinoColors.systemGrey)),
+                          Text('暂无训练记录', style: TextStyle(color: Colors.grey)),
                           SizedBox(height: 8),
-                          Text('开始你的第一次训练吧！', style: TextStyle(color: CupertinoColors.systemGrey2)),
+                          Text('开始你的第一次训练吧！', style: TextStyle(color: Colors.grey)),
                         ],
                       ),
                     );
@@ -188,14 +189,14 @@ class _Chip extends StatelessWidget {
       padding: const EdgeInsets.only(right: 8),
       child: CupertinoButton(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        color: isSelected ? CupertinoColors.activeBlue : CupertinoColors.systemGrey5,
+        color: isSelected ? Colors.blue : Colors.grey[200],
         minSize: 32,
         borderRadius: BorderRadius.circular(16),
         onPressed: onTap,
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? CupertinoColors.white : CupertinoColors.label,
+            color: isSelected ? Colors.white : Colors.black,
             fontSize: 14,
           ),
         ),
@@ -242,7 +243,7 @@ class _SessionCard extends StatelessWidget {
                   color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(CupertinoIcons.circle_grid_hex_fill, color: CupertinoColors.activeBlue),
+                child: const Icon(Icons.grid_view, color: Colors.blue),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -254,7 +255,7 @@ class _SessionCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: CupertinoColors.label,
+                        color: Colors.black,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -262,7 +263,7 @@ class _SessionCard extends StatelessWidget {
                       dateStr,
                       style: const TextStyle(
                         fontSize: 14,
-                        color: CupertinoColors.systemGrey,
+                        color: Colors.grey,
                       ),
                     ),
                     if (session.note != null && session.note!.isNotEmpty) ...[
@@ -271,7 +272,7 @@ class _SessionCard extends StatelessWidget {
                         session.note!,
                         style: const TextStyle(
                           fontSize: 13,
-                          color: CupertinoColors.systemGrey2,
+                          color: Colors.grey,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -283,10 +284,10 @@ class _SessionCard extends StatelessWidget {
               CupertinoButton(
                 padding: EdgeInsets.zero,
                 minSize: 32,
-                child: const Icon(CupertinoIcons.delete, color: CupertinoColors.destructiveRed, size: 20),
+                child: const Icon(Icons.delete, color: Colors.red, size: 20),
                 onPressed: onDelete,
               ),
-              const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+              const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
         ),
@@ -310,7 +311,7 @@ class _SessionDetailScreen extends ConsumerWidget {
         middle: Text(DateFormat('MM月dd日', 'zh_CN').format(session.date)),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.delete),
+          child: const Icon(Icons.delete),
           onPressed: () => _showDeleteDialog(context, ref),
         ),
       ),
@@ -416,7 +417,7 @@ class _ExerciseDetailCard extends StatelessWidget {
                   width: 30,
                   child: Text(
                     '${set.setNumber}.',
-                    style: const TextStyle(color: CupertinoColors.systemGrey),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
                 Expanded(

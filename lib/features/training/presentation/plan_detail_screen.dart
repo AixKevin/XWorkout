@@ -586,8 +586,8 @@ class _DayDetailTile extends ConsumerWidget {
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 16),
                       child: const Icon(
-                        CupertinoIcons.delete,
-                        color: CupertinoColors.white,
+                        Icons.delete,
+                        color: Colors.white,
                       ),
                     ),
                     onDismissed: (direction) {
@@ -611,7 +611,7 @@ class _DayDetailTile extends ConsumerWidget {
             ),
           ),
           CupertinoListTile(
-            leading: const Icon(CupertinoIcons.add),
+            leading: const Icon(Icons.add),
             title: const Text('添加训练项目'),
             onTap: () {
               _showAddExerciseDialog(context, ref);

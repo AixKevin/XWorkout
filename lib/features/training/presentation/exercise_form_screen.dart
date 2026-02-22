@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/core/database/database.dart';
@@ -222,8 +223,8 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                 padding: EdgeInsets.zero,
                 onPressed: _delete,
                 child: const Icon(
-                  CupertinoIcons.delete,
-                  color: CupertinoColors.destructiveRed,
+                  Icons.delete,
+                  color: Colors.red,
                 ),
               ),
             CupertinoButton(

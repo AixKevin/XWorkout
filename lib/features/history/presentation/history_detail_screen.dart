@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:xworkout/core/database/database.dart';
@@ -34,12 +35,12 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
         middle: Text(DateFormat('MM月dd日', 'zh_CN').format(widget.record.date)),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.back),
+          child: const Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.delete, color: CupertinoColors.destructiveRed),
+          child: const Icon(Icons.delete, color: Colors.red),
           onPressed: () => _showDeleteDialog(context),
         ),
       ),
@@ -105,7 +106,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                   if (records.isEmpty) {
                     return [
                       const CupertinoListTile(
-                        leading: const Icon(CupertinoIcons.circle_grid_hex_fill),
+                        leading: const Icon(Icons.grid_view),
                         title: Text('暂无记录'),
                       ),
                     ];
@@ -118,10 +119,10 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                           orElse: () => exercises.first,
                         );
                         return CupertinoListTile(
-                          leading: const Icon(CupertinoIcons.circle_grid_hex_fill),
+                          leading: const Icon(Icons.grid_view),
                           title: Text(exercise.name),
                           subtitle: Text('${record.actualSets}组 - ${record.actualReps}次 ${record.actualWeight.isNotEmpty ? record.actualWeight.split(',').where((w) => w.isNotEmpty).map((w) => '${w}kg').join(' / ') : ''}'),
-                          trailing: const Icon(CupertinoIcons.chevron_right),
+                          trailing: const Icon(Icons.chevron_right),
                         );
                       },
                       loading: () => const CupertinoListTile(
@@ -161,9 +162,9 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
             CupertinoListSection.insetGrouped(
               children: [
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.pencil, color: CupertinoColors.activeBlue),
+                  leading: const Icon(Icons.edit, color: Colors.blue),
                   title: const Text('编辑记录'),
-                  trailing: const Icon(CupertinoIcons.chevron_right),
+                  trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     _showEditDialog(context);
                   },
@@ -264,13 +265,13 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
   IconData _getStatusIcon() {
     switch (widget.record.status) {
       case 'completed':
-        return CupertinoIcons.checkmark_circle_fill;
+        return Icons.check_circle;
       case 'normal':
-        return CupertinoIcons.checkmark_circle_fill;
+        return Icons.check_circle;
       case 'skipped':
-        return CupertinoIcons.xmark_circle_fill;
+        return Icons.cancel;
       default:
-        return CupertinoIcons.circle;
+        return Icons.radio_button_unchecked;
     }
   }
   
