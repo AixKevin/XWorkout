@@ -192,10 +192,12 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
             isDestructiveAction: true,
             child: const Text('删除'),
             onPressed: () async {
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Close dialog
               await _deleteRecord();
-              if (context.mounted) {
-                Navigator.of(context).pop();
+              // Use a slight delay to ensure the dialog is fully closed
+              await Future.delayed(const Duration(milliseconds: 100));
+              if (mounted) {
+                Navigator.of(context).pop(); // Go back to history list
               }
             },
           ),
