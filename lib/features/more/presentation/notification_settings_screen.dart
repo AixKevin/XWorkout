@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/services/notification_service.dart';
 import 'package:xworkout/features/more/data/settings_repository.dart';
@@ -134,13 +135,13 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     additionalInfo: Text(
                       '${_reminderHour.toString().padLeft(2, '0')}:${_reminderMinute.toString().padLeft(2, '0')}',
                     ),
-                    trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+                    trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                     onTap: () => _showTimePicker(),
                   ),
                   CupertinoListTile(
                     title: const Text('重复'),
                     additionalInfo: Text(_getWeekdaysString()),
-                    trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+                    trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                     onTap: () => _showWeekdaysPicker(),
                   ),
                   CupertinoListTile(
@@ -305,7 +306,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       return CupertinoListTile(
                         title: Text(weekdays[index]),
                         trailing: isSelected
-                            ? const Icon(CupertinoIcons.checkmark, color: CupertinoColors.activeBlue)
+                            ? const Icon(Icons.check, color: Colors.blue)
                             : null,
                         onTap: () {
                           setModalState(() {

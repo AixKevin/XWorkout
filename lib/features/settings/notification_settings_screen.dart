@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/core/services/notification_service.dart';
@@ -48,7 +49,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     header: const Text('提醒开关'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(CupertinoIcons.bell_fill),
+                        leading: const Icon(Icons.notifications),
                         title: const Text('启用训练提醒'),
                         trailing: CupertinoSwitch(
                           value: _notificationsEnabled,
@@ -66,7 +67,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                           additionalInfo: Text(
                             '${_reminderHour.toString().padLeft(2, '0')}:${_reminderMinute.toString().padLeft(2, '0')}',
                           ),
-                          trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                          trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
                           onTap: () => _showTimePicker(),
                         ),
                       ],
@@ -88,8 +89,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       children: [
                         CupertinoListTile(
                           leading: Icon(
-                            CupertinoIcons.checkmark_circle_fill,
-                            color: CupertinoColors.activeGreen,
+                            Icons.check_circle,
+                            color: Colors.green,
                           ),
                           title: const Text('保存设置'),
                           onTap: () => _saveSettings(),
@@ -109,8 +110,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       title: Text(name),
       trailing: isSelected
           ? const Icon(
-              CupertinoIcons.checkmark,
-              color: CupertinoColors.activeGreen,
+              Icons.check,
+              color: Colors.green,
             )
           : null,
       onTap: () {

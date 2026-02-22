@@ -270,7 +270,7 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
                     CupertinoListTile(
                       title: const Text('默认时长'),
                       additionalInfo: Text('$_duration 秒'),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () => _showDurationPicker(),
                     ),
                   ],
@@ -426,19 +426,19 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
                     CupertinoListTile(
                       title: const Text('重量单位'),
                       additionalInfo: Text(_weightUnit.toUpperCase()),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () => _showWeightUnitPicker(),
                     ),
                     CupertinoListTile(
                       title: const Text('日期格式'),
                       additionalInfo: Text(_dateFormat),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () => _showDateFormatPicker(),
                     ),
                     CupertinoListTile(
                       title: const Text('每周首日'),
                       additionalInfo: Text(_firstDay == 1 ? '周一' : '周日'),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () => _showFirstDayPicker(),
                     ),
                   ],
