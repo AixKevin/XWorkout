@@ -41,7 +41,7 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
         middle: Text(plan?.name ?? '计划详情'),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.arrow_back_ios),
+          child: const Text('返回'),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: plan != null

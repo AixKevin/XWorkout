@@ -35,7 +35,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
         middle: Text(DateFormat('MM月dd日', 'zh_CN').format(widget.record.date)),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.arrow_back_ios),
+          child: const Text('返回'),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: CupertinoButton(

@@ -113,7 +113,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
         ),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.close),
+          child: const Text('关闭'),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: CupertinoButton(

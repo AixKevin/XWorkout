@@ -63,7 +63,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         middle: const Text('训练项目'),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.arrow_back_ios),
+          child: const Text('返回'),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: CupertinoButton(

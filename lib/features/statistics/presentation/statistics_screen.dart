@@ -539,7 +539,7 @@ class _ExerciseStatsSheet extends ConsumerWidget {
                 Text(exerciseName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.close, color: Colors.grey),
+                  child: const Text('关闭', style: TextStyle(fontSize: 16, color: Colors.grey)),
                 ),
               ],
             ),
