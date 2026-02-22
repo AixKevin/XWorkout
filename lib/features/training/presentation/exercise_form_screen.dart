@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors, Icons;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/core/database/database.dart';
+import 'package:xworkout/features/workout/data/workout_providers.dart';
 
 class ExerciseFormScreen extends ConsumerStatefulWidget {
   final Exercise? exercise;
@@ -22,10 +22,16 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
   late TextEditingController _weightController;
   late TextEditingController _noteController;
   
-  final List<String> _categories = [
-    '胸部', '背部', '腿部'
-  ];
+
   
+  List<String> _getCategories(AsyncValue<List<WorkoutType>> typesAsync) {
+    return typesAsync.when(
+      data: (types) => types.map((t) => t.name).toList(),
+      loading: () => ['胸部', '背部', '腿部'],
+      error: (_, __) => ['胸部', '背部', '腿部'],
+    );
+  }
+
   bool get isEditing => widget.exercise != null;
 
   @override
@@ -55,7 +61,7 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
     super.dispose();
   }
 
-  void _showCategoryPicker() {
+  void _showCategoryPicker(List<String> categories) {
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) => Container(
@@ -93,19 +99,19 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                   useMagnifier: true,
                   itemExtent: 32.0,
                   scrollController: FixedExtentScrollController(
-                    initialItem: (_selectedCategory != null && _categories.contains(_selectedCategory))
-                        ? _categories.indexOf(_selectedCategory!) 
+                    initialItem: (_selectedCategory != null && categories.contains(_selectedCategory))
+                        ? categories.indexOf(_selectedCategory!) 
                         : 0,
                   ),
                   onSelectedItemChanged: (int selectedItem) {
                     setState(() {
-                      _selectedCategory = _categories[selectedItem];
+                      _selectedCategory = categories[selectedItem];
                     });
                   },
-                  children: List<Widget>.generate(_categories.length, (int index) {
+                  children: List<Widget>.generate(categories.length, (int index) {
                     return Center(
                       child: Text(
-                        _categories[index],
+                        categories[index],
                       ),
                     );
                   }),
@@ -208,6 +214,9 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final workoutTypesAsync = ref.watch(workoutTypesProvider);
+    final categories = _getCategories(workoutTypesAsync);
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(isEditing ? '编辑项目' : '新建项目'),
@@ -249,12 +258,12 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    if (_selectedCategory == null) {
+                    if (_selectedCategory == null && categories.isNotEmpty) {
                       setState(() {
-                        _selectedCategory = _categories[0];
+                        _selectedCategory = categories[0];
                       });
                     }
-                    _showCategoryPicker();
+                    _showCategoryPicker(categories);
                   },
                   child: CupertinoFormRow(
                     prefix: const Text('分类'),
