@@ -332,34 +332,34 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
             color: CupertinoColors.systemBackground,
             border: Border(top: BorderSide(color: CupertinoColors.systemGrey5)),
           ),
-          child: Column(
-            children: [
-              // 添加动作按钮
-              CupertinoButton(
-                color: CupertinoColors.activeBlue,
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text('添加动作', style: TextStyle(color: CupertinoColors.white)),
-                  ],
-                ),
-                onPressed: () => _showAddExerciseDialog(context, exercisesAsync),
-              ),
-              const SizedBox(height: 12),
-              // 完成训练按钮
-              SizedBox(
-                width: double.infinity,
-                child: CupertinoButton(
-                  color: CupertinoColors.activeGreen,
-                  child: const Text('完成训练', style: TextStyle(color: CupertinoColors.white)),
-                  onPressed: () => _completeWorkout(context),
-                ),
-              ),
-
-            ],
-          ),
+          child: Row(
+  children: [
+    Expanded(
+      child: CupertinoButton(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        color: CupertinoColors.activeBlue,
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add, color: Colors.white, size: 18),
+            SizedBox(width: 4),
+            Text('添加动作', style: TextStyle(color: CupertinoColors.white, fontSize: 14)),
+          ],
+        ),
+        onPressed: () => _showAddExerciseDialog(context, exercisesAsync),
+      ),
+    ),
+    const SizedBox(width: 12),
+    Expanded(
+      child: CupertinoButton(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        color: CupertinoColors.activeGreen,
+        child: const Text('完成训练', style: TextStyle(color: CupertinoColors.white, fontSize: 14)),
+        onPressed: () => _completeWorkout(context),
+      ),
+    ),
+  ],
+),
         ),
       ],
     );
