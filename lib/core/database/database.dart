@@ -8,7 +8,10 @@ import 'tables.dart';
 part 'database.g.dart';
 
 @DriftDatabase(tables: [
+  WorkoutTypes,
   Exercises,
+  WorkoutSessions,
+  WorkoutSets,
   WorkoutPlans,
   PlanDays,
   DayExercises,
@@ -22,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forMobile() : super(_openConnection());
   
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
   
   @override
   MigrationStrategy get migration {
@@ -30,15 +33,41 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (Migrator m) async {
         await m.createAll();
         await _createIndexes(m);
+        // Insert default workout types
+        await _insertDefaultTypes();
       },
       onUpgrade: (Migrator m, int from, int to) async {
         if (from < 2) {
           await _createIndexes(m);
         }
+        if (from < 3) {
+          // Migration to version 3: Add new tables
+          await m.createAll();
+          await _insertDefaultTypes();
+        }
       },
     );
   }
-
+  
+  Future<void> _insertDefaultTypes() async {
+    // Insert default workout types if not exist
+    final existingTypes = await select(workoutTypes).get();
+    if (existingTypes.isEmpty) {
+      await into(workoutTypes).insert(WorkoutTypesCompanion.insert(
+        name: '胸部',
+        sortOrder: const Value(1),
+      ));
+      await into(workoutTypes).insert(WorkoutTypesCompanion.insert(
+        name: '背部',
+        sortOrder: const Value(2),
+      ));
+      await into(workoutTypes).insert(WorkoutTypesCompanion.insert(
+        name: '腿部',
+        sortOrder: const Value(3),
+      ));
+    }
+  }
+  
   Future<void> _createIndexes(Migrator m) async {
     // Indexes for PlanDays
     await customStatement('CREATE INDEX IF NOT EXISTS idx_plan_days_plan_id ON plan_days (plan_id);');

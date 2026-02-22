@@ -16,12 +16,12 @@ class BottomNavBar extends StatelessWidget {
           CupertinoTabBar(
             items: const [
               BottomNavigationBarItem(
-                icon: Icon(Icons.today),
-                label: '今日',
-              ),
-              BottomNavigationBarItem(
                 icon: Icon(Icons.fitness_center),
                 label: '训练',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.history),
+                label: '历史',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.more_horiz),

@@ -5,7 +5,17 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'database.dart';
 
-export 'database.dart' show AppDatabase, Exercise, ExercisesCompanion, WorkoutPlan, WorkoutPlansCompanion, PlanDay, PlanDaysCompanion, DayExercise, DayExercisesCompanion, DailyRecord, DailyRecordsCompanion, ExerciseRecord, ExerciseRecordsCompanion, AppSetting, AppSettingsCompanion;
+export 'database.dart' show AppDatabase, 
+  WorkoutType, WorkoutTypesCompanion,
+  Exercise, ExercisesCompanion, 
+  WorkoutSession, WorkoutSessionsCompanion, 
+  WorkoutSet, WorkoutSetsCompanion,
+  WorkoutPlan, WorkoutPlansCompanion, 
+  PlanDay, PlanDaysCompanion, 
+  DayExercise, DayExercisesCompanion, 
+  DailyRecord, DailyRecordsCompanion, 
+  ExerciseRecord, ExerciseRecordsCompanion, 
+  AppSetting, AppSettingsCompanion;
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
