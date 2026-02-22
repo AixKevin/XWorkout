@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/material.dart' show Colors, Icons;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
@@ -224,7 +224,7 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                 padding: EdgeInsets.zero,
                 onPressed: _delete,
                 child: Icon(
-                  PhosphorIcons.trash(),
+                  Icons.delete,
                   color: Colors.red,
                 ),
               ),

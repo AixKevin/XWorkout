@@ -6,6 +6,7 @@ import 'package:xworkout/core/database/database_provider.dart';
 import 'package:xworkout/features/workout/data/workout_providers.dart';
 import 'package:xworkout/features/workout/data/workout_repository.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
+import 'package:xworkout/features/training/presentation/exercise_list_screen.dart';
 import 'package:uuid/uuid.dart';
 
 class WorkoutScreen extends ConsumerStatefulWidget {
@@ -21,27 +22,35 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     final workoutTypesAsync = ref.watch(workoutTypesProvider);
     final currentSession = ref.watch(currentSessionProvider);
 
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(currentSession != null ? '训练中' : '开始训练'),
-        leading: currentSession != null
-            ? CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: const Text('取消'),
-                onPressed: () => _showCancelDialog(context),
-              )
-            : null,
-      ),
-      child: SafeArea(
-        child: workoutTypesAsync.when(
-          data: (types) {
-            if (currentSession != null) {
-              return _WorkoutRecordingView(session: currentSession);
-            }
-            return _TypeSelectionView(types: types);
-          },
-          loading: () => const Center(child: CupertinoActivityIndicator()),
-          error: (e, _) => Center(child: Text('错误: $e')),
+    return PopScope(
+      canPop: currentSession == null,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop && currentSession != null) {
+          _showCancelDialog(context);
+        }
+      },
+      child: CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+          middle: Text(currentSession != null ? '训练中' : '开始训练'),
+          leading: currentSession != null
+              ? CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  child: const Text('取消'),
+                  onPressed: () => _showCancelDialog(context),
+                )
+              : null,
+        ),
+        child: SafeArea(
+          child: workoutTypesAsync.when(
+            data: (types) {
+              if (currentSession != null) {
+                return _WorkoutRecordingView(session: currentSession);
+              }
+              return _TypeSelectionView(types: types);
+            },
+            loading: () => const Center(child: CupertinoActivityIndicator()),
+            error: (e, _) => Center(child: Text('错误: $e')),
+          ),
         ),
       ),
     );
@@ -310,6 +319,22 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
                   color: CupertinoColors.activeGreen,
                   child: const Text('完成训练', style: TextStyle(color: CupertinoColors.white)),
                   onPressed: () => _completeWorkout(context),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // 动作管理按钮
+              SizedBox(
+                width: double.infinity,
+                child: CupertinoButton(
+                  color: CupertinoColors.systemGrey,
+                  child: const Text('动作管理', style: TextStyle(color: CupertinoColors.white)),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const ExerciseListScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
