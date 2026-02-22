@@ -23,6 +23,11 @@ class TodayScreen extends ConsumerWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(formatDate(selectedDate)),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.back, size: 28),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       child: SafeArea(
         child: AsyncValueWidget<WorkoutPlan?>(
