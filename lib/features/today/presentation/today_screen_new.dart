@@ -8,6 +8,8 @@ import 'package:xworkout/features/training/presentation/providers/exercise_provi
 import 'package:xworkout/features/training/data/exercise_repository.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:xworkout/features/training/presentation/exercise_list_screen.dart';
+import 'package:xworkout/features/more/presentation/workout_types_screen.dart';
 import 'package:intl/intl.dart';
 
 class TodayScreen extends ConsumerWidget {
@@ -281,6 +283,41 @@ class TodayScreen extends ConsumerWidget {
                   onPressed: null,
                 ),
               ],
+              const SizedBox(height: 12),
+              // 类型编辑和动作管理按钮
+              Row(
+                children: [
+                  Expanded(
+                    child: CupertinoButton(
+                      color: CupertinoColors.systemGrey,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: const Text('类型编辑', style: TextStyle(color: CupertinoColors.white)),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(
+                            builder: (context) => const WorkoutTypesScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CupertinoButton(
+                      color: CupertinoColors.systemGrey,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: const Text('动作管理', style: TextStyle(color: CupertinoColors.white)),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(
+                            builder: (context) => const ExerciseListScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
