@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Material;
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
@@ -41,13 +41,13 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
         middle: Text(plan?.name ?? '计划详情'),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.back),
+          child: const Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: plan != null
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: const Icon(CupertinoIcons.ellipsis),
+                child: const Icon(Icons.more_vert),
                 onPressed: () => _showActionSheet(context, plan),
               )
             : null,
