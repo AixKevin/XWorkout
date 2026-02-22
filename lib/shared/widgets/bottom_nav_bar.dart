@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:go_router/go_router.dart';
 
 class BottomNavBar extends StatelessWidget {
@@ -8,30 +9,30 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: Column(
-        children: [
-          Expanded(child: navigationShell),
-          CupertinoTabBar(
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.circle_grid_hex_fill),
-                label: '训练',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.clock_fill),
-                label: '历史',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.ellipsis),
-                label: '更多',
-              ),
-            ],
-            currentIndex: navigationShell.currentIndex,
-            onTap: (index) => _onTap(index),
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) => _onTap(index),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center),
+            label: '训练',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: '历史',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.more_horiz),
+            label: '更多',
           ),
         ],
       ),
+      tabBuilder: (context, index) {
+        return CupertinoTabView(
+          builder: (context) => navigationShell,
+        );
+      },
     );
   }
 

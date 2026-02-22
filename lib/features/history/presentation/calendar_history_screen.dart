@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 import 'package:xworkout/features/workout/data/workout_providers.dart';
 import 'package:xworkout/features/workout/data/workout_repository.dart';
+import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 
 class CalendarHistoryScreen extends ConsumerStatefulWidget {
   const CalendarHistoryScreen({super.key});
@@ -135,44 +136,138 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
         itemBuilder: (context, index) {
           final session = sessions[index];
           final type = types.where((t) => t.id == session.typeId).firstOrNull;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: CupertinoColors.systemBackground,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: CupertinoColors.systemGrey5),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+          return GestureDetector(
+            onTap: () => _showSessionDetail(context, session),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: CupertinoColors.systemBackground,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: CupertinoColors.systemGrey5),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(CupertinoIcons.sportscourt, color: CupertinoColors.activeBlue),
                   ),
-                  child: const Icon(CupertinoIcons.sportscourt, color: CupertinoColors.activeBlue),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(type?.name ?? '训练', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
-                      Text(DateFormat('HH:mm').format(session.date), style: const TextStyle(color: CupertinoColors.systemGrey, fontSize: 14)),
-                      if (session.note != null && session.note!.isNotEmpty)
-                        Text(session.note!, style: const TextStyle(color: CupertinoColors.systemGrey2, fontSize: 13)),
-                    ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(type?.name ?? '训练', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                        Text(DateFormat('HH:mm').format(session.date), style: const TextStyle(color: CupertinoColors.systemGrey, fontSize: 14)),
+                        if (session.note != null && session.note!.isNotEmpty)
+                          Text(session.note!, style: const TextStyle(color: CupertinoColors.systemGrey2, fontSize: 13)),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3),
+                ],
+              ),
             ),
           );
         },
       ),
       loading: () => const Center(child: CupertinoActivityIndicator()),
       error: (e, _) => Center(child: Text('错误: $e')),
+    );
+  }
+
+  void _showSessionDetail(BuildContext context, WorkoutSession session) {
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) => _SessionDetailPage(session: session),
+      ),
+    );
+  }
+}
+
+class _SessionDetailPage extends ConsumerWidget {
+  final WorkoutSession session;
+  const _SessionDetailPage({required this.session});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final setsAsync = ref.watch(sessionSetsProvider(session.id));
+    final exercisesAsync = ref.watch(exerciseListProvider);
+
+    return Scaffold(
+      appBar: const CupertinoNavigationBar(
+        middle: Text('训练详情'),
+        backgroundColor: CupertinoColors.systemBackground,
+      ),
+      body: SafeArea(
+        child: setsAsync.when(
+          data: (sets) {
+            final grouped = <String, List<WorkoutSet>>{};
+            for (final set in sets) {
+              grouped.putIfAbsent(set.exerciseId, () => []).add(set);
+            }
+            if (grouped.isEmpty) {
+              return const Center(child: Text('暂无数据'));
+            }
+            return exercisesAsync.when(
+              data: (exercises) => ListView(
+                padding: const EdgeInsets.all(16),
+                children: grouped.entries.map((entry) {
+                  final exercise = exercises.where((e) => e.id == entry.key).firstOrNull;
+                  return _ExerciseDetailCard(
+                    exerciseName: exercise?.name ?? '未知动作',
+                    sets: entry.value,
+                  );
+                }).toList(),
+              ),
+              loading: () => const Center(child: CupertinoActivityIndicator()),
+              error: (e, _) => Center(child: Text('错误: $e')),
+            );
+          },
+          loading: () => const Center(child: CupertinoActivityIndicator()),
+          error: (e, _) => Center(child: Text('错误: $e')),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExerciseDetailCard extends StatelessWidget {
+  final String exerciseName;
+  final List<WorkoutSet> sets;
+  const _ExerciseDetailCard({required this.exerciseName, required this.sets});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: CupertinoColors.systemBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: CupertinoColors.systemGrey5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(exerciseName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          ...sets.map((set) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                SizedBox(width: 30, child: Text('${set.setNumber}.', style: const TextStyle(color: CupertinoColors.systemGrey))),
+                Expanded(child: Text('${set.weight.isEmpty ? "-" : set.weight} × ${set.reps}次', style: const TextStyle(fontSize: 15))),
+              ],
+            ),
+          )),
+        ],
+      ),
     );
   }
 }
