@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/history/presentation/workout_history_screen.dart';
+import 'package:xworkout/features/history/presentation/calendar_history_screen.dart';
 import 'package:xworkout/features/data/data_management_screen.dart';
 import 'package:xworkout/features/settings/settings_screen.dart';
 import 'package:xworkout/features/more/data/settings_repository.dart';
@@ -23,25 +24,16 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('数据'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.time),
-                  title: const Text('历史记录'),
-                  subtitle: const Text('查看训练历史'),
+                  leading: const Icon(CupertinoIcons.calendar),
+                  title: const Text('日历视图'),
+                  subtitle: const Text('按日期查看训练'),
                   trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
-                        builder: (context) => const HistoryScreen(),
+                        builder: (context) => const CalendarHistoryScreen(),
                       ),
                     );
-                  },
-                ),
-                CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.chart_bar),
-                  title: const Text('统计'),
-                  subtitle: const Text('训练数据分析'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                  onTap: () {
-                    // TODO: Navigate to simplified statistics
                   },
                 ),
                 CupertinoListTile(
@@ -108,7 +100,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             const Center(
               child: Text(
-                'XWorkout v3.1.0',
+                'XWorkout v4.0.1',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -118,7 +110,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             const Center(
               child: Text(
-                'Build 310',
+                'Build 401',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -178,7 +170,7 @@ class MoreScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 16),
             const Text('XWorkout'),
-            const Text('版本: 3.1.0 (Build 310)'),
+            const Text('版本: 4.0.1 (Build 401)'),
             const SizedBox(height: 8),
             const Text('轻量级健身记录软件'),
             const Text('简洁、离线、跨平台'),

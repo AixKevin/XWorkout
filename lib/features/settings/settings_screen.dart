@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/features/settings/app_settings_repository.dart';
@@ -60,7 +59,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('外观'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(Icons.dark_mode),
+                        leading: Icon(CupertinoIcons.moon_fill),
                         title: const Text('深色模式'),
                         trailing: CupertinoSwitch(
                           value: _isDarkMode,
@@ -73,24 +72,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('训练'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(Icons.fitness_center),
+                        leading: Icon(CupertinoIcons.circle_grid_hex_fill),
                         title: const Text('重量单位'),
                         additionalInfo: Text(_weightUnit.toUpperCase()),
-                        trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                        trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                         onTap: () => _showWeightUnitPicker(),
                       ),
                       CupertinoListTile(
-                        leading: Icon(Icons.format_list_bulleted),
+                        leading: Icon(CupertinoIcons.list_bullet),
                         title: const Text('默认组数'),
                         additionalInfo: Text('$_defaultSets 组'),
-                        trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                        trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                         onTap: () => _showSetsPicker(),
                       ),
                       CupertinoListTile(
-                        leading: Icon(Icons.looks_one),
+                        leading: Icon(CupertinoIcons.repeat),
                         title: const Text('默认次数'),
                         additionalInfo: Text('$_defaultReps 次'),
-                        trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                        trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                         onTap: () => _showRepsPicker(),
                       ),
                     ],
@@ -98,15 +97,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   CupertinoListSection.insetGrouped(
                     header: const Text('关于'),
                     children: [
-                      const CupertinoListTile(
-                        leading: Icon(Icons.info),
-                        title: Text('版本'),
-                        additionalInfo: Text('1.7.0'),
-                      ),
                       CupertinoListTile(
-                        leading: Icon(Icons.code),
+                        leading: Icon(CupertinoIcons.chevron_left_slash_chevron_right),
                         title: const Text('开源许可'),
-                        trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                        trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                         onTap: () => _showLicenses(),
                       ),
                     ],

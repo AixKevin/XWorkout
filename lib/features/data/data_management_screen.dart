@@ -72,7 +72,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                           : '${_startDate!.toString().split(' ')[0]} - ${_endDate?.toString().split(' ')[0] ?? '至今'}',
                         style: const TextStyle(color: CupertinoColors.systemGrey),
                       ),
-                      const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 20),
+                      const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 20),
                     ],
                   ),
                   onTap: _pickDateRange,
@@ -89,7 +89,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                   subtitle: const Text('表格格式，方便分析'),
                   trailing: _isExporting
                       ? const CupertinoActivityIndicator()
-                      : const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                      : const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: _isExporting ? null : () => _exportCsv(),
                 ),
                 CupertinoListTile(
@@ -98,7 +98,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                   subtitle: const Text('生成训练摘要报告'),
                   trailing: _isExporting
                       ? const CupertinoActivityIndicator()
-                      : const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                      : const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: _isExporting ? null : () => _exportPdf(),
                 ),
                 CupertinoListTile(
@@ -107,7 +107,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                   subtitle: const Text('完整数据备份'),
                   trailing: _isExporting
                       ? const CupertinoActivityIndicator()
-                      : const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                      : const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: _isExporting ? null : () => _exportJson(),
                 ),
               ],
@@ -122,7 +122,7 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                   subtitle: const Text('支持 JSON 格式'),
                   trailing: _isImporting
                       ? const CupertinoActivityIndicator()
-                      : const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                      : const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: _isImporting ? null : () => _importBackup(),
                 ),
               ],
@@ -133,14 +133,14 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
               children: [
                 CupertinoListTile(
                   leading: Icon(
-                    material.Icons.delete,
+                    CupertinoIcons.trash,
                     color: CupertinoColors.destructiveRed,
                   ),
                   title: Text(
                     '清除所有数据',
                     style: TextStyle(color: CupertinoColors.destructiveRed),
                   ),
-                  trailing: const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _showClearDataDialog(),
                 ),
               ],

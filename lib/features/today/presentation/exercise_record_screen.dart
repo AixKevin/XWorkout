@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon, LinearProgressIndicator;
+import 'package:flutter/material.dart' show LinearProgressIndicator;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database.dart';
@@ -113,7 +113,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
         ),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(Icons.close),
+          child: const Icon(CupertinoIcons.xmark),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: CupertinoButton(
@@ -161,7 +161,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
-                        const Icon(Icons.emoji_events, color: CupertinoColors.systemYellow, size: 20),
+                        const Icon(CupertinoIcons.star_fill, color: CupertinoColors.systemYellow, size: 20),
                         const SizedBox(width: 8),
                         Text(
                           '历史最佳: ${_personalRecord}kg',
@@ -207,7 +207,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.add),
+                        Icon(CupertinoIcons.add),
                         SizedBox(width: 8),
                         Text('添加一组'),
                       ],
@@ -237,7 +237,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     placeholder: '添加备注 (例如: 座椅高度5)',
                     prefix: const Padding(
                       padding: EdgeInsets.only(left: 8),
-                      child: Icon(Icons.edit_note, color: CupertinoColors.systemGrey),
+                      child: Icon(CupertinoIcons.pencil, color: CupertinoColors.systemGrey),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                     decoration: BoxDecoration(
@@ -474,14 +474,14 @@ class _SetItem extends StatelessWidget {
         color: CupertinoColors.activeGreen,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 16),
-        child: const Icon(Icons.check, color: CupertinoColors.white),
+        child: const Icon(CupertinoIcons.checkmark, color: CupertinoColors.white),
       ),
       secondaryBackground: Container(
         color: setRecord.isCompleted ? CupertinoColors.systemGrey : CupertinoColors.activeGreen,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 16),
         child: Icon(
-          setRecord.isCompleted ? Icons.undo : Icons.check,
+          setRecord.isCompleted ? CupertinoIcons.arrow_counterclockwise : CupertinoIcons.checkmark,
           color: CupertinoColors.white,
         ),
       ),
@@ -538,7 +538,7 @@ class _SetItem extends StatelessWidget {
               },
               suffix: isPR ? const Padding(
                 padding: EdgeInsets.only(right: 8.0),
-                child: Icon(Icons.emoji_events, color: CupertinoColors.systemYellow, size: 16),
+                child: Icon(CupertinoIcons.star_fill, color: CupertinoColors.systemYellow, size: 16),
               ) : null,
             ),
           ),
@@ -551,7 +551,7 @@ class _SetItem extends StatelessWidget {
       trailing: CupertinoButton(
         padding: EdgeInsets.zero,
         child: Icon(
-          setRecord.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+          setRecord.isCompleted ? CupertinoIcons.checkmark_circle_fill : CupertinoIcons.circle,
           color: setRecord.isCompleted 
               ? CupertinoColors.activeGreen 
               : CupertinoColors.systemGrey,

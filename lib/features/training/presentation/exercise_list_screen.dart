@@ -223,7 +223,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
       ),
     );
   }
-}
+
   Widget _buildCategoryChip(String label, bool isSelected, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,

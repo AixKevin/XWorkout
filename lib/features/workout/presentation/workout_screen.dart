@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon, Divider, ExpansionTile, Material;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 import 'package:xworkout/features/workout/data/workout_providers.dart';
@@ -423,6 +423,7 @@ class _LastTrainingReference extends ConsumerWidget {
     if (session == null) return const SizedBox.shrink();
 
     final lastSessionAsync = ref.watch(lastSessionByTypeProvider(session.typeId));
+    final exercisesAsync = ref.watch(exerciseListProvider);
 
     return lastSessionAsync.when(
       data: (lastSession) {
@@ -446,7 +447,11 @@ class _LastTrainingReference extends ConsumerWidget {
 
         final setsAsync = ref.watch(sessionSetsProvider(lastSession.id));
         return setsAsync.when(
-          data: (sets) => _buildReferenceCard(sets),
+          data: (sets) => exercisesAsync.when(
+            data: (exercises) => _buildReferenceCard(sets, exercises),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
           loading: () => const SizedBox.shrink(),
           error: (_, __) => const SizedBox.shrink(),
         );
@@ -456,7 +461,7 @@ class _LastTrainingReference extends ConsumerWidget {
     );
   }
 
-  Widget _buildReferenceCard(List<WorkoutSet> sets) {
+  Widget _buildReferenceCard(List<WorkoutSet> sets, List<Exercise> exercises) {
     // 按动作分组
     final groupedSets = <String, List<WorkoutSet>>{};
     for (final set in sets) {
@@ -474,20 +479,24 @@ class _LastTrainingReference extends ConsumerWidget {
         title: '上次训练参考',
         subtitle: '${sets.length}组动作',
         children: groupedSets.entries.map((entry) {
+          final exerciseId = entry.key;
+          final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
+          final exerciseName = exercise?.name ?? '未知动作';
+          
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '动作: ${entry.key}',
+                  exerciseName,
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 Text(
                   entry.value.map((s) => '${s.setNumber}. ${s.weight.isEmpty ? "-" : s.weight} × ${s.reps}次').join(' | '),
                   style: const TextStyle(fontSize: 13, color: CupertinoColors.systemGrey),
                 ),
-                const Divider(),
+                Container(height: 0.5, color: CupertinoColors.separator),
               ],
             ),
           );

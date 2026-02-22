@@ -99,7 +99,7 @@ class PlanListScreen extends ConsumerWidget {
                   ),
                   leading: Icon(
                     isActive 
-                        ? CupertinoIcons.check_mark_circled_solid
+                        ? CupertinoIcons.checkmark_circle_fill
                         : CupertinoIcons.chart_bar,
                     color: isActive ? CupertinoColors.activeGreen : null,
                   ),

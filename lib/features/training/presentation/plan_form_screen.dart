@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 
@@ -135,7 +134,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                   additionalInfo: Text(
                     '${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')}',
                   ),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
                   onTap: () => _showDatePicker(context),
                 ),
               ],

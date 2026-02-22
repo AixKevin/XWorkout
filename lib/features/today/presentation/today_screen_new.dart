@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
 import 'package:xworkout/features/today/data/today_repository.dart';
@@ -47,7 +46,7 @@ class TodayScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.timer,
+            CupertinoIcons.timer,
             size: 64,
             color: CupertinoColors.systemGrey,
           ),
@@ -121,7 +120,7 @@ class TodayScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.bar_chart),
+              Icon(CupertinoIcons.graph_square_fill),
               const SizedBox(width: 8),
               Text(
                 plan.name,
@@ -158,7 +157,7 @@ class TodayScreen extends ConsumerWidget {
       child: Column(
         children: [
           Icon(
-            Icons.hotel,
+            CupertinoIcons.bed_double_fill,
             size: 64,
             color: CupertinoColors.systemGrey,
           ),

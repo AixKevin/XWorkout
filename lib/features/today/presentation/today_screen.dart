@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
@@ -30,7 +29,7 @@ class TodayScreen extends ConsumerWidget {
           data: (plan) {
             if (plan == null) {
               return const EmptyStateWidget(
-                icon: Icons.timer,
+                icon: CupertinoIcons.timer,
                 title: '暂无激活的计划',
                 message: '请先在「训练」页面创建并激活健身计划',
               );
@@ -59,7 +58,7 @@ class TodayScreen extends ConsumerWidget {
       data: (planDays) {
         if (planDays.isEmpty) {
           return const EmptyStateWidget(
-            icon: Icons.bar_chart,
+            icon: CupertinoIcons.graph_square_fill,
             title: '暂无训练日',
             message: '请在计划中添加训练日',
           );
@@ -101,7 +100,7 @@ class TodayScreen extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                   const Icon(Icons.bar_chart),
+                   const Icon(CupertinoIcons.graph_square_fill),
                   const SizedBox(width: 8),
                   Text(
                     plan.name,
@@ -140,7 +139,7 @@ class TodayScreen extends ConsumerWidget {
       child: Column(
         children: [
           const Icon(
-            Icons.hotel,
+            CupertinoIcons.bed_double_fill,
             size: 64,
             color: CupertinoColors.systemGrey,
           ),
@@ -232,7 +231,7 @@ class TodayScreen extends ConsumerWidget {
                 data: (exercises) {
                   if (exercises.isEmpty) {
                     return const EmptyStateWidget(
-                      icon: Icons.fitness_center,
+                      icon: CupertinoIcons.circle_grid_hex_fill,
                       title: '暂无训练项目',
                       message: '请在计划中添加训练项目',
                     );
@@ -280,7 +279,7 @@ class TodayScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.check_circle,
+                        CupertinoIcons.checkmark_circle_fill,
                         color: CupertinoColors.activeGreen,
                       ),
                       SizedBox(width: 8),
@@ -316,7 +315,7 @@ class TodayScreen extends ConsumerWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.check, color: CupertinoColors.white, size: 28),
+                        Icon(CupertinoIcons.checkmark, color: CupertinoColors.white, size: 28),
                         SizedBox(width: 8),
                         Text(
                           '完成训练',
@@ -368,7 +367,7 @@ class TodayScreen extends ConsumerWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.play_arrow_rounded, color: CupertinoColors.white, size: 28),
+                        Icon(CupertinoIcons.play_fill, color: CupertinoColors.white, size: 28),
                         SizedBox(width: 8),
                         Text(
                           '开始训练',

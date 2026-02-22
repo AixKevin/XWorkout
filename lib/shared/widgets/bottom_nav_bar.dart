@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Icon;
 import 'package:go_router/go_router.dart';
 
 class BottomNavBar extends StatelessWidget {
