@@ -317,9 +317,10 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
         _LastTrainingReference(sessionId: widget.session.id),
 
         // 训练动作列表
+        // 训练动作列表
         Expanded(
           child: setsAsync.when(
-            data: (sets) => _buildExerciseList(sets, exercisesAsync),
+            data: (sets) => _buildExerciseList(sets, exercisesAsync, workoutTypesAsync),
             loading: () => const Center(child: CupertinoActivityIndicator()),
             error: (e, _) => Center(child: Text('错误: $e')),
           ),
@@ -365,7 +366,7 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
     );
   }
 
-  Widget _buildExerciseList(List<WorkoutSet> sets, AsyncValue<List<Exercise>> exercisesAsync) {
+  Widget _buildExerciseList(List<WorkoutSet> sets, AsyncValue<List<Exercise>> exercisesAsync, AsyncValue<List<WorkoutType>> workoutTypesAsync) {
     // 按动作分组
     final groupedSets = <String, List<WorkoutSet>>{};
     for (final set in sets) {
@@ -373,20 +374,82 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
     }
 
     if (groupedSets.isEmpty) {
-      return const Center(
-        child: Text(
-          '点击下方添加动作开始训练',
-          style: TextStyle(color: CupertinoColors.systemGrey),
-        ),
+      return ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // 顶部信息
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: CupertinoColors.systemGrey6,
+            child: Row(
+              children: [
+                workoutTypesAsync.when(
+                  data: (types) {
+                    final type = types.where((t) => t.id == widget.session.typeId).firstOrNull;
+                    return Text(type?.name ?? '训练', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold));
+                  },
+                  loading: () => const Text('加载中...'),
+                  error: (_, __) => const Text('训练'),
+                ),
+                const Spacer(),
+                Text(
+                  '${DateTime.now().month}月${DateTime.now().day}日',
+                  style: const TextStyle(color: CupertinoColors.systemGrey),
+                ),
+              ],
+            ),
+          ),
+          // 上次训练参考
+          _LastTrainingReference(sessionId: widget.session.id),
+          // 空状态提示
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Text(
+                '点击下方添加动作开始训练',
+                style: TextStyle(color: CupertinoColors.systemGrey),
+              ),
+            ),
+          ),
+        ],
       );
     }
 
     return exercisesAsync.when(
       data: (exercises) => ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: groupedSets.length,
+        itemCount: groupedSets.length + 2, // +2 for top info and reference
         itemBuilder: (context, index) {
-          final exerciseId = groupedSets.keys.elementAt(index);
+          if (index == 0) {
+            // 顶部信息
+            return Container(
+              padding: const EdgeInsets.all(16),
+              color: CupertinoColors.systemGrey6,
+              child: Row(
+                children: [
+                  workoutTypesAsync.when(
+                    data: (types) {
+                      final type = types.where((t) => t.id == widget.session.typeId).firstOrNull;
+                      return Text(type?.name ?? '训练', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold));
+                    },
+                    loading: () => const Text('加载中...'),
+                    error: (_, __) => const Text('训练'),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${DateTime.now().month}月${DateTime.now().day}日',
+                    style: const TextStyle(color: CupertinoColors.systemGrey),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (index == 1) {
+            // 上次训练参考
+            return _LastTrainingReference(sessionId: widget.session.id);
+          }
+          // 动作列表
+          final exerciseId = groupedSets.keys.elementAt(index - 2);
           final exerciseSets = groupedSets[exerciseId]!;
           final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
 
