@@ -1,9 +1,11 @@
 import 'package:drift/drift.dart';
-import 'package:xworkout/core/database/database.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 import 'package:uuid/uuid.dart';
 
-final workoutTypeRepositoryProvider = WorkoutTypeRepository();
+final workoutTypeRepositoryProvider = Provider<WorkoutTypeRepository>((ref) {
+  return WorkoutTypeRepository();
+});
 
 class WorkoutTypeRepository {
   // 获取所有训练类型
@@ -114,6 +116,16 @@ class WorkoutSessionRepository {
           ..limit(1))
         .get();
     return sessions.isEmpty ? null : sessions.first;
+  }
+
+  // 获取最后两次同类型训练
+  Future<List<WorkoutSession>> getLastTwoSessionsByType(int typeId) async {
+    final sessions = await (databaseProvider.select(databaseProvider.workoutSessions)
+          ..where((s) => s.typeId.equals(typeId) & s.status.equals('completed'))
+          ..orderBy([(s) => OrderingTerm.desc(s.date)])
+          ..limit(2))
+        .get();
+    return sessions;
   }
 
   // 根据ID获取训练会话

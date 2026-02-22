@@ -14,6 +14,35 @@ class AppTheme {
       barBackgroundColor: Color(0xF0F9F9F9),
       textTheme: CupertinoTextThemeData(
         primaryColor: primaryColor,
+        textStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: CupertinoColors.label,
+        ),
+        actionTextStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: primaryColor,
+        ),
+        navTitleTextStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.bold,
+          color: CupertinoColors.label,
+        ),
+        navLargeTitleTextStyle: TextStyle(
+          fontSize: 34,
+          fontWeight: FontWeight.bold,
+          color: CupertinoColors.label,
+        ),
+        navActionTextStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: primaryColor,
+        ),
+        tabLabelTextStyle: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -26,6 +55,35 @@ class AppTheme {
       barBackgroundColor: Color(0xF01D1D1D),
       textTheme: CupertinoTextThemeData(
         primaryColor: primaryColor,
+        textStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: CupertinoColors.label,
+        ),
+        actionTextStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: primaryColor,
+        ),
+        navTitleTextStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.bold,
+          color: CupertinoColors.label,
+        ),
+        navLargeTitleTextStyle: TextStyle(
+          fontSize: 34,
+          fontWeight: FontWeight.bold,
+          color: CupertinoColors.label,
+        ),
+        navActionTextStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: primaryColor,
+        ),
+        tabLabelTextStyle: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

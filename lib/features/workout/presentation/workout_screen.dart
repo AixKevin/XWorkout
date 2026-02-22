@@ -52,15 +52,23 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
       context: context,
       builder: (context) => CupertinoAlertDialog(
         title: const Text('取消训练'),
-        content: const Text('确定要取消本次训练吗？'),
+        content: const Text('请选择操作'),
         actions: [
           CupertinoDialogAction(
-            child: const Text('继续训练'),
+            child: const Text('取消'),
             onPressed: () => Navigator.pop(context),
           ),
           CupertinoDialogAction(
+            isDefaultAction: true,
+            child: const Text('保存'),
+            onPressed: () async {
+              Navigator.pop(context);
+              await _completeWorkout();
+            },
+          ),
+          CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('取消'),
+            child: const Text('不保存'),
             onPressed: () async {
               Navigator.pop(context);
               await _cancelTraining();
@@ -69,6 +77,14 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _completeWorkout() async {
+    final session = ref.read(currentSessionProvider);
+    if (session != null) {
+      await workoutSessionRepositoryProvider.completeSession(session.id);
+      ref.read(currentSessionProvider.notifier).state = null;
+    }
   }
 
   Future<void> _cancelTraining() async {
@@ -365,14 +381,23 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
   }
 
   void _showAddExerciseDialog(BuildContext context, AsyncValue<List<Exercise>> exercisesAsync) {
+    // Get the workout type name from workoutTypesAsync
+    final workoutTypesAsync = ref.read(workoutTypesProvider);
+    final category = workoutTypesAsync.valueOrNull
+        ?.where((t) => t.id == widget.session.typeId)
+        .firstOrNull
+        ?.name;
+
     showCupertinoModalPopup(
       context: context,
       builder: (context) => _AddExerciseSheet(
         sessionId: widget.session.id,
         exercisesAsync: exercisesAsync,
+        category: category,
       ),
     );
   }
+
 
   void _completeWorkout(BuildContext context) {
     final noteController = TextEditingController();
@@ -423,12 +448,12 @@ class _LastTrainingReference extends ConsumerWidget {
     final session = ref.watch(currentSessionProvider);
     if (session == null) return const SizedBox.shrink();
 
-    final lastSessionAsync = ref.watch(lastSessionByTypeProvider(session.typeId));
+    final lastTwoSessionsAsync = ref.watch(lastTwoSessionsByTypeProvider(session.typeId));
     final exercisesAsync = ref.watch(exerciseListProvider);
 
-    return lastSessionAsync.when(
-      data: (lastSession) {
-        if (lastSession == null) {
+    return lastTwoSessionsAsync.when(
+      data: (lastTwoSessions) {
+        if (lastTwoSessions.isEmpty) {
           return Container(
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.all(16),
@@ -446,10 +471,19 @@ class _LastTrainingReference extends ConsumerWidget {
           );
         }
 
-        final setsAsync = ref.watch(sessionSetsProvider(lastSession.id));
-        return setsAsync.when(
-          data: (sets) => exercisesAsync.when(
-            data: (exercises) => _buildReferenceCard(sets, exercises),
+        // 获取两个会话的组数据
+        final setsAsync1 = ref.watch(sessionSetsProvider(lastTwoSessions[0].id));
+        final setsAsync2 = lastTwoSessions.length > 1
+            ? ref.watch(sessionSetsProvider(lastTwoSessions[1].id))
+            : const AsyncValue<List<WorkoutSet>>.data([]);
+
+        return setsAsync1.when(
+          data: (sets1) => setsAsync2.when(
+            data: (sets2) => exercisesAsync.when(
+              data: (exercises) => _buildReferenceCard(lastTwoSessions, sets1, sets2, exercises),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
           ),
@@ -462,11 +496,16 @@ class _LastTrainingReference extends ConsumerWidget {
     );
   }
 
-  Widget _buildReferenceCard(List<WorkoutSet> sets, List<Exercise> exercises) {
+  Widget _buildReferenceCard(List<WorkoutSession> sessions, List<WorkoutSet> sets1, List<WorkoutSet> sets2, List<Exercise> exercises) {
     // 按动作分组
-    final groupedSets = <String, List<WorkoutSet>>{};
-    for (final set in sets) {
-      groupedSets.putIfAbsent(set.exerciseId, () => []).add(set);
+    final groupedSets1 = <String, List<WorkoutSet>>{};
+    for (final set in sets1) {
+      groupedSets1.putIfAbsent(set.exerciseId, () => []).add(set);
+    }
+
+    final groupedSets2 = <String, List<WorkoutSet>>{};
+    for (final set in sets2) {
+      groupedSets2.putIfAbsent(set.exerciseId, () => []).add(set);
     }
 
     return Container(
@@ -477,31 +516,91 @@ class _LastTrainingReference extends ConsumerWidget {
         border: Border.all(color: CupertinoColors.systemBlue.withValues(alpha: 0.3)),
       ),
       child: _ExpandableSection(
-        title: '上次训练参考',
-        subtitle: '${sets.length}组动作',
-        children: groupedSets.entries.map((entry) {
-          final exerciseId = entry.key;
-          final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
-          final exerciseName = exercise?.name ?? '未知动作';
-          
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  exerciseName,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+        title: '前2次训练参考',
+        subtitle: '${sessions.length}次训练',
+        children: [
+          // 第1次训练
+          if (sessions.isNotEmpty) ...[
+            _buildSessionHeader('第1次', sessions[0].date),
+            ...groupedSets1.entries.map((entry) {
+              final exerciseId = entry.key;
+              final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
+              final exerciseName = exercise?.name ?? '未知动作';
+              
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      exerciseName,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      entry.value.map((s) => '${s.setNumber}. ${s.weight.isEmpty ? "-" : s.weight} × ${s.reps}次').join(' | '),
+                      style: const TextStyle(fontSize: 13, color: CupertinoColors.systemGrey),
+                    ),
+                    Container(height: 0.5, color: CupertinoColors.separator),
+                  ],
                 ),
-                Text(
-                  entry.value.map((s) => '${s.setNumber}. ${s.weight.isEmpty ? "-" : s.weight} × ${s.reps}次').join(' | '),
-                  style: const TextStyle(fontSize: 13, color: CupertinoColors.systemGrey),
+              );
+            }),
+          ],
+          // 第2次训练
+          if (sessions.length > 1) ...[
+            const SizedBox(height: 8),
+            _buildSessionHeader('第2次', sessions[1].date),
+            ...groupedSets2.entries.map((entry) {
+              final exerciseId = entry.key;
+              final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
+              final exerciseName = exercise?.name ?? '未知动作';
+              
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      exerciseName,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      entry.value.map((s) => '${s.setNumber}. ${s.weight.isEmpty ? "-" : s.weight} × ${s.reps}次').join(' | '),
+                      style: const TextStyle(fontSize: 13, color: CupertinoColors.systemGrey),
+                    ),
+                    Container(height: 0.5, color: CupertinoColors.separator),
+                  ],
                 ),
-                Container(height: 0.5, color: CupertinoColors.separator),
-              ],
+              );
+            }),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSessionHeader(String title, DateTime date) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: CupertinoColors.systemBlue,
             ),
-          );
-        }).toList(),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${date.month}月${date.day}日',
+            style: const TextStyle(
+              fontSize: 12,
+              color: CupertinoColors.systemGrey,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -727,8 +826,9 @@ class _ExerciseCardState extends State<_ExerciseCard> {
 class _AddExerciseSheet extends ConsumerStatefulWidget {
   final String sessionId;
   final AsyncValue<List<Exercise>> exercisesAsync;
+  final String? category;
 
-  const _AddExerciseSheet({required this.sessionId, required this.exercisesAsync});
+  const _AddExerciseSheet({required this.sessionId, required this.exercisesAsync, this.category});
 
   @override
   ConsumerState<_AddExerciseSheet> createState() => _AddExerciseSheetState();
@@ -773,8 +873,12 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
             child: widget.exercisesAsync.when(
               data: (exercises) {
                 final filtered = exercises
-                    .where((e) => e.name.toLowerCase().contains(_searchText.toLowerCase()))
+                    .where((e) =>
+                        e.name.toLowerCase().contains(_searchText.toLowerCase()) &&
+                        (widget.category == null || e.category == null || e.category == widget.category))
                     .toList();
+
+
 
                 if (filtered.isEmpty) {
                   return Center(

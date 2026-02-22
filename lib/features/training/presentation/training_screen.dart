@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/features/training/presentation/exercise_list_screen.dart';
 import 'package:xworkout/features/training/presentation/plan_list_screen.dart';
 import 'package:xworkout/features/history/presentation/workout_history_screen.dart';
+import 'package:xworkout/features/more/presentation/workout_types_screen.dart';
 
 class TrainingScreen extends StatelessWidget {
   const TrainingScreen({super.key});
@@ -72,6 +73,35 @@ class TrainingScreen extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: CupertinoButton.filled(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const WorkoutTypesScreen(),
+                    ),
+                  );
+                },
+                child: const Text('类型编辑'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: CupertinoButton.filled(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const ExerciseListScreen(),
+                    ),
+                  );
+                },
+                child: const Text('动作管理'),
+              ),
+            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),

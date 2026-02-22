@@ -4,7 +4,7 @@ import 'package:xworkout/features/workout/data/workout_repository.dart';
 
 // 训练类型Provider
 final workoutTypesProvider = StreamProvider<List<WorkoutType>>((ref) {
-  return workoutTypeRepositoryProvider.watchAllTypes();
+  return ref.watch(workoutTypeRepositoryProvider).watchAllTypes();
 });
 
 // 当前选中的训练类型
@@ -26,6 +26,11 @@ final sessionsByTypeProvider = FutureProvider.family<List<WorkoutSession>, int>(
 // 最后一次同类型训练
 final lastSessionByTypeProvider = FutureProvider.family<WorkoutSession?, int>((ref, typeId) {
   return workoutSessionRepositoryProvider.getLastSessionByType(typeId);
+});
+
+// 最后两次同类型训练
+final lastTwoSessionsByTypeProvider = FutureProvider.family<List<WorkoutSession>, int>((ref, typeId) {
+  return workoutSessionRepositoryProvider.getLastTwoSessionsByType(typeId);
 });
 
 // 当前会话的训练组

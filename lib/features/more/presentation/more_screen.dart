@@ -7,6 +7,7 @@ import 'package:xworkout/features/history/presentation/calendar_history_screen.d
 import 'package:xworkout/features/data/data_management_screen.dart';
 import 'package:xworkout/features/settings/settings_screen.dart';
 import 'package:xworkout/features/more/data/settings_repository.dart';
+import 'package:xworkout/features/more/presentation/workout_types_screen.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 
 class MoreScreen extends ConsumerWidget {
@@ -80,6 +81,19 @@ class MoreScreen extends ConsumerWidget {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
                         builder: (context) => const SettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                CupertinoListTile(
+                  leading: const Icon(Icons.category),
+                  title: const Text('训练类型'),
+                  subtitle: const Text('管理训练分类'),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => const WorkoutTypesScreen(),
                       ),
                     );
                   },
