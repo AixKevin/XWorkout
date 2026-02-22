@@ -243,7 +243,7 @@ class _SessionCard extends StatelessWidget {
                   color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(CupertinoIcons.square_grid_2x2, color: Colors.blue),
+                child: const Icon(Icons.grid_view, color: Colors.blue),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -284,10 +284,10 @@ class _SessionCard extends StatelessWidget {
               CupertinoButton(
                 padding: EdgeInsets.zero,
                 minSize: 32,
-                child: const Icon(CupertinoIcons.delete, color: Colors.red, size: 20),
+                child: const Icon(Icons.delete, color: Colors.red, size: 20),
                 onPressed: onDelete,
               ),
-              const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+              const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
         ),
@@ -311,7 +311,7 @@ class _SessionDetailScreen extends ConsumerWidget {
         middle: Text(DateFormat('MM月dd日', 'zh_CN').format(session.date)),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.delete),
+          child: const Icon(Icons.delete),
           onPressed: () => _showDeleteDialog(context, ref),
         ),
       ),

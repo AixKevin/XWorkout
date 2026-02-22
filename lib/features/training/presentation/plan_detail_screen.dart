@@ -41,13 +41,13 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
         middle: Text(plan?.name ?? '计划详情'),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.back, size: 28),
+          child: const Text('返回'),
           onPressed: () => Navigator.of(context).pop(),
         ),
         trailing: plan != null
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: const Icon(CupertinoIcons.ellipsis),
+                child: const Icon(Icons.more_vert),
                 onPressed: () => _showActionSheet(context, plan),
               )
             : null,
@@ -586,7 +586,7 @@ class _DayDetailTile extends ConsumerWidget {
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 16),
                       child: const Icon(
-                        CupertinoIcons.delete,
+                        Icons.delete,
                         color: Colors.white,
                       ),
                     ),
@@ -611,7 +611,7 @@ class _DayDetailTile extends ConsumerWidget {
             ),
           ),
           CupertinoListTile(
-            leading: const Icon(CupertinoIcons.add),
+            leading: const Icon(Icons.add),
             title: const Text('添加训练项目'),
             onTap: () {
               _showAddExerciseDialog(context, ref);
