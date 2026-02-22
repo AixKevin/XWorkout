@@ -129,7 +129,7 @@ class _TypeSelectionView extends ConsumerWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),
-        ...types.map((type) => _TypeCard(type: type)),
+        ...types.where((type) => type.name != '通用').map((type) => _TypeCard(type: type)),
         const SizedBox(height: 24),
         // 类型编辑和动作管理按钮
         Row(

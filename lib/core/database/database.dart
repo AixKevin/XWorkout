@@ -54,6 +54,10 @@ class AppDatabase extends _$AppDatabase {
     final existingTypes = await select(workoutTypes).get();
     if (existingTypes.isEmpty) {
       await into(workoutTypes).insert(WorkoutTypesCompanion.insert(
+        name: '通用',
+        sortOrder: const Value(0),
+      ));
+      await into(workoutTypes).insert(WorkoutTypesCompanion.insert(
         name: '胸部',
         sortOrder: const Value(1),
       ));
