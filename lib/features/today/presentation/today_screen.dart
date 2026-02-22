@@ -70,12 +70,11 @@ class TodayScreen extends ConsumerWidget {
         final todayPlanDay = planDays[dayIndex];
         
         final isRestDay = todayPlanDay.isRestDay;
-        final workoutDuration = ref.watch(workoutDurationProvider);
         
         return ListView(
           padding: const EdgeInsets.only(bottom: 100),
           children: [
-            _buildPlanHeader(plan, cycleDay, isRestDay, workoutDuration),
+            _buildPlanHeader(plan, cycleDay, isRestDay),
             if (isRestDay)
               _buildRestDayView(context, ref, todayRecordAsync)
             else
@@ -86,7 +85,7 @@ class TodayScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildPlanHeader(WorkoutPlan plan, int cycleDay, bool isRestDay, Duration duration) {
+  Widget _buildPlanHeader(WorkoutPlan plan, int cycleDay, bool isRestDay) {
     return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.all(16),
@@ -102,7 +101,7 @@ class TodayScreen extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                   Icon(Icons.bar_chart),
+                   const Icon(Icons.bar_chart),
                   const SizedBox(width: 8),
                   Text(
                     plan.name,
@@ -113,16 +112,6 @@ class TodayScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              if (duration > Duration.zero)
-                Text(
-                  '已训练 ${_formatDuration(duration)}',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: CupertinoColors.activeGreen,
-                    fontWeight: FontWeight.w600,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ),
             ],
           ),
           const SizedBox(height: 8),
@@ -138,14 +127,6 @@ class TodayScreen extends ConsumerWidget {
     );
   }
   
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = twoDigits(duration.inHours);
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return duration.inHours > 0 ? '$hours:$minutes:$seconds' : '$minutes:$seconds';
-  }
-  
   Widget _buildRestDayView(
     BuildContext context,
     WidgetRef ref,
@@ -158,7 +139,7 @@ class TodayScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          Icon(
+          const Icon(
             Icons.hotel,
             size: 64,
             color: CupertinoColors.systemGrey,
@@ -207,7 +188,8 @@ class TodayScreen extends ConsumerWidget {
     final exercisesAsync = ref.watch(todayDayExercisesProvider(todayPlanDay.id));
     final record = todayRecordAsync.valueOrNull;
     final isTraining = record?.status == 'normal';
-    final isCompleted = record?.status == 'completed' || record?.status == 'normal';
+    final isCompleted = record?.status == 'completed';
+    final isSkipped = record?.status == 'skipped';
     
     return Column(
       children: [
@@ -275,7 +257,7 @@ class TodayScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              if (record?.status == 'skipped') ...[
+              if (isSkipped) ...[
                 CupertinoButton(
                   color: CupertinoColors.activeBlue,
                   child: const Text('撤销偷懒'),
@@ -311,6 +293,45 @@ class TodayScreen extends ConsumerWidget {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ] else if (isTraining) ...[
+                 // Training in progress - show Complete button
+                Container(
+                  width: double.infinity,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: CupertinoColors.activeGreen,
+                    boxShadow: [
+                      BoxShadow(
+                        color: CupertinoColors.activeGreen.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.check, color: CupertinoColors.white, size: 28),
+                        SizedBox(width: 8),
+                        Text(
+                          '完成训练',
+                          style: TextStyle(
+                            color: CupertinoColors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      _showCompleteDialog(context, ref, todayPlanDay.id);
+                    },
                   ),
                 ),
               ] else ...[
@@ -376,6 +397,33 @@ class TodayScreen extends ConsumerWidget {
       ],
     );
   }
+  
+  void _showCompleteDialog(BuildContext context, WidgetRef ref, String planDayId) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('完成训练'),
+        content: const Text('确认完成今天的训练吗？完成后将无法继续记录。'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: const Text('确认完成'),
+            onPressed: () async {
+              await ref.read(todayNotifierProvider.notifier).completeTraining(planDayId);
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   
   void _showSkipDialog(BuildContext context, WidgetRef ref, String? recordId) {
     final reasonController = TextEditingController();

@@ -7,6 +7,7 @@ import 'package:xworkout/features/statistics/presentation/statistics_screen.dart
 import 'package:xworkout/features/settings/settings_screen.dart';
 import 'package:xworkout/features/more/data/settings_repository.dart';
 import 'package:xworkout/features/more/presentation/notification_settings_screen.dart';
+import 'package:xworkout/core/database/database_provider.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -89,14 +90,6 @@ class MoreScreen extends ConsumerWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(Icons.timer),
-                  title: const Text('休息计时器'),
-                  trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                  onTap: () {
-                    _showRestTimerSettings(context, ref);
-                  },
-                ),
-                CupertinoListTile(
                   leading: const Icon(Icons.display_settings),
                   title: const Text('显示设置'),
                   trailing: const Icon(Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
@@ -134,7 +127,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             const Center(
               child: Text(
-                'XWorkout v2.4.0',
+                'XWorkout v3.1.0',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -144,7 +137,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             const Center(
               child: Text(
-                'Build 240',
+                'Build 310',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -204,7 +197,7 @@ class MoreScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 16),
             const Text('XWorkout'),
-            const Text('版本: 2.4.0 (Build 240)'),
+            const Text('版本: 3.1.0 (Build 310)'),
             const SizedBox(height: 8),
             const Text('轻量级健身记录软件'),
             const Text('简洁、离线、跨平台'),

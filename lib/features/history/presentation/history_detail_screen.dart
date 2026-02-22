@@ -4,23 +4,44 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
+import 'package:xworkout/features/today/data/today_repository.dart';
+import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
+import 'package:xworkout/core/database/database_provider.dart';
+import 'package:xworkout/core/database/database.dart';
+import 'package:drift/drift.dart' show Value;
 
-class HistoryDetailScreen extends ConsumerWidget {
+final exerciseRecordsProvider = StreamProvider.family<List<ExerciseRecord>, String>((ref, dailyRecordId) {
+  final repository = ref.watch(todayRecordRepositoryProvider);
+  return repository.watchExerciseRecords(dailyRecordId);
+});
+
+class HistoryDetailScreen extends ConsumerStatefulWidget {
   final DailyRecord record;
   
   const HistoryDetailScreen({super.key, required this.record});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HistoryDetailScreen> createState() => _HistoryDetailScreenState();
+}
+
+class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
+  @override
+  Widget build(BuildContext context) {
     final exerciseAsync = ref.watch(exerciseListProvider);
+    final exerciseRecordsAsync = ref.watch(exerciseRecordsProvider(widget.record.id));
     
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text(DateFormat('MM月dd日', 'zh_CN').format(record.date)),
+        middle: Text(DateFormat('MM月dd日', 'zh_CN').format(widget.record.date)),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           child: const Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.of(context).pop(),
+        ),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(Icons.delete, color: CupertinoColors.destructiveRed),
+          onPressed: () => _showDeleteDialog(context),
         ),
       ),
       child: SafeArea(
@@ -54,7 +75,7 @@ class HistoryDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        DateFormat('yyyy年M月d日 EEEE', 'zh_CN').format(record.date),
+                        DateFormat('yyyy年M月d日 EEEE', 'zh_CN').format(widget.record.date),
                         style: const TextStyle(
                           fontSize: 14,
                           color: CupertinoColors.systemGrey,
@@ -67,12 +88,12 @@ class HistoryDetailScreen extends ConsumerWidget {
             ),
             
             // Skip reason if skipped
-            if (record.status == 'skipped' && record.skipReason != null)
+            if (widget.record.status == 'skipped' && widget.record.skipReason != null)
               CupertinoListSection.insetGrouped(
                 header: const Text('偷懒原因'),
                 children: [
                   CupertinoListTile(
-                    title: Text(record.skipReason!),
+                    title: Text(widget.record.skipReason!),
                   ),
                 ],
               ),
@@ -80,28 +101,59 @@ class HistoryDetailScreen extends ConsumerWidget {
             // Exercise records
             CupertinoListSection.insetGrouped(
               header: const Text('训练记录'),
-              children: [
-                // This would need to fetch the exercise records for this day
-                // For now, showing placeholder
-                CupertinoListTile(
-                  leading: const Icon(Icons.fitness_center),
-                  title: const Text('查看详细记录'),
-                  subtitle: const Text('点击查看每组训练数据'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    // TODO: Navigate to exercise detail
-                  },
-                ),
-              ],
+              children: exerciseRecordsAsync.when(
+                data: (records) {
+                  if (records.isEmpty) {
+                    return [
+                      const CupertinoListTile(
+                        leading: Icon(Icons.fitness_center),
+                        title: Text('暂无记录'),
+                      ),
+                    ];
+                  }
+                  return records.map((record) {
+                    return exerciseAsync.when(
+                      data: (exercises) {
+                        final exercise = exercises.firstWhere(
+                          (e) => e.id == record.exerciseId,
+                          orElse: () => exercises.first,
+                        );
+                        return CupertinoListTile(
+                          leading: const Icon(Icons.fitness_center),
+                          title: Text(exercise.name),
+                          subtitle: Text('${record.actualSets}组 - ${record.actualReps}次 ${record.actualWeight.isNotEmpty ? record.actualWeight.split(',').where((w) => w.isNotEmpty).map((w) => '${w}kg').join(' / ') : ''}'),
+                          trailing: const Icon(Icons.chevron_right),
+                        );
+                      },
+                      loading: () => const CupertinoListTile(
+                        title: Text('加载中...'),
+                      ),
+                      error: (_, __) => const CupertinoListTile(
+                        title: Text('加载失败'),
+                      ),
+                    );
+                  }).toList();
+                },
+                loading: () => [
+                  const CupertinoListTile(
+                    title: Text('加载中...'),
+                  ),
+                ],
+                error: (_, __) => [
+                  const CupertinoListTile(
+                    title: Text('加载失败'),
+                  ),
+                ],
+              ),
             ),
             
             // Note
-            if (record.note != null)
+            if (widget.record.note != null)
               CupertinoListSection.insetGrouped(
                 header: const Text('备注'),
                 children: [
                   CupertinoListTile(
-                    title: Text(record.note!),
+                    title: Text(widget.record.note!),
                   ),
                 ],
               ),
@@ -114,7 +166,7 @@ class HistoryDetailScreen extends ConsumerWidget {
                   title: const Text('编辑记录'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    // TODO: Edit record
+                    _showEditDialog(context);
                   },
                 ),
               ],
@@ -125,8 +177,78 @@ class HistoryDetailScreen extends ConsumerWidget {
     );
   }
   
+  void _showDeleteDialog(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('删除记录'),
+        content: const Text('确定要删除这条训练记录吗？此操作不可恢复。'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text('删除'),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _deleteRecord();
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Future<void> _deleteRecord() async {
+    final db = databaseProvider;
+    await (db.delete(db.exerciseRecords)..where((t) => t.dailyRecordId.equals(widget.record.id))).go();
+    await (db.delete(db.dailyRecords)..where((t) => t.id.equals(widget.record.id))).go();
+  }
+  
+  void _showEditDialog(BuildContext context) {
+    final noteController = TextEditingController(text: widget.record.note ?? '');
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('编辑备注'),
+        content: Column(
+          children: [
+            const SizedBox(height: 12),
+            CupertinoTextField(
+              controller: noteController,
+              placeholder: '添加备注',
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            child: const Text('保存'),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              final db = databaseProvider;
+              await (db.update(db.dailyRecords)
+                ..where((t) => t.id.equals(widget.record.id)))
+                .write(DailyRecordsCompanion(note: Value(noteController.text.trim())));
+              setState(() {});
+            },
+          ),
+        ],
+      ),
+    );
+  }
+  
   Color _getStatusColor() {
-    switch (record.status) {
+    switch (widget.record.status) {
       case 'completed':
         return CupertinoColors.activeGreen;
       case 'normal':
@@ -139,7 +261,7 @@ class HistoryDetailScreen extends ConsumerWidget {
   }
   
   IconData _getStatusIcon() {
-    switch (record.status) {
+    switch (widget.record.status) {
       case 'completed':
         return Icons.check_circle;
       case 'normal':
@@ -152,7 +274,7 @@ class HistoryDetailScreen extends ConsumerWidget {
   }
   
   String _getStatusText() {
-    switch (record.status) {
+    switch (widget.record.status) {
       case 'completed':
         return '训练完成';
       case 'normal':
@@ -160,7 +282,7 @@ class HistoryDetailScreen extends ConsumerWidget {
       case 'skipped':
         return '请假';
       default:
-        return record.status;
+        return widget.record.status;
     }
   }
 }

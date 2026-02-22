@@ -127,26 +127,6 @@ class _DataManagementScreenState extends ConsumerState<DataManagementScreen> {
                 ),
               ],
             ),
-
-            CupertinoListSection.insetGrouped(
-              header: const Text('自动备份'),
-              children: [
-                CupertinoListTile(
-                  leading: const Icon(PhosphorIcons.arrowsClockwise),
-                  title: const Text('每日自动备份'),
-                  trailing: CupertinoSwitch(
-                    value: _autoBackupEnabled,
-                    onChanged: _toggleAutoBackup,
-                  ),
-                ),
-                CupertinoListTile(
-                  leading: const Icon(PhosphorIcons.folder),
-                  title: const Text('查看本地备份'),
-                  trailing: const Icon(material.Icons.chevron_right, color: CupertinoColors.systemGrey3, size: 28),
-                  onTap: () => _openBackupFolder(),
-                ),
-              ],
-            ),
             
             CupertinoListSection.insetGrouped(
               header: const Text('危险操作'),
