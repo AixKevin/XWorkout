@@ -191,6 +191,18 @@ class MoreScreen extends ConsumerWidget {
             const Text('轻量级健身记录软件'),
             const Text('简洁、离线、跨平台'),
             const SizedBox(height: 16),
+            const Text('作者: Aixkevin'),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () {
+                // TODO: Open project page
+              },
+              child: const Text(
+                'https://github.com/AixKevin/XWorkout',
+                style: TextStyle(color: CupertinoColors.activeBlue),
+              ),
+            ),
+            const SizedBox(height: 16),
             const Text('基于 Flutter 开发'),
             const SizedBox(height: 16),
             GestureDetector(
