@@ -23,7 +23,7 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
   late TextEditingController _noteController;
   
   final List<String> _categories = [
-    '胸部', '背部', '肩部', '手臂', '腿部', '核心', '有氧', '其他'
+    '胸部', '背部', '腿部'
   ];
   
   bool get isEditing => widget.exercise != null;

@@ -321,22 +321,7 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
                   onPressed: () => _completeWorkout(context),
                 ),
               ),
-              const SizedBox(height: 12),
-              // 动作管理按钮
-              SizedBox(
-                width: double.infinity,
-                child: CupertinoButton(
-                  color: CupertinoColors.systemGrey,
-                  child: const Text('动作管理', style: TextStyle(color: CupertinoColors.white)),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => const ExerciseListScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
+
             ],
           ),
         ),
@@ -473,12 +458,12 @@ class _LastTrainingReference extends ConsumerWidget {
     final session = ref.watch(currentSessionProvider);
     if (session == null) return const SizedBox.shrink();
 
-    final lastTwoSessionsAsync = ref.watch(lastTwoSessionsByTypeProvider(session.typeId));
+    final lastSessionAsync = ref.watch(lastSessionByTypeProvider(session.typeId));
     final exercisesAsync = ref.watch(exerciseListProvider);
 
-    return lastTwoSessionsAsync.when(
-      data: (lastTwoSessions) {
-        if (lastTwoSessions.isEmpty) {
+    return lastSessionAsync.when(
+      data: (lastSession) {
+        if (lastSession == null) {
           return Container(
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.all(16),
@@ -496,19 +481,12 @@ class _LastTrainingReference extends ConsumerWidget {
           );
         }
 
-        // 获取两个会话的组数据
-        final setsAsync1 = ref.watch(sessionSetsProvider(lastTwoSessions[0].id));
-        final setsAsync2 = lastTwoSessions.length > 1
-            ? ref.watch(sessionSetsProvider(lastTwoSessions[1].id))
-            : const AsyncValue<List<WorkoutSet>>.data([]);
+        // 获取单个会话的组数据
+        final setsAsync = ref.watch(sessionSetsProvider(lastSession.id));
 
-        return setsAsync1.when(
-          data: (sets1) => setsAsync2.when(
-            data: (sets2) => exercisesAsync.when(
-              data: (exercises) => _buildReferenceCard(lastTwoSessions, sets1, sets2, exercises),
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
-            ),
+        return setsAsync.when(
+          data: (sets) => exercisesAsync.when(
+            data: (exercises) => _buildReferenceCard(lastSession, sets, exercises),
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
           ),
@@ -521,16 +499,11 @@ class _LastTrainingReference extends ConsumerWidget {
     );
   }
 
-  Widget _buildReferenceCard(List<WorkoutSession> sessions, List<WorkoutSet> sets1, List<WorkoutSet> sets2, List<Exercise> exercises) {
+  Widget _buildReferenceCard(WorkoutSession session, List<WorkoutSet> sets, List<Exercise> exercises) {
     // 按动作分组
-    final groupedSets1 = <String, List<WorkoutSet>>{};
-    for (final set in sets1) {
-      groupedSets1.putIfAbsent(set.exerciseId, () => []).add(set);
-    }
-
-    final groupedSets2 = <String, List<WorkoutSet>>{};
-    for (final set in sets2) {
-      groupedSets2.putIfAbsent(set.exerciseId, () => []).add(set);
+    final groupedSets = <String, List<WorkoutSet>>{};
+    for (final set in sets) {
+      groupedSets.putIfAbsent(set.exerciseId, () => []).add(set);
     }
 
     return Container(
@@ -541,64 +514,32 @@ class _LastTrainingReference extends ConsumerWidget {
         border: Border.all(color: CupertinoColors.systemBlue.withValues(alpha: 0.3)),
       ),
       child: _ExpandableSection(
-        title: '前2次训练参考',
-        subtitle: '${sessions.length}次训练',
+        title: '上次训练参考',
+        subtitle: '${session.date.month}月${session.date.day}日',
         children: [
-          // 第1次训练
-          if (sessions.isNotEmpty) ...[
-            _buildSessionHeader('第1次', sessions[0].date),
-            ...groupedSets1.entries.map((entry) {
-              final exerciseId = entry.key;
-              final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
-              final exerciseName = exercise?.name ?? '未知动作';
-              
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      exerciseName,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      entry.value.map((s) => '${s.setNumber}. ${s.weight.isEmpty ? "-" : s.weight} × ${s.reps}次').join(' | '),
-                      style: const TextStyle(fontSize: 13, color: CupertinoColors.systemGrey),
-                    ),
-                    Container(height: 0.5, color: CupertinoColors.separator),
-                  ],
-                ),
-              );
-            }),
-          ],
-          // 第2次训练
-          if (sessions.length > 1) ...[
-            const SizedBox(height: 8),
-            _buildSessionHeader('第2次', sessions[1].date),
-            ...groupedSets2.entries.map((entry) {
-              final exerciseId = entry.key;
-              final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
-              final exerciseName = exercise?.name ?? '未知动作';
-              
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      exerciseName,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      entry.value.map((s) => '${s.setNumber}. ${s.weight.isEmpty ? "-" : s.weight} × ${s.reps}次').join(' | '),
-                      style: const TextStyle(fontSize: 13, color: CupertinoColors.systemGrey),
-                    ),
-                    Container(height: 0.5, color: CupertinoColors.separator),
-                  ],
-                ),
-              );
-            }),
-          ],
+          ...groupedSets.entries.map((entry) {
+            final exerciseId = entry.key;
+            final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
+            final exerciseName = exercise?.name ?? '未知动作';
+            
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    exerciseName,
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  Text(
+                    entry.value.map((s) => '${s.setNumber}. ${s.weight.isEmpty ? "-" : s.weight} × ${s.reps}次').join(' | '),
+                    style: const TextStyle(fontSize: 13, color: CupertinoColors.systemGrey),
+                  ),
+                  Container(height: 0.5, color: CupertinoColors.separator),
+                ],
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -775,71 +716,73 @@ class _ExerciseCardState extends State<_ExerciseCard> {
           // 组列表
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Column(
-              children: [
-                // 表头
-                const Row(
-                  children: [
-                    SizedBox(width: 40, child: Text('组', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
-                    Expanded(child: Text('重量', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
-                    Expanded(child: Text('次数', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
-                    SizedBox(width: 40),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // 组数据
-                ...widget.sets.map((set) {
-                  _weightControllers.putIfAbsent(set.id, () => TextEditingController(text: set.weight));
-                  _repsControllers.putIfAbsent(set.id, () => TextEditingController(text: set.reps.toString()));
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // 表头
+                  const Row(
+                    children: [
+                      SizedBox(width: 40, child: Text('组', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
+                      Expanded(child: Text('重量', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
+                      Expanded(child: Text('次数', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
+                      SizedBox(width: 40),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // 组数据
+                  ...widget.sets.map((set) {
+                    _weightControllers.putIfAbsent(set.id, () => TextEditingController(text: set.weight));
+                    _repsControllers.putIfAbsent(set.id, () => TextEditingController(text: set.reps.toString()));
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 40,
-                          child: Text('${set.setNumber}', style: const TextStyle(fontWeight: FontWeight.w500)),
-                        ),
-                        Expanded(
-                          child: CupertinoTextField(
-                            controller: _weightControllers[set.id],
-                            placeholder: '重量',
-                            suffix: CupertinoButton(
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 40,
+                            child: Text('${set.setNumber}', style: const TextStyle(fontWeight: FontWeight.w500)),
+                          ),
+                          Expanded(
+                            child: CupertinoTextField(
+                              controller: _weightControllers[set.id],
+                              placeholder: '重量',
+                              suffix: CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                minSize: 24,
+                                child: const Text('kg', style: TextStyle(fontSize: 12)),
+                                onPressed: () {
+                                  final current = _weightControllers[set.id]!.text;
+                                  _weightControllers[set.id]!.text = current.endsWith('kg') ? current : '$current kg';
+                                  widget.onUpdateSet(set.id, _weightControllers[set.id]!.text, int.tryParse(_repsControllers[set.id]!.text) ?? 0);
+                                },
+                              ),
+                              onChanged: (value) => widget.onUpdateSet(set.id, value, int.tryParse(_repsControllers[set.id]!.text) ?? 0),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: CupertinoTextField(
+                              controller: _repsControllers[set.id],
+                              placeholder: '次数',
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) => widget.onUpdateSet(set.id, _weightControllers[set.id]!.text, int.tryParse(value) ?? 0),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 40,
+                            child: CupertinoButton(
                               padding: EdgeInsets.zero,
                               minSize: 24,
-                              child: const Text('kg', style: TextStyle(fontSize: 12)),
-                              onPressed: () {
-                                final current = _weightControllers[set.id]!.text;
-                                _weightControllers[set.id]!.text = current.endsWith('kg') ? current : '$current kg';
-                                widget.onUpdateSet(set.id, _weightControllers[set.id]!.text, int.tryParse(_repsControllers[set.id]!.text) ?? 0);
-                              },
+                              child: Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                              onPressed: () => widget.onDeleteSet(set.id),
                             ),
-                            onChanged: (value) => widget.onUpdateSet(set.id, value, int.tryParse(_repsControllers[set.id]!.text) ?? 0),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: CupertinoTextField(
-                            controller: _repsControllers[set.id],
-                            placeholder: '次数',
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) => widget.onUpdateSet(set.id, _weightControllers[set.id]!.text, int.tryParse(value) ?? 0),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 40,
-                          child: CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            minSize: 24,
-                            child: Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                            onPressed: () => widget.onDeleteSet(set.id),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-              ],
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
             ),
           ),
         ],

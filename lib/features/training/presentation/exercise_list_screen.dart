@@ -21,7 +21,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   String? _selectedCategory;
 
   final List<String> _categories = [
-    '胸部', '背部', '肩部', '手臂', '腿部', '核心', '有氧', '其他'
+    '胸部', '背部', '腿部'
   ];
 
   @override
