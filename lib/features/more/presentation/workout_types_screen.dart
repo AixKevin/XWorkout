@@ -45,30 +45,33 @@ class _WorkoutTypesScreenState extends ConsumerState<WorkoutTypesScreen> {
                     style: const TextStyle(fontSize: 13),
                   ),
                   children: [
-                    ...types.map((type) => CupertinoListTile(
-                      title: Text(type.name),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            child: const Icon(CupertinoIcons.pencil, size: 22),
-                            onPressed: () => _showRenameTypeDialog(context, type.id, type.name),
-                          ),
-                          CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            child: const Icon(
-                              CupertinoIcons.delete,
-                              size: 22,
-                              color: CupertinoColors.destructiveRed,
+                    ...types.map((type) {
+                      final isReadOnly = type.name == '通用';
+                      return CupertinoListTile(
+                        title: Text(type.name),
+                        trailing: isReadOnly ? null : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: const Icon(CupertinoIcons.pencil, size: 22),
+                              onPressed: () => _showRenameTypeDialog(context, type.id, type.name),
                             ),
-                            onPressed: types.length > 1
-                                ? () => _showDeleteTypeDialog(context, type.id, type.name)
-                                : null,
-                          ),
-                        ],
-                      ),
-                    )),
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: const Icon(
+                                CupertinoIcons.delete,
+                                size: 22,
+                                color: CupertinoColors.destructiveRed,
+                              ),
+                              onPressed: types.length > 1
+                                  ? () => _showDeleteTypeDialog(context, type.id, type.name)
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                     if (!canAdd)
                       const CupertinoListTile(
                         title: Text(
