@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons, Colors;
+import 'package:flutter/material.dart' show Colors;
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 

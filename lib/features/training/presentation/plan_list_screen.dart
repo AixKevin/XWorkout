@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Colors;
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
 import 'package:xworkout/features/training/presentation/plan_form_screen.dart';
@@ -100,8 +101,8 @@ class PlanListScreen extends ConsumerWidget {
                   ),
                   leading: Icon(
                     isActive 
-                        ? Icons.check_circle
-                        : Icons.bar_chart,
+                        ? PhosphorIcons.checkCircle()
+                        : PhosphorIcons.chartBar(),
                     color: isActive ? Colors.green : null,
                   ),
                   trailing: Row(
@@ -109,8 +110,8 @@ class PlanListScreen extends ConsumerWidget {
                     children: [
                       CupertinoButton(
                         padding: EdgeInsets.zero,
-                        child: const Icon(
-                          Icons.delete,
+                        child: Icon(
+                          PhosphorIcons.trash(),
                           color: Colors.red,
                           size: 22,
                         ),
