@@ -915,7 +915,7 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
                 final filtered = exercises
                     .where((e) =>
                         e.name.toLowerCase().contains(_searchText.toLowerCase()) &&
-                        (widget.category == null || e.category == null || e.category == widget.category))
+                        (widget.category == null || e.category == null || e.category == widget.category || e.category == '通用'))
                     .toList();
 
 
