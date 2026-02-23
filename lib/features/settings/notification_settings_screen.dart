@@ -49,7 +49,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     header: const Text('提醒开关'),
                     children: [
                       CupertinoListTile(
-                        leading: const Icon(CupertinoIcons.bell),
+                        leading: const Icon(Icons.notifications),
                         title: const Text('启用训练提醒'),
                         trailing: CupertinoSwitch(
                           value: _notificationsEnabled,
@@ -67,7 +67,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                           additionalInfo: Text(
                             '${_reminderHour.toString().padLeft(2, '0')}:${_reminderMinute.toString().padLeft(2, '0')}',
                           ),
-                          trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
+                          trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
                           onTap: () => _showTimePicker(),
                         ),
                       ],
@@ -89,7 +89,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       children: [
                         CupertinoListTile(
                           leading: Icon(
-                            CupertinoIcons.checkmark_circle,
+                            Icons.check_circle,
                             color: Colors.green,
                           ),
                           title: const Text('保存设置'),
@@ -110,7 +110,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       title: Text(name),
       trailing: isSelected
           ? const Icon(
-              CupertinoIcons.checkmark,
+              Icons.check,
               color: Colors.green,
             )
           : null,

@@ -154,7 +154,7 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                       color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(CupertinoIcons.sportscourt, color: Colors.blue),
+                    child: const Icon(Icons.fitness_center, color: Colors.blue),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -168,7 +168,7 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                       ],
                     ),
                   ),
-                  const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                  const Icon(Icons.chevron_right, color: Colors.grey),
                 ],
               ),
             ),

@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/material.dart' show Colors, Icons;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/plan_provider.dart';
@@ -58,7 +58,7 @@ class PlanListScreen extends ConsumerWidget {
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.add),
+          child: const Icon(Icons.add),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoPageRoute(
@@ -74,7 +74,7 @@ class PlanListScreen extends ConsumerWidget {
           data: (plans) {
             if (plans.isEmpty) {
               return EmptyStateWidget(
-                icon: CupertinoIcons.square_grid_2x2,
+                icon: Icons.grid_view,
                 title: '暂无健身计划',
                 message: '创建您的第一个健身计划开始训练',
                 actionLabel: '创建计划',
@@ -101,8 +101,8 @@ class PlanListScreen extends ConsumerWidget {
                   ),
                   leading: Icon(
                     isActive 
-                        ? CupertinoIcons.checkmark_circle
-                        : CupertinoIcons.chart_bar,
+                        ? PhosphorIcons.checkCircle()
+                        : PhosphorIcons.chartBar(),
                     color: isActive ? Colors.green : null,
                   ),
                   trailing: Row(
@@ -111,13 +111,13 @@ class PlanListScreen extends ConsumerWidget {
                       CupertinoButton(
                         padding: EdgeInsets.zero,
                         child: Icon(
-                          CupertinoIcons.delete,
+                          Icons.delete,
                           color: Colors.red,
                           size: 22,
                         ),
                         onPressed: () => _confirmDeletePlan(context, ref, plan),
                       ),
-                      const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
+                      const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
                     ],
                   ),
                   onTap: () {

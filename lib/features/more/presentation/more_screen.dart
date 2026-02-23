@@ -27,10 +27,10 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('数据'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.calendar),
+                  leading: const Icon(Icons.calendar_today),
                   title: const Text('日历视图'),
                   subtitle: const Text('按日期查看训练'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -40,10 +40,10 @@ class MoreScreen extends ConsumerWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.floppy_disk),
+                  leading: const Icon(Icons.save),
                   title: const Text('数据管理'),
                   subtitle: const Text('导出、备份数据'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -53,9 +53,9 @@ class MoreScreen extends ConsumerWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.refresh),
+                  leading: const Icon(Icons.refresh),
                   title: const Text('重置设置'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showResetSettingsDialog(context, ref);
                   },
@@ -66,17 +66,17 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('设置'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.device_phone_portrait),
+                  leading: const Icon(Icons.phone_android),
                   title: const Text('显示设置'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showDisplaySettings(context, ref);
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.settings),
+                  leading: const Icon(Icons.settings),
                   title: const Text('通用设置'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -86,10 +86,10 @@ class MoreScreen extends ConsumerWidget {
                   },
                 ),
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.folder),
+                  leading: const Icon(Icons.category),
                   title: const Text('训练类型'),
                   subtitle: const Text('管理训练分类'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -104,9 +104,9 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('应用'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(CupertinoIcons.info),
+                  leading: const Icon(Icons.info),
                   title: const Text('关于'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showAbout(context);
                   },
@@ -296,7 +296,7 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
                     CupertinoListTile(
                       title: const Text('默认时长'),
                       additionalInfo: Text('$_duration 秒'),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () => _showDurationPicker(),
                     ),
                   ],
@@ -452,19 +452,19 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
                     CupertinoListTile(
                       title: const Text('重量单位'),
                       additionalInfo: Text(_weightUnit.toUpperCase()),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () => _showWeightUnitPicker(),
                     ),
                     CupertinoListTile(
                       title: const Text('日期格式'),
                       additionalInfo: Text(_dateFormat),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () => _showDateFormatPicker(),
                     ),
                     CupertinoListTile(
                       title: const Text('每周首日'),
                       additionalInfo: Text(_firstDay == 1 ? '周一' : '周日'),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                       onTap: () => _showFirstDayPicker(),
                     ),
                   ],

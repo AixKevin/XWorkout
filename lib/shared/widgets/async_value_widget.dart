@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AsyncValueWidget<T> extends StatelessWidget {
@@ -36,14 +37,14 @@ class AsyncValueWidget<T> extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
-                      CupertinoIcons.exclamationmark_triangle,
+                      Icons.warning,
                       size: 48,
-                      color: CupertinoColors.destructiveRed,
+                      color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       '加载失败',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -53,7 +54,7 @@ class AsyncValueWidget<T> extends StatelessWidget {
                       e.toString(),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: CupertinoColors.systemGrey,
+                        color: Colors.grey,
                       ),
                     ),
                     if (onRetry != null) ...[

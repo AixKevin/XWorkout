@@ -59,7 +59,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('外观'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(CupertinoIcons.moon),
+                        leading: Icon(Icons.dark_mode),
                         title: const Text('深色模式'),
                         trailing: CupertinoSwitch(
                           value: _isDarkMode,
@@ -72,24 +72,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('训练'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(CupertinoIcons.square_grid_2x2),
+                        leading: Icon(Icons.grid_view),
                         title: const Text('重量单位'),
                         additionalInfo: Text(_weightUnit.toUpperCase()),
-                        trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                        trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                         onTap: () => _showWeightUnitPicker(),
                       ),
                       CupertinoListTile(
-                        leading: Icon(CupertinoIcons.list_bullet),
+                        leading: Icon(Icons.list),
                         title: const Text('默认组数'),
                         additionalInfo: Text('$_defaultSets 组'),
-                        trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                        trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                         onTap: () => _showSetsPicker(),
                       ),
                       CupertinoListTile(
-                        leading: Icon(CupertinoIcons.repeat),
+                        leading: Icon(Icons.repeat),
                         title: const Text('默认次数'),
                         additionalInfo: Text('$_defaultReps 次'),
-                        trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                        trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                         onTap: () => _showRepsPicker(),
                       ),
                     ],
@@ -98,9 +98,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('关于'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(CupertinoIcons.arrow_right_arrow_left),
+                        leading: Icon(Icons.swap_horiz),
                         title: const Text('开源许可'),
-                        trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                        trailing: Icon(Icons.chevron_right, color: Colors.grey[400], size: 28),
                         onTap: () => _showLicenses(),
                       ),
                     ],

@@ -74,13 +74,13 @@ class TemplateListScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        CupertinoIcons.person,
+                        Icons.person,
                         color: Colors.green,
                       ),
                     ),
                     title: Text(template.name),
                     subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                    trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
+                    trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
                     onTap: () => _showTemplateDetail(context, ref, template),
                   );
                 }).toList(),
@@ -97,13 +97,13 @@ class TemplateListScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
-                      CupertinoIcons.chart_bar,
+                      Icons.bar_chart,
                       color: Colors.blue,
                     ),
                   ),
                   title: Text(template.name),
                   subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
+                  trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
                   onTap: () => _showTemplateDetail(context, ref, template),
                 );
               }).toList(),
@@ -221,7 +221,7 @@ class TemplateListScreen extends ConsumerWidget {
                           ? [
                                 const CupertinoListTile(
                                 title: Text('休息'),
-                                leading: Icon(CupertinoIcons.bed_double),
+                                leading: Icon(Icons.hotel),
                               ),
                             ]
                           : day.exercises.map((exercise) {
@@ -230,7 +230,7 @@ class TemplateListScreen extends ConsumerWidget {
                                 subtitle: Text(
                                   '${exercise.targetSets}组 × ${exercise.targetReps}次${exercise.targetWeight != null ? ' × ${exercise.targetWeight}kg' : ''}',
                                 ),
-                                leading: const Icon(CupertinoIcons.square_grid_2x2),
+                                leading: const Icon(Icons.grid_view),
                               );
                             }).toList(),
                     );
