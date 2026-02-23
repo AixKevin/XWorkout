@@ -80,7 +80,7 @@ class TemplateListScreen extends ConsumerWidget {
                     ),
                     title: Text(template.name),
                     subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                    trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                    trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                     onTap: () => _showTemplateDetail(context, ref, template),
                   );
                 }).toList(),
@@ -103,7 +103,7 @@ class TemplateListScreen extends ConsumerWidget {
                   ),
                   title: Text(template.name),
                   subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                  trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                   onTap: () => _showTemplateDetail(context, ref, template),
                 );
               }).toList(),

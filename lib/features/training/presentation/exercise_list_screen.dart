@@ -210,7 +210,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                                   ),
                                   onPressed: () => _confirmDelete(context, ref, exercise),
                                 ),
-                                const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                                const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                               ],
                             ),
                             onTap: () {

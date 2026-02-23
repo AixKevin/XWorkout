@@ -135,13 +135,13 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     additionalInfo: Text(
                       '${_reminderHour.toString().padLeft(2, '0')}:${_reminderMinute.toString().padLeft(2, '0')}',
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                    trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
                     onTap: () => _showTimePicker(),
                   ),
                   CupertinoListTile(
                     title: const Text('重复'),
                     additionalInfo: Text(_getWeekdaysString()),
-                    trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                    trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
                     onTap: () => _showWeekdaysPicker(),
                   ),
                   CupertinoListTile(

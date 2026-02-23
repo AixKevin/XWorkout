@@ -122,7 +122,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                           leading: const Icon(Icons.grid_view),
                           title: Text(exercise.name),
                           subtitle: Text('${record.actualSets}组 - ${record.actualReps}次 ${record.actualWeight.isNotEmpty ? record.actualWeight.split(',').where((w) => w.isNotEmpty).map((w) => '${w}kg').join(' / ') : ''}'),
-                          trailing: const Icon(Icons.chevron_right),
+                          trailing: const Icon(CupertinoIcons.chevron_right),
                         );
                       },
                       loading: () => const CupertinoListTile(
@@ -164,7 +164,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                 CupertinoListTile(
                   leading: const Icon(Icons.edit, color: Colors.blue),
                   title: const Text('编辑记录'),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: const Icon(CupertinoIcons.chevron_right),
                   onTap: () {
                     _showEditDialog(context);
                   },

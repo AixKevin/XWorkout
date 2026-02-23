@@ -287,7 +287,7 @@ class _SessionCard extends StatelessWidget {
                 child: const Icon(Icons.delete, color: Colors.red, size: 20),
                 onPressed: onDelete,
               ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
+              const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
             ],
           ),
         ),

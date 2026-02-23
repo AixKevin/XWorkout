@@ -101,8 +101,8 @@ class PlanListScreen extends ConsumerWidget {
                   ),
                   leading: Icon(
                     isActive 
-                        ? PhosphorIcons.checkCircle()
-                        : PhosphorIcons.chartBar(),
+                        ? CupertinoIcons.checkmark_circle
+                        : CupertinoIcons.chart_bar,
                     color: isActive ? Colors.green : null,
                   ),
                   trailing: Row(
@@ -117,7 +117,7 @@ class PlanListScreen extends ConsumerWidget {
                         ),
                         onPressed: () => _confirmDeletePlan(context, ref, plan),
                       ),
-                      const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                      const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                     ],
                   ),
                   onTap: () {

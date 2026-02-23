@@ -168,7 +168,7 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right, color: Colors.grey),
+                  const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
                 ],
               ),
             ),

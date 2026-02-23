@@ -136,7 +136,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                   additionalInfo: Text(
                     '${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')}',
                   ),
-                  trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                   onTap: () => _showDatePicker(context),
                 ),
               ],

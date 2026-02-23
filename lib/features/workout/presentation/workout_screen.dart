@@ -213,7 +213,7 @@ class _TypeCard extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
-              const Icon(Icons.chevron_right, color: Colors.white),
+              const Icon(CupertinoIcons.chevron_right, color: Colors.white),
               const SizedBox(width: 20),
             ],
           ),

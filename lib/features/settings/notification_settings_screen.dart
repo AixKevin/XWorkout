@@ -67,7 +67,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                           additionalInfo: Text(
                             '${_reminderHour.toString().padLeft(2, '0')}:${_reminderMinute.toString().padLeft(2, '0')}',
                           ),
-                          trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                          trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                           onTap: () => _showTimePicker(),
                         ),
                       ],

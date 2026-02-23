@@ -300,7 +300,7 @@ class _HistoryItem extends StatelessWidget {
           fontSize: 13,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
       onTap: () {
         Navigator.of(context).push(
           CupertinoPageRoute(
