@@ -35,6 +35,8 @@ class AppDatabase extends _$AppDatabase {
         await _createIndexes(m);
         // Insert default workout types
         await _insertDefaultTypes();
+        // Insert default exercises
+        await _insertDefaultExercises();
       },
       onUpgrade: (Migrator m, int from, int to) async {
         if (from < 2) {
@@ -44,6 +46,7 @@ class AppDatabase extends _$AppDatabase {
           // Migration to version 3: Add new tables
           await m.createAll();
           await _insertDefaultTypes();
+          await _insertDefaultExercises();
         }
       },
     );
@@ -58,17 +61,116 @@ class AppDatabase extends _$AppDatabase {
         sortOrder: const Value(0),
       ));
       await into(workoutTypes).insert(WorkoutTypesCompanion.insert(
-        name: '胸部',
+        name: '胸肌与三头',
         sortOrder: const Value(1),
       ));
       await into(workoutTypes).insert(WorkoutTypesCompanion.insert(
-        name: '背部',
+        name: '背部与二头',
         sortOrder: const Value(2),
       ));
       await into(workoutTypes).insert(WorkoutTypesCompanion.insert(
-        name: '腿部',
+        name: '肩部与臀腿',
         sortOrder: const Value(3),
       ));
+    }
+  }
+  
+  Future<void> _insertDefaultExercises() async {
+    final existingExercises = await select(exercises).get();
+    if (existingExercises.isEmpty) {
+      final now = DateTime.now();
+      
+      // 通用
+      await into(exercises).insert(ExercisesCompanion.insert(
+        id: 'ex_tongyong_juanqu',
+        name: '负重蜷曲',
+        typeId: const Value(1),
+        category: const Value('通用'),
+        defaultSets: const Value(3),
+        defaultReps: const Value(15),
+        defaultWeight: const Value(6),
+        createdAt: now,
+      ));
+      
+      // 胸肌与三头
+      final chestExercises = [
+        ('ex_gangling_wotui', '杠铃卧推', 4, 10, 50.0),
+        ('ex_pingban_yangling_wotui', '平板哑铃卧推', 4, 12, 17.5),
+        ('ex_shangxian_yangling_wotui', '上斜哑铃卧推', 4, 10, 17.5),
+        ('ex_hudieji_jiaxiong', '蝴蝶机夹胸', 3, 15, 6.0),
+        ('ex_qixie_tuixiong', '器械推胸', 4, 12, 1.0),
+        ('ex_suikushi', '碎颅式', 4, 12, 5.0),
+        ('ex_shoutou_bitichong', '绳索过头臂屈伸', 4, 12, 6.0),
+        ('ex_shoutiao_xialaqi', '绳索下拉直杆', 3, 12, 8.0),
+      ];
+      
+      for (final e in chestExercises) {
+        await into(exercises).insert(ExercisesCompanion.insert(
+          id: e.$1,
+          name: e.$2,
+          typeId: const Value(2),
+          category: const Value('胸肌与三头'),
+          defaultSets: Value(e.$3),
+          defaultReps: Value(e.$4),
+          defaultWeight: Value(e.$5),
+          createdAt: now,
+        ));
+      }
+      
+      // 背部与二头
+      final backExercises = [
+        ('ex_yintixiangshang', '引体向上', 4, 10, null),
+        ('ex_gaowei_xiala_qixie', '高位下拉器械', 4, 11, 25.0),
+        ('ex_gaowei_xiala', '高位下拉', 4, 12, 8.0),
+        ('ex_gaowei_xiala_duiwo_kuanku', '高位下拉对握宽距', 4, 12, 8.0),
+        ('ex_zuozi_huachuan', '坐姿划船', 4, 12, 8.0),
+        ('ex_t_guizahuchuan', 't杠划船', 3, 12, 20.0),
+        ('ex_qixie_huachuan', '器械划船', 3, 12, 1.0),
+        ('ex_mushifanduiwanqu', '牧师凳弯举', 4, 15, 20.0),
+        ('ex_longmenjia_wanquan', '龙门架弯举', 4, 12, 40.0),
+        ('ex_chuishi_wanquan', '锤式弯举', 4, 12, 5.0),
+        ('ex_fanxiang_gangling_wanquan', '反向杠铃弯举', 4, 12, 10.0),
+      ];
+      
+      for (final e in backExercises) {
+        await into(exercises).insert(ExercisesCompanion.insert(
+          id: e.$1,
+          name: e.$2,
+          typeId: const Value(3),
+          category: const Value('背部与二头'),
+          defaultSets: Value(e.$3),
+          defaultReps: Value(e.$4),
+          defaultWeight: Value(e.$5),
+          createdAt: now,
+        ));
+      }
+      
+      // 肩部与臀腿
+      final shoulderLegExercises = [
+        ('ex_zuozi_tuishoulder', '坐姿推肩', 4, 12, 15.0),
+        ('ex_qixie_tuishoulder', '器械推肩', 4, 12, 20.0),
+        ('ex_shenglian_cepingju', '绳索侧平举', 4, 15, 2.0),
+        ('ex_houshu_qixie', '后束器械', 4, 15, 6.0),
+        ('ex_shenglian_mianla', '绳索面拉', 3, 6, 60.0),
+        ('ex_shengwan_zhengshou_wanquan', '手腕正手弯举', 3, 12, null),
+        ('ex_shengwan_fanshou_wanquan', '手腕反手弯举', 3, 12, null),
+        ('ex_kaobei_shenqiqi', '靠背深蹲机', 4, 10, 20.0),
+        ('ex_zhengtiaoqi', '正蹲机', 4, 12, 20.0),
+        ('ex_gaojiaobei_shenqun', '高脚杯深蹲', 3, 15, 15.0),
+      ];
+      
+      for (final e in shoulderLegExercises) {
+        await into(exercises).insert(ExercisesCompanion.insert(
+          id: e.$1,
+          name: e.$2,
+          typeId: const Value(4),
+          category: const Value('肩部与臀腿'),
+          defaultSets: Value(e.$3),
+          defaultReps: Value(e.$4),
+          defaultWeight: Value(e.$5),
+          createdAt: now,
+        ));
+      }
     }
   }
   

@@ -224,11 +224,11 @@ class _TypeCard extends ConsumerWidget {
 
   List<Color> _getTypeColors(String name) {
     switch (name) {
-      case '胸部':
+      case '胸肌与三头':
         return [const Color(0xFFFF6B6B), const Color(0xFFFF8E8E)];
-      case '背部':
+      case '背部与二头':
         return [const Color(0xFF4ECDC4), const Color(0xFF44A08D)];
-      case '腿部':
+      case '肩部与臀腿':
         return [const Color(0xFF667EEA), const Color(0xFF764BA2)];
       default:
         return [CupertinoColors.systemGrey, CupertinoColors.systemGrey2];
@@ -237,11 +237,11 @@ class _TypeCard extends ConsumerWidget {
 
   IconData _getTypeIcon(String name) {
     switch (name) {
-      case '胸部':
+      case '胸肌与三头':
         return Icons.grid_view;
-      case '背部':
+      case '背部与二头':
         return Icons.person;
-      case '腿部':
+      case '肩部与臀腿':
         return Icons.directions_run;
       default:
         return Icons.grid_view;
