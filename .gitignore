@@ -45,6 +45,5 @@ coverage/
 .sisyphus/
 AGENTS.md
 PROMPT.md
-docs/
 setup-windows.bat
 .gitattributes
