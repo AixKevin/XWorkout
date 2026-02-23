@@ -23,10 +23,10 @@ class TrainingScreen extends StatelessWidget {
               header: const Text('训练项目'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.fitness()),
+                  leading: Icon(CupertinoIcons.sportscourt),
                   title: const Text('我的训练项目'),
                   subtitle: const Text('自定义训练项目'),
-                  trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -41,10 +41,10 @@ class TrainingScreen extends StatelessWidget {
               header: const Text('健身计划'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.chartBar()),
+                  leading: Icon(CupertinoIcons.chart_bar),
                   title: const Text('我的健身计划'),
                   subtitle: const Text('设置训练周期'),
-                  trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -59,10 +59,10 @@ class TrainingScreen extends StatelessWidget {
               header: const Text('记录'),
               children: [
                 CupertinoListTile(
-                  leading: Icon(PhosphorIcons.chartLineUp()),
+                  leading: Icon(CupertinoIcons.chart_bar),
                   title: const Text('历史记录'),
                   subtitle: const Text('查看训练历史'),
-                  trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
+                  trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(

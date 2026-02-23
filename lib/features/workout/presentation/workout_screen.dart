@@ -213,7 +213,7 @@ class _TypeCard extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
-              const Icon(Icons.chevron_right, color: Colors.white),
+              const Icon(CupertinoIcons.chevron_right, color: Colors.white),
               const SizedBox(width: 20),
             ],
           ),
@@ -238,13 +238,13 @@ class _TypeCard extends ConsumerWidget {
   IconData _getTypeIcon(String name) {
     switch (name) {
       case '胸部':
-        return Icons.grid_view;
+        return CupertinoIcons.square_grid_2x2;
       case '背部':
-        return Icons.person;
+        return CupertinoIcons.person;
       case '腿部':
-        return Icons.directions_run;
+        return CupertinoIcons.sportscourt;
       default:
-        return Icons.grid_view;
+        return CupertinoIcons.square_grid_2x2;
     }
   }
 
@@ -315,7 +315,7 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, color: Colors.white, size: 18),
+            Icon(CupertinoIcons.add, color: Colors.white, size: 18),
             SizedBox(width: 4),
             Text('添加动作', style: TextStyle(color: CupertinoColors.white, fontSize: 14)),
           ],
@@ -545,7 +545,7 @@ class _LastTrainingReference extends ConsumerWidget {
             ),
             child: const Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.grey),
+                Icon(CupertinoIcons.info, color: Colors.grey),
                 SizedBox(width: 8),
                 Text('暂无同类型历史记录', style: TextStyle(color: CupertinoColors.systemGrey)),
               ],
@@ -675,7 +675,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> with SingleTicke
           },
           child: Row(
             children: [
-              const Icon(Icons.description, color: Colors.blue),
+              const Icon(CupertinoIcons.doc_text, color: Colors.blue),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -699,7 +699,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> with SingleTicke
               ),
               const Spacer(),
               Icon(
-                _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                _isExpanded ? CupertinoIcons.chevron_up : CupertinoIcons.chevron_down,
                 color: CupertinoColors.systemBlue,
                 size: 20,
               ),
@@ -779,7 +779,7 @@ class _ExerciseCardState extends State<_ExerciseCard> {
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   minSize: 24,
-                  child: const Icon(Icons.add_circle, color: Colors.blue),
+                  child: const Icon(CupertinoIcons.add_circled, color: Colors.blue),
                   onPressed: widget.onAddSet,
                 ),
               ],
@@ -845,7 +845,7 @@ class _ExerciseCardState extends State<_ExerciseCard> {
                             child: CupertinoButton(
                               padding: EdgeInsets.zero,
                               minSize: 24,
-                              child: Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                              child: Icon(CupertinoIcons.delete, color: Colors.red, size: 20),
                               onPressed: () => widget.onDeleteSet(set.id),
                             ),
                           ),
@@ -943,7 +943,7 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
                     return CupertinoListTile(
                       title: Text(exercise.name),
                       subtitle: exercise.category != null ? Text(exercise.category!) : null,
-                      trailing: const Icon(Icons.add),
+                      trailing: const Icon(CupertinoIcons.add),
                       onTap: () => _addExercise(exercise.id),
                     );
                   },

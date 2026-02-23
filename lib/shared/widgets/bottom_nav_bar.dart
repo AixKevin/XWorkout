@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Icons;
 import 'package:go_router/go_router.dart';
 
 class BottomNavBar extends StatelessWidget {
@@ -21,15 +20,15 @@ class BottomNavBar extends StatelessWidget {
             ),
             items: const [
               BottomNavigationBarItem(
-                icon: Icon(Icons.fitness_center),
+                icon: Icon(CupertinoIcons.sportscourt),
                 label: '训练',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.history),
+                icon: Icon(CupertinoIcons.clock),
                 label: '历史',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.more_horiz),
+                icon: Icon(CupertinoIcons.ellipsis),
                 label: '更多',
               ),
             ],

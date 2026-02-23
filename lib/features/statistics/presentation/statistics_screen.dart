@@ -42,7 +42,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '总训练',
                       provider: totalWorkoutsProvider,
-                      icon: Icons.grid_view,
+                      icon: CupertinoIcons.square_grid_2x2,
                       color: CupertinoColors.activeBlue,
                       unit: '次',
                     ),
@@ -52,7 +52,7 @@ class StatisticsScreen extends ConsumerWidget {
                     child: _OverviewCard(
                       title: '当前连胜',
                       provider: currentStreakProvider,
-                      icon: Icons.local_fire_department,
+                      icon: CupertinoIcons.flame,
                       color: CupertinoColors.activeOrange,
                       unit: '天',
                     ),
@@ -169,7 +169,7 @@ class _WeeklyGoalCard extends ConsumerWidget {
                     ),
                   ),
                   Icon(
-                    progress >= 1.0 ? Icons.check : Icons.show_chart,
+                    progress >= 1.0 ? CupertinoIcons.checkmark : CupertinoIcons.chart_bar,
                     color: progress >= 1.0 ? CupertinoColors.activeGreen : CupertinoColors.systemGrey,
                   ),
                 ],
@@ -355,7 +355,7 @@ class _TopExercisesList extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const Icon(Icons.chevron_right, color: Colors.grey),
+                    const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
                   ],
                 ),
               ),
@@ -561,7 +561,7 @@ class _ExerciseStatsSheet extends ConsumerWidget {
                             child: _StatBox(
                               title: '最大重量', 
                               value: '${maxWeight.toStringAsFixed(1)} kg',
-                              icon: Icons.vertical_align_top,
+                              icon: CupertinoIcons.arrow_up_to_line,
                               color: CupertinoColors.systemRed,
                             ),
                           ),
@@ -570,7 +570,7 @@ class _ExerciseStatsSheet extends ConsumerWidget {
                             child: _StatBox(
                               title: '总容量', 
                               value: '${(totalVolume / 1000).toStringAsFixed(1)}k kg',
-                              icon: Icons.layers,
+                              icon: CupertinoIcons.layers,
                               color: CupertinoColors.systemPurple,
                             ),
                           ),

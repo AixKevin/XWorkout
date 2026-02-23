@@ -162,7 +162,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 20),
+                        const Icon(CupertinoIcons.star, color: Colors.amber, size: 20),
                         const SizedBox(width: 8),
                         Text(
                           '历史最佳: ${_personalRecord}kg',
@@ -208,7 +208,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.add),
+                        Icon(CupertinoIcons.add),
                         SizedBox(width: 8),
                         Text('添加一组'),
                       ],
@@ -238,7 +238,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     placeholder: '添加备注 (例如: 座椅高度5)',
                     prefix: const Padding(
                       padding: EdgeInsets.only(left: 8),
-                      child: Icon(Icons.edit, color: Colors.grey),
+                      child: Icon(CupertinoIcons.pencil, color: Colors.grey),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                     decoration: BoxDecoration(
@@ -475,14 +475,14 @@ class _SetItem extends StatelessWidget {
         color: Colors.green,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 16),
-        child: const Icon(Icons.check, color: Colors.white),
+        child: const Icon(CupertinoIcons.checkmark, color: Colors.white),
       ),
       secondaryBackground: Container(
         color: setRecord.isCompleted ? Colors.grey : Colors.green,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 16),
         child: Icon(
-          setRecord.isCompleted ? Icons.replay : Icons.check,
+          setRecord.isCompleted ? CupertinoIcons.refresh : CupertinoIcons.checkmark,
           color: Colors.white,
         ),
       ),
@@ -539,7 +539,7 @@ class _SetItem extends StatelessWidget {
               },
               suffix: isPR ? const Padding(
                 padding: EdgeInsets.only(right: 8.0),
-                child: Icon(Icons.star, color: Colors.amber, size: 16),
+                child: Icon(CupertinoIcons.star, color: Colors.amber, size: 16),
               ) : null,
             ),
           ),
@@ -552,7 +552,7 @@ class _SetItem extends StatelessWidget {
       trailing: CupertinoButton(
         padding: EdgeInsets.zero,
         child: Icon(
-          setRecord.isCompleted ? Icons.check_circle : Icons.circle_outlined,
+          setRecord.isCompleted ? CupertinoIcons.checkmark_circle : CupertinoIcons.circle,
           color: setRecord.isCompleted 
               ? Colors.green 
               : Colors.grey,
