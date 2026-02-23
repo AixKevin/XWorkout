@@ -7,7 +7,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-green)
-![Version](https://img.shields.io/badge/version-4.9.5-brightgreen)
+![Version](https://img.shields.io/badge/version-4.9.6-brightgreen)
 
 </div>
 
@@ -210,6 +210,9 @@ lib/
 | DailyRecords | 每日记录 |
 | ExerciseRecords | 动作记录 |
 | AppSettings | 应用设置 |
+
+### v4.9.6 (2026-02-23)
+- fix: 隐藏历史界面的「通用」分类标签
 
 ### v4.9.5 (2026-02-23)
 - feat: 添加版本自动同步脚本，实现版本号统一管理

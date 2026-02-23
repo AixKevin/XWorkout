@@ -161,7 +161,7 @@ class _FilterChips extends StatelessWidget {
             isSelected: selectedId == null,
             onTap: () => onSelected(null),
           ),
-          ...types.map((type) => _Chip(
+          ...types.where((type) => type.name != '通用').map((type) => _Chip(
             label: type.name,
             isSelected: selectedId == type.id,
             onTap: () => onSelected(type.id),
