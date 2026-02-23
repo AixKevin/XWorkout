@@ -7,7 +7,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-green)
-![Version](https://img.shields.io/badge/version-4.9.3-brightgreen)
+![Version](https://img.shields.io/badge/version-4.9.4-brightgreen)
 
 </div>
 
@@ -186,6 +186,9 @@ lib/
 | AppSettings | 应用设置 |
 
 ## 📝 更新日志
+
+### v4.9.4 (2026-02-23)
+- 修复：允许「通用」类别动作添加到其他类别训练中
 
 ### v4.9.3 (2026-02-23)
 - 更新训练类别名称
