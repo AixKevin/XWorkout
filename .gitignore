@@ -43,7 +43,6 @@ coverage/
 
 # OpenCode 工具文件
 .sisyphus/
-AGENTS.md
 PROMPT.md
 setup-windows.bat
 .gitattributes
