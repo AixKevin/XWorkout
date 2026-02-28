@@ -7,6 +7,7 @@ import 'package:xworkout/features/workout/data/workout_providers.dart';
 import 'package:xworkout/features/workout/data/workout_repository.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/presentation/exercise_list_screen.dart';
+import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
 import 'package:xworkout/features/more/presentation/workout_types_screen.dart';
 import 'package:uuid/uuid.dart';
 
@@ -903,9 +904,24 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: CupertinoSearchTextField(
-              placeholder: '搜索动作',
-              onChanged: (value) => setState(() => _searchText = value),
+            child: Row(
+              children: [
+                Expanded(
+                  child: CupertinoSearchTextField(
+                    placeholder: '搜索动作',
+                    onChanged: (value) => setState(() => _searchText = value),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                CupertinoButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  minSize: 0,
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Text('新建', style: TextStyle(color: CupertinoColors.white, fontSize: 14)),
+                  onPressed: () => _navigateToCreateExercise(context),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),
@@ -1016,6 +1032,18 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
         ],
       ),
     );
+  }
+
+  Future<void> _navigateToCreateExercise(BuildContext context) async {
+    await Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) => const ExerciseFormScreen(),
+      ),
+    );
+    // 关闭当前弹窗，用户可以重新打开添加动作对话框
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 }
 

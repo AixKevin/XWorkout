@@ -7,7 +7,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-green)
-![Version](https://img.shields.io/badge/version-4.9.6-brightgreen)
+![Version](https://img.shields.io/badge/version-4.9.7-brightgreen)
 
 </div>
 
@@ -210,6 +210,9 @@ lib/
 | DailyRecords | 每日记录 |
 | ExerciseRecords | 动作记录 |
 | AppSettings | 应用设置 |
+
+### v4.9.7 (2026-02-23)
+- feat: 训练中添加动作界面新增"新建"按钮，可跳转至新建项目页面
 
 ### v4.9.6 (2026-02-23)
 - fix: 隐藏历史界面的「通用」分类标签
