@@ -6,6 +6,8 @@ import 'package:xworkout/core/database/database_provider.dart';
 import 'package:xworkout/features/workout/data/workout_providers.dart';
 import 'package:xworkout/features/workout/data/workout_repository.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 // 筛选类型Provider
 final historyFilterProvider = StateProvider<int?>((ref) => null);
@@ -56,7 +58,8 @@ class HistoryScreen extends ConsumerWidget {
                           SizedBox(height: 16),
                           Text('暂无训练记录', style: TextStyle(color: Colors.grey)),
                           SizedBox(height: 8),
-                          Text('开始你的第一次训练吧！', style: TextStyle(color: Colors.grey)),
+                          Text('开始你的第一次训练吧！',
+                              style: TextStyle(color: Colors.grey)),
                         ],
                       ),
                     );
@@ -69,12 +72,15 @@ class HistoryScreen extends ConsumerWidget {
                       final session = filtered[index];
                       return typesAsync.when(
                         data: (types) {
-                          final type = types.where((t) => t.id == session.typeId).firstOrNull;
+                          final type = types
+                              .where((t) => t.id == session.typeId)
+                              .firstOrNull;
                           return _SessionCard(
                             session: session,
                             typeName: type?.name ?? '训练',
                             onTap: () => _showSessionDetail(context, session),
-                            onDelete: () => _deleteSession(context, ref, session),
+                            onDelete: () =>
+                                _deleteSession(context, ref, session),
                           );
                         },
                         loading: () => _SessionCard(
@@ -93,7 +99,8 @@ class HistoryScreen extends ConsumerWidget {
                     },
                   );
                 },
-                loading: () => const Center(child: CupertinoActivityIndicator()),
+                loading: () =>
+                    const Center(child: CupertinoActivityIndicator()),
                 error: (e, _) => Center(child: Text('错误: $e')),
               ),
             ),
@@ -111,7 +118,8 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  void _deleteSession(BuildContext context, WidgetRef ref, WorkoutSession session) {
+  void _deleteSession(
+      BuildContext context, WidgetRef ref, WorkoutSession session) {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -162,10 +170,10 @@ class _FilterChips extends StatelessWidget {
             onTap: () => onSelected(null),
           ),
           ...types.where((type) => type.name != '通用').map((type) => _Chip(
-            label: type.name,
-            isSelected: selectedId == type.id,
-            onTap: () => onSelected(type.id),
-          )),
+                label: type.name,
+                isSelected: selectedId == type.id,
+                onTap: () => onSelected(type.id),
+              )),
         ],
       ),
     );
@@ -305,6 +313,7 @@ class _SessionDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final setsAsync = ref.watch(sessionSetsProvider(session.id));
     final exercisesAsync = ref.watch(exerciseListProvider);
+    final weightUnit = ref.watch(weightUnitProvider);
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -333,10 +342,12 @@ class _SessionDetailScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 children: grouped.entries.map((entry) {
                   final exerciseId = entry.key;
-                  final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
+                  final exercise =
+                      exercises.where((e) => e.id == exerciseId).firstOrNull;
                   return _ExerciseDetailCard(
                     exerciseName: exercise?.name ?? '未知动作',
                     sets: entry.value,
+                    weightUnit: weightUnit,
                   );
                 }).toList(),
               ),
@@ -382,10 +393,12 @@ class _SessionDetailScreen extends ConsumerWidget {
 class _ExerciseDetailCard extends StatelessWidget {
   final String exerciseName;
   final List<WorkoutSet> sets;
+  final String weightUnit;
 
   const _ExerciseDetailCard({
     required this.exerciseName,
     required this.sets,
+    required this.weightUnit,
   });
 
   @override
@@ -410,27 +423,35 @@ class _ExerciseDetailCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           ...sets.map((set) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 30,
-                  child: Text(
-                    '${set.setNumber}.',
-                    style: const TextStyle(color: Colors.grey),
-                  ),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 30,
+                      child: Text(
+                        '${set.setNumber}.',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${_formatWeight(set.weight)} × ${set.reps}次',
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: Text(
-                    '${set.weight.isEmpty ? "-" : set.weight} × ${set.reps}次',
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                ),
-              ],
-            ),
-          )),
+              )),
         ],
       ),
     );
+  }
+
+  String _formatWeight(String raw) {
+    final kg = WeightUnitUtils.parseStoredToKg(raw);
+    if (kg == null) {
+      return '-';
+    }
+    return '${WeightUnitUtils.formatKgToDisplay(kg, weightUnit)}$weightUnit';
   }
 }

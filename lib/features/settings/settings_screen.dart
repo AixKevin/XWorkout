@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/settings/app_settings_repository.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
 
 final appSettingsRepositoryProvider = Provider<AppSettingsRepository>((ref) {
   return AppSettingsRepository();
@@ -30,13 +31,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _loadSettings() async {
     final repo = ref.read(appSettingsRepositoryProvider);
     final themeMode = await repo.getThemeMode();
-    final weightUnit = await repo.getWeightUnit();
     final defaultSets = await repo.getDefaultSets();
     final defaultReps = await repo.getDefaultReps();
 
     setState(() {
       _isDarkMode = themeMode == 'dark';
-      _weightUnit = weightUnit;
       _defaultSets = defaultSets;
       _defaultReps = defaultReps;
       _isLoading = false;
@@ -45,6 +44,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final globalWeightUnit = ref.watch(weightUnitProvider);
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         middle: Text('设置'),
@@ -74,22 +74,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       CupertinoListTile(
                         leading: Icon(Icons.grid_view),
                         title: const Text('重量单位'),
-                        additionalInfo: Text(_weightUnit.toUpperCase()),
-                        trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                        additionalInfo: Text(globalWeightUnit.toUpperCase()),
+                        trailing: Icon(CupertinoIcons.chevron_right,
+                            color: Colors.grey[400], size: 28),
                         onTap: () => _showWeightUnitPicker(),
                       ),
                       CupertinoListTile(
                         leading: Icon(Icons.list),
                         title: const Text('默认组数'),
                         additionalInfo: Text('$_defaultSets 组'),
-                        trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                        trailing: Icon(CupertinoIcons.chevron_right,
+                            color: Colors.grey[400], size: 28),
                         onTap: () => _showSetsPicker(),
                       ),
                       CupertinoListTile(
                         leading: Icon(Icons.repeat),
                         title: const Text('默认次数'),
                         additionalInfo: Text('$_defaultReps 次'),
-                        trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                        trailing: Icon(CupertinoIcons.chevron_right,
+                            color: Colors.grey[400], size: 28),
                         onTap: () => _showRepsPicker(),
                       ),
                     ],
@@ -100,7 +103,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       CupertinoListTile(
                         leading: Icon(Icons.swap_horiz),
                         title: const Text('开源许可'),
-                        trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                        trailing: Icon(CupertinoIcons.chevron_right,
+                            color: Colors.grey[400], size: 28),
                         onTap: () => _showLicenses(),
                       ),
                     ],
@@ -127,11 +131,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           CupertinoActionSheetAction(
             onPressed: () => _setWeightUnit('kg'),
-            child: Text('千克 (kg)${_weightUnit == 'kg' ? ' ✓' : ''}'),
+            child: Text(
+                '千克 (kg)${ref.read(weightUnitProvider) == 'kg' ? ' ✓' : ''}'),
           ),
           CupertinoActionSheetAction(
-            onPressed: () => _setWeightUnit('lbs'),
-            child: Text('磅 (lbs)${_weightUnit == 'lbs' ? ' ✓' : ''}'),
+            onPressed: () => _setWeightUnit('lb'),
+            child: Text(
+                '磅 (lb)${ref.read(weightUnitProvider) == 'lb' ? ' ✓' : ''}'),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
@@ -144,8 +150,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _setWeightUnit(String unit) async {
-    final repo = ref.read(appSettingsRepositoryProvider);
-    await repo.setWeightUnit(unit);
+    await ref.read(weightUnitProvider.notifier).setWeightUnit(unit);
     setState(() {
       _weightUnit = unit;
     });
@@ -176,12 +181,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Expanded(
               child: CupertinoPicker(
                 itemExtent: 40,
-                scrollController: FixedExtentScrollController(initialItem: _defaultSets - 1),
+                scrollController:
+                    FixedExtentScrollController(initialItem: _defaultSets - 1),
                 onSelectedItemChanged: (index) {
                   _defaultSets = index + 1;
-                  ref.read(appSettingsRepositoryProvider).setDefaultSets(_defaultSets);
+                  ref
+                      .read(appSettingsRepositoryProvider)
+                      .setDefaultSets(_defaultSets);
                 },
-                children: List.generate(10, (index) => Center(child: Text('${index + 1} 组'))),
+                children: List.generate(
+                    10, (index) => Center(child: Text('${index + 1} 组'))),
               ),
             ),
           ],
@@ -214,12 +223,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Expanded(
               child: CupertinoPicker(
                 itemExtent: 40,
-                scrollController: FixedExtentScrollController(initialItem: _defaultReps - 1),
+                scrollController:
+                    FixedExtentScrollController(initialItem: _defaultReps - 1),
                 onSelectedItemChanged: (index) {
                   _defaultReps = index + 1;
-                  ref.read(appSettingsRepositoryProvider).setDefaultReps(_defaultReps);
+                  ref
+                      .read(appSettingsRepositoryProvider)
+                      .setDefaultReps(_defaultReps);
                 },
-                children: List.generate(30, (index) => Center(child: Text('${index + 1} 次'))),
+                children: List.generate(
+                    30, (index) => Center(child: Text('${index + 1} 次'))),
               ),
             ),
           ],

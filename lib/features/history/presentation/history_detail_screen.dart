@@ -9,27 +9,33 @@ import 'package:xworkout/features/today/presentation/providers/today_provider.da
 import 'package:xworkout/core/database/database_provider.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:drift/drift.dart' show Value;
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
-final exerciseRecordsProvider = StreamProvider.family<List<ExerciseRecord>, String>((ref, dailyRecordId) {
+final exerciseRecordsProvider =
+    StreamProvider.family<List<ExerciseRecord>, String>((ref, dailyRecordId) {
   final repository = ref.watch(todayRecordRepositoryProvider);
   return repository.watchExerciseRecords(dailyRecordId);
 });
 
 class HistoryDetailScreen extends ConsumerStatefulWidget {
   final DailyRecord record;
-  
+
   const HistoryDetailScreen({super.key, required this.record});
 
   @override
-  ConsumerState<HistoryDetailScreen> createState() => _HistoryDetailScreenState();
+  ConsumerState<HistoryDetailScreen> createState() =>
+      _HistoryDetailScreenState();
 }
 
 class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final exerciseAsync = ref.watch(exerciseListProvider);
-    final exerciseRecordsAsync = ref.watch(exerciseRecordsProvider(widget.record.id));
-    
+    final exerciseRecordsAsync =
+        ref.watch(exerciseRecordsProvider(widget.record.id));
+    final weightUnit = ref.watch(weightUnitProvider);
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(DateFormat('MM月dd日', 'zh_CN').format(widget.record.date)),
@@ -75,7 +81,8 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                         ),
                       ),
                       Text(
-                        DateFormat('yyyy年M月d日 EEEE', 'zh_CN').format(widget.record.date),
+                        DateFormat('yyyy年M月d日 EEEE', 'zh_CN')
+                            .format(widget.record.date),
                         style: const TextStyle(
                           fontSize: 14,
                           color: CupertinoColors.systemGrey,
@@ -86,9 +93,10 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                 ],
               ),
             ),
-            
+
             // Skip reason if skipped
-            if (widget.record.status == 'skipped' && widget.record.skipReason != null)
+            if (widget.record.status == 'skipped' &&
+                widget.record.skipReason != null)
               CupertinoListSection.insetGrouped(
                 header: const Text('偷懒原因'),
                 children: [
@@ -97,7 +105,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                   ),
                 ],
               ),
-            
+
             // Exercise records
             CupertinoListSection.insetGrouped(
               header: const Text('训练记录'),
@@ -121,7 +129,8 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                         return CupertinoListTile(
                           leading: const Icon(Icons.grid_view),
                           title: Text(exercise.name),
-                          subtitle: Text('${record.actualSets}组 - ${record.actualReps}次 ${record.actualWeight.isNotEmpty ? record.actualWeight.split(',').where((w) => w.isNotEmpty).map((w) => '${w}kg').join(' / ') : ''}'),
+                          subtitle: Text(
+                              '${record.actualSets}组 - ${record.actualReps}次 ${_formatWeights(record.actualWeight, weightUnit)}'),
                           trailing: const Icon(CupertinoIcons.chevron_right),
                         );
                       },
@@ -146,7 +155,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                 ],
               ),
             ),
-            
+
             // Note
             if (widget.record.note != null)
               CupertinoListSection.insetGrouped(
@@ -157,7 +166,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
                   ),
                 ],
               ),
-            
+
             // Actions
             CupertinoListSection.insetGrouped(
               children: [
@@ -176,7 +185,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
       ),
     );
   }
-  
+
   void _showDeleteDialog(BuildContext context) {
     showCupertinoDialog(
       context: context,
@@ -205,15 +214,20 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
       ),
     );
   }
-  
+
   Future<void> _deleteRecord() async {
     final db = databaseProvider;
-    await (db.delete(db.exerciseRecords)..where((t) => t.dailyRecordId.equals(widget.record.id))).go();
-    await (db.delete(db.dailyRecords)..where((t) => t.id.equals(widget.record.id))).go();
+    await (db.delete(db.exerciseRecords)
+          ..where((t) => t.dailyRecordId.equals(widget.record.id)))
+        .go();
+    await (db.delete(db.dailyRecords)
+          ..where((t) => t.id.equals(widget.record.id)))
+        .go();
   }
-  
+
   void _showEditDialog(BuildContext context) {
-    final noteController = TextEditingController(text: widget.record.note ?? '');
+    final noteController =
+        TextEditingController(text: widget.record.note ?? '');
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -239,8 +253,9 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
               Navigator.of(context).pop();
               final db = databaseProvider;
               await (db.update(db.dailyRecords)
-                ..where((t) => t.id.equals(widget.record.id)))
-                .write(DailyRecordsCompanion(note: Value(noteController.text.trim())));
+                    ..where((t) => t.id.equals(widget.record.id)))
+                  .write(DailyRecordsCompanion(
+                      note: Value(noteController.text.trim())));
               setState(() {});
             },
           ),
@@ -248,7 +263,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
       ),
     );
   }
-  
+
   Color _getStatusColor() {
     switch (widget.record.status) {
       case 'completed':
@@ -261,7 +276,26 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
         return CupertinoColors.systemGrey;
     }
   }
-  
+
+  String _formatWeights(String rawWeights, String weightUnit) {
+    if (rawWeights.isEmpty) {
+      return '';
+    }
+    final result = rawWeights
+        .split(',')
+        .where((w) => w.trim().isNotEmpty)
+        .map((w) {
+          final kg = WeightUnitUtils.parseStoredToKg(w);
+          if (kg == null) {
+            return '';
+          }
+          return '${WeightUnitUtils.formatKgToDisplay(kg, weightUnit)}$weightUnit';
+        })
+        .where((w) => w.isNotEmpty)
+        .join(' / ');
+    return result;
+  }
+
   IconData _getStatusIcon() {
     switch (widget.record.status) {
       case 'completed':
@@ -274,7 +308,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
         return Icons.radio_button_unchecked;
     }
   }
-  
+
   String _getStatusText() {
     switch (widget.record.status) {
       case 'completed':

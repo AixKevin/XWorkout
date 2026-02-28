@@ -5,6 +5,8 @@ import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/features/training/data/exercise_repository.dart';
 import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 class ExerciseDetailScreen extends ConsumerWidget {
   final Exercise exercise;
@@ -15,6 +17,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final historyAsync = ref.watch(exerciseHistoryProvider(exercise.id));
     final maxWeightAsync = ref.watch(exerciseMaxWeightProvider(exercise.id));
+    final weightUnit = ref.watch(weightUnitProvider);
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -43,9 +46,10 @@ class ExerciseDetailScreen extends ConsumerWidget {
                   children: [
                     if (exercise.category != null)
                       _buildInfoRow('分类', exercise.category!),
-                    _buildInfoRow('默认设置', 
-                      '${exercise.defaultSets}组 × ${exercise.defaultReps}次'
-                      '${exercise.defaultWeight != null ? ' ${exercise.defaultWeight}kg' : ''}'),
+                    _buildInfoRow(
+                        '默认设置',
+                        '${exercise.defaultSets}组 × ${exercise.defaultReps}次'
+                            '${exercise.defaultWeight != null ? ' ${WeightUnitUtils.formatKgToDisplay(exercise.defaultWeight!, weightUnit)}$weightUnit' : ''}'),
                     if (exercise.note != null && exercise.note!.isNotEmpty)
                       _buildInfoRow('备注', exercise.note!),
                   ],
@@ -60,7 +64,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
                     _buildStatCard(
                       '最佳表现',
                       maxWeightAsync.when(
-                        data: (weight) => weight != null ? '${weight}kg' : '暂无记录',
+                        data: (weight) => weight != null
+                            ? '${WeightUnitUtils.formatKgToDisplay(weight, weightUnit)}$weightUnit'
+                            : '暂无记录',
                         loading: () => '加载中...',
                         error: (_, __) => '错误',
                       ),
@@ -99,14 +105,16 @@ class ExerciseDetailScreen extends ConsumerWidget {
                     (context, index) {
                       final record = history[index];
                       return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: CupertinoColors.systemBackground,
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: CupertinoColors.systemGrey.withOpacity(0.1),
+                              color:
+                                  CupertinoColors.systemGrey.withOpacity(0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -126,7 +134,8 @@ class ExerciseDetailScreen extends ConsumerWidget {
                             Row(
                               children: [
                                 Expanded(
-                                  child: Text('重量: ${record.weight}kg'),
+                                  child: Text(
+                                      '重量: ${_formatRecordWeight(record.weight, weightUnit)}$weightUnit'),
                                 ),
                                 Expanded(
                                   child: Text('次数: ${record.reps}'),
@@ -224,5 +233,13 @@ class ExerciseDetailScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  String _formatRecordWeight(String raw, String weightUnit) {
+    final kg = WeightUnitUtils.parseStoredToKg(raw);
+    if (kg == null) {
+      return '-';
+    }
+    return WeightUnitUtils.formatKgToDisplay(kg, weightUnit);
   }
 }

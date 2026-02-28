@@ -7,7 +7,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-green)
-![Version](https://img.shields.io/badge/version-4.9.7-brightgreen)
+![Version](https://img.shields.io/badge/version-4.9.8-brightgreen)
 
 </div>
 
@@ -211,8 +211,22 @@ lib/
 | ExerciseRecords | 动作记录 |
 | AppSettings | 应用设置 |
 
+### v4.9.8 (2026-02-28)
+- feat: 训练中支持每组独立重量单位切换（kg/lb）
+- feat: 每个重量输入框旁新增单位下拉菜单
+- improve: 同一动作内不同组可使用不同单位
+- feat: 训练中添加动作界面新增"新建"按钮，可跳转至新建项目页面
+
 ### v4.9.7 (2026-02-23)
 - feat: 训练中添加动作界面新增"新建"按钮，可跳转至新建项目页面
+=======
+### v4.9.7 (2026-02-28)
+- feat: 训练中支持每组独立重量单位切换（kg/lb）
+- feat: 每个重量输入框旁新增单位下拉菜单
+- improve: 同一动作内不同组可使用不同单位
+- improve: 单位切换后输入值自动按目标单位转换显示
+- improve: 按每组单位换算并存储重量，兼容历史数据读取
+>>>>>>> pr-1
 
 ### v4.9.6 (2026-02-23)
 - fix: 隐藏历史界面的「通用」分类标签

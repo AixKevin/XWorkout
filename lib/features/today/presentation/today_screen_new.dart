@@ -11,6 +11,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:xworkout/features/training/presentation/exercise_list_screen.dart';
 import 'package:xworkout/features/more/presentation/workout_types_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -20,7 +22,7 @@ class TodayScreen extends ConsumerWidget {
     final activePlanAsync = ref.watch(todayActivePlanProvider);
     final todayRecordAsync = ref.watch(todayRecordProvider);
     final selectedDate = DateTime.now();
-    
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(formatDate(selectedDate)),
@@ -36,7 +38,7 @@ class TodayScreen extends ConsumerWidget {
             if (plan == null) {
               return _buildNoPlanView(context);
             }
-            
+
             return _buildTodayContent(context, ref, plan, todayRecordAsync);
           },
           loading: () => const Center(child: CupertinoActivityIndicator()),
@@ -47,7 +49,7 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildNoPlanView(BuildContext context) {
     return Center(
       child: Column(
@@ -78,7 +80,7 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildTodayContent(
     BuildContext context,
     WidgetRef ref,
@@ -87,26 +89,27 @@ class TodayScreen extends ConsumerWidget {
   ) {
     final cycleDay = calculateCycleDay(plan);
     final planDaysAsync = ref.watch(planDaysProvider(plan.id));
-    
+
     return planDaysAsync.when(
       data: (planDays) {
         final todayPlanDay = planDays.isNotEmpty && cycleDay <= planDays.length
             ? planDays[cycleDay - 1]
             : null;
-        
+
         if (todayPlanDay == null) {
           return _buildNoPlanView(context);
         }
-        
+
         final isRestDay = todayPlanDay.isRestDay;
-        
+
         return ListView(
           children: [
             _buildPlanHeader(plan, cycleDay, isRestDay),
             if (isRestDay)
               _buildRestDayView(context, ref, todayRecordAsync)
             else
-              _buildTrainingDayView(context, ref, todayPlanDay, todayRecordAsync),
+              _buildTrainingDayView(
+                  context, ref, todayPlanDay, todayRecordAsync),
           ],
         );
       },
@@ -114,7 +117,7 @@ class TodayScreen extends ConsumerWidget {
       error: (e, _) => Center(child: Text('加载失败: $e')),
     );
   }
-  
+
   Widget _buildPlanHeader(WorkoutPlan plan, int cycleDay, bool isRestDay) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -151,7 +154,7 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildRestDayView(
     BuildContext context,
     WidgetRef ref,
@@ -159,7 +162,7 @@ class TodayScreen extends ConsumerWidget {
   ) {
     final record = todayRecordAsync.valueOrNull;
     final isSkipped = record?.status == 'skipped';
-    
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -199,17 +202,18 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildTrainingDayView(
     BuildContext context,
     WidgetRef ref,
     PlanDay todayPlanDay,
     AsyncValue<DailyRecord?> todayRecordAsync,
   ) {
-    final exercisesAsync = ref.watch(todayDayExercisesProvider(todayPlanDay.id));
+    final exercisesAsync =
+        ref.watch(todayDayExercisesProvider(todayPlanDay.id));
     final record = todayRecordAsync.valueOrNull;
     final isTraining = record?.status == 'normal';
-    
+
     return Column(
       children: [
         Padding(
@@ -233,7 +237,7 @@ class TodayScreen extends ConsumerWidget {
                       style: TextStyle(color: CupertinoColors.systemGrey),
                     );
                   }
-                  
+
                   return Column(
                     children: exercises.map((de) {
                       return _ExerciseCard(
@@ -261,7 +265,9 @@ class TodayScreen extends ConsumerWidget {
                   child: const Text('撤销偷懒'),
                   onPressed: () {
                     if (record != null) {
-                      ref.read(todayNotifierProvider.notifier).undoSkip(record.id);
+                      ref
+                          .read(todayNotifierProvider.notifier)
+                          .undoSkip(record.id);
                     }
                   },
                 ),
@@ -275,7 +281,8 @@ class TodayScreen extends ConsumerWidget {
                 CupertinoButton.filled(
                   child: const Text('开始训练'),
                   onPressed: () async {
-                    final recordId = await ref.read(todayNotifierProvider.notifier)
+                    final recordId = await ref
+                        .read(todayNotifierProvider.notifier)
                         .startTraining(todayPlanDay.id);
                     if (context.mounted) {
                       _showTrainingStarted(context);
@@ -296,7 +303,8 @@ class TodayScreen extends ConsumerWidget {
                     child: CupertinoButton(
                       color: CupertinoColors.systemGrey,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: const Text('类型编辑', style: TextStyle(color: CupertinoColors.white)),
+                      child: const Text('类型编辑',
+                          style: TextStyle(color: CupertinoColors.white)),
                       onPressed: () {
                         Navigator.of(context).push(
                           CupertinoPageRoute(
@@ -311,7 +319,8 @@ class TodayScreen extends ConsumerWidget {
                     child: CupertinoButton(
                       color: CupertinoColors.systemGrey,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: const Text('动作管理', style: TextStyle(color: CupertinoColors.white)),
+                      child: const Text('动作管理',
+                          style: TextStyle(color: CupertinoColors.white)),
                       onPressed: () {
                         Navigator.of(context).push(
                           CupertinoPageRoute(
@@ -329,10 +338,10 @@ class TodayScreen extends ConsumerWidget {
       ],
     );
   }
-  
+
   void _showSkipDialog(BuildContext context, WidgetRef ref, String? recordId) {
     final reasonController = TextEditingController();
-    
+
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -357,9 +366,9 @@ class TodayScreen extends ConsumerWidget {
             child: const Text('确认'),
             onPressed: () {
               ref.read(todayNotifierProvider.notifier).skipTraining(
-                recordId,
-                reasonController.text.trim(),
-              );
+                    recordId,
+                    reasonController.text.trim(),
+                  );
               Navigator.of(context).pop();
             },
           ),
@@ -367,7 +376,7 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   void _showTrainingStarted(BuildContext context) {
     showCupertinoDialog(
       context: context,
@@ -389,7 +398,7 @@ class _ExerciseCard extends ConsumerWidget {
   final DayExercise dayExercise;
   final bool isRecording;
   final String? dailyRecordId;
-  
+
   const _ExerciseCard({
     required this.dayExercise,
     required this.isRecording,
@@ -399,7 +408,8 @@ class _ExerciseCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final exerciseAsync = ref.watch(exerciseListProvider);
-    
+    final weightUnit = ref.watch(weightUnitProvider);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -430,7 +440,7 @@ class _ExerciseCard extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${dayExercise.targetSets}组 × ${dayExercise.targetReps}次${dayExercise.targetWeight != null ? ' ${dayExercise.targetWeight}kg' : ''}',
+            '${dayExercise.targetSets}组 × ${dayExercise.targetReps}次${dayExercise.targetWeight != null ? ' ${WeightUnitUtils.formatKgToDisplay(dayExercise.targetWeight!, weightUnit)}$weightUnit' : ''}',
             style: const TextStyle(
               fontSize: 15,
               color: CupertinoColors.systemGrey,
@@ -441,21 +451,27 @@ class _ExerciseCard extends ConsumerWidget {
             CupertinoButton(
               padding: EdgeInsets.zero,
               child: const Text('记录'),
-              onPressed: () => _showRecordDialog(context, ref),
+              onPressed: () => _showRecordDialog(context, ref, weightUnit),
             ),
           ],
         ],
       ),
     );
   }
-  
-  void _showRecordDialog(BuildContext context, WidgetRef ref) {
-    final setsController = TextEditingController(text: dayExercise.targetSets.toString());
-    final repsController = TextEditingController(text: dayExercise.targetReps.toString());
+
+  void _showRecordDialog(
+      BuildContext context, WidgetRef ref, String weightUnit) {
+    final setsController =
+        TextEditingController(text: dayExercise.targetSets.toString());
+    final repsController =
+        TextEditingController(text: dayExercise.targetReps.toString());
     final weightController = TextEditingController(
-      text: dayExercise.targetWeight?.toString() ?? '',
+      text: dayExercise.targetWeight != null
+          ? WeightUnitUtils.formatKgToDisplay(
+              dayExercise.targetWeight!, weightUnit)
+          : '',
     );
-    
+
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -476,8 +492,9 @@ class _ExerciseCard extends ConsumerWidget {
             const SizedBox(height: 8),
             CupertinoTextField(
               controller: weightController,
-              placeholder: '重量(kg)',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              placeholder: '重量($weightUnit)',
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
             ),
           ],
         ),
@@ -493,9 +510,15 @@ class _ExerciseCard extends ConsumerWidget {
                 ref.read(todayNotifierProvider.notifier).saveExerciseRecord(
                   dailyRecordId: dailyRecordId!,
                   exerciseId: dayExercise.exerciseId,
-                  actualSets: int.tryParse(setsController.text) ?? dayExercise.targetSets,
-                  actualReps: [int.tryParse(repsController.text) ?? dayExercise.targetReps],
-                  actualWeight: [double.tryParse(weightController.text)],
+                  actualSets: int.tryParse(setsController.text) ??
+                      dayExercise.targetSets,
+                  actualReps: [
+                    int.tryParse(repsController.text) ?? dayExercise.targetReps
+                  ],
+                  actualWeight: [
+                    WeightUnitUtils.parseDisplayToKg(
+                        weightController.text, weightUnit)
+                  ],
                 );
               }
               Navigator.of(context).pop();

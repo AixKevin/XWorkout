@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
   return SettingsRepository();
@@ -13,7 +14,8 @@ class SettingsRepository {
   static const String _keyVibrationEnabled = 'vibration_enabled';
 
   // Display Keys
-  static const String _keyWeightUnit = 'weight_unit'; // Mirrors AppSettingsRepository
+  static const String _keyWeightUnit =
+      'weight_unit'; // Mirrors AppSettingsRepository
   static const String _keyDateFormat = 'date_format';
   static const String _keyFirstDayOfWeek = 'first_day_of_week';
 
@@ -21,12 +23,15 @@ class SettingsRepository {
   static const String _keyNotificationEnabled = 'notification_enabled';
   static const String _keyReminderHour = 'reminder_hour';
   static const String _keyReminderMinute = 'reminder_minute';
-  static const String _keyReminderDays = 'reminder_days'; // Stored as CSV string "1,2,3"
-  static const String _keySmartNotificationEnabled = 'smart_notification_enabled';
+  static const String _keyReminderDays =
+      'reminder_days'; // Stored as CSV string "1,2,3"
+  static const String _keySmartNotificationEnabled =
+      'smart_notification_enabled';
   static const String _keyWeeklySummaryEnabled = 'weekly_summary_enabled';
   static const String _keyStreakReminderEnabled = 'streak_reminder_enabled';
   static const String _keyRestDayReminderEnabled = 'rest_day_reminder_enabled';
-  static const String _keyAchievementNotificationEnabled = 'achievement_notification_enabled';
+  static const String _keyAchievementNotificationEnabled =
+      'achievement_notification_enabled';
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
@@ -74,12 +79,14 @@ class SettingsRepository {
   // Display
   Future<String> getWeightUnit() async {
     final prefs = await _prefs;
-    return prefs.getString(_keyWeightUnit) ?? 'kg';
+    return WeightUnitUtils.normalizeUnit(
+      prefs.getString(_keyWeightUnit) ?? 'kg',
+    );
   }
 
   Future<void> setWeightUnit(String unit) async {
     final prefs = await _prefs;
-    await prefs.setString(_keyWeightUnit, unit);
+    await prefs.setString(_keyWeightUnit, WeightUnitUtils.normalizeUnit(unit));
   }
 
   Future<String> getDateFormat() async {
@@ -141,7 +148,11 @@ class SettingsRepository {
       // Default: Mon, Wed, Fri
       return [1, 3, 5];
     }
-    return csv.split(',').map((e) => int.tryParse(e) ?? 0).where((e) => e > 0).toList();
+    return csv
+        .split(',')
+        .map((e) => int.tryParse(e) ?? 0)
+        .where((e) => e > 0)
+        .toList();
   }
 
   Future<void> setReminderDays(List<int> days) async {

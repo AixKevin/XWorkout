@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/features/workout/data/workout_providers.dart';
+import 'package:xworkout/features/more/data/settings_repository.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 class ExerciseFormScreen extends ConsumerStatefulWidget {
   final Exercise? exercise;
-  
+
   const ExerciseFormScreen({super.key, this.exercise});
 
   @override
@@ -21,9 +23,8 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
   late TextEditingController _repsController;
   late TextEditingController _weightController;
   late TextEditingController _noteController;
-  
+  String _weightUnit = 'kg';
 
-  
   List<String> _getCategories(AsyncValue<List<WorkoutType>> typesAsync) {
     return typesAsync.when(
       data: (types) => types.map((t) => t.name).toList(),
@@ -46,9 +47,28 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
       text: widget.exercise?.defaultReps.toString() ?? '10',
     );
     _weightController = TextEditingController(
-      text: widget.exercise?.defaultWeight?.toString() ?? '',
+      text: widget.exercise?.defaultWeight != null
+          ? WeightUnitUtils.formatKgToDisplay(
+              widget.exercise!.defaultWeight!, _weightUnit)
+          : '',
     );
     _noteController = TextEditingController(text: widget.exercise?.note ?? '');
+    _loadWeightUnit();
+  }
+
+  Future<void> _loadWeightUnit() async {
+    final unit = await ref.read(settingsRepositoryProvider).getWeightUnit();
+    final normalized = WeightUnitUtils.normalizeUnit(unit);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _weightUnit = normalized;
+      if (widget.exercise?.defaultWeight != null) {
+        _weightController.text = WeightUnitUtils.formatKgToDisplay(
+            widget.exercise!.defaultWeight!, _weightUnit);
+      }
+    });
   }
 
   @override
@@ -99,8 +119,9 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                   useMagnifier: true,
                   itemExtent: 32.0,
                   scrollController: FixedExtentScrollController(
-                    initialItem: (_selectedCategory != null && categories.contains(_selectedCategory))
-                        ? categories.indexOf(_selectedCategory!) 
+                    initialItem: (_selectedCategory != null &&
+                            categories.contains(_selectedCategory))
+                        ? categories.indexOf(_selectedCategory!)
                         : 0,
                   ),
                   onSelectedItemChanged: (int selectedItem) {
@@ -108,7 +129,8 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                       _selectedCategory = categories[selectedItem];
                     });
                   },
-                  children: List<Widget>.generate(categories.length, (int index) {
+                  children:
+                      List<Widget>.generate(categories.length, (int index) {
                     return Center(
                       child: Text(
                         categories[index],
@@ -130,9 +152,9 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
       _showError('请输入项目名称');
       return;
     }
-    
+
     final notifier = ref.read(exerciseNotifierProvider.notifier);
-    
+
     try {
       if (isEditing) {
         await notifier.updateExerciseWithValues(
@@ -141,9 +163,10 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
           category: _selectedCategory,
           defaultSets: int.tryParse(_setsController.text) ?? 3,
           defaultReps: int.tryParse(_repsController.text) ?? 10,
-          defaultWeight: double.tryParse(_weightController.text),
-          note: _noteController.text.trim().isEmpty 
-              ? null 
+          defaultWeight: WeightUnitUtils.parseDisplayToKg(
+              _weightController.text, _weightUnit),
+          note: _noteController.text.trim().isEmpty
+              ? null
               : _noteController.text.trim(),
           createdAt: widget.exercise!.createdAt,
         );
@@ -153,13 +176,14 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
           category: _selectedCategory,
           defaultSets: int.tryParse(_setsController.text) ?? 3,
           defaultReps: int.tryParse(_repsController.text) ?? 10,
-          defaultWeight: double.tryParse(_weightController.text),
-          note: _noteController.text.trim().isEmpty 
-              ? null 
+          defaultWeight: WeightUnitUtils.parseDisplayToKg(
+              _weightController.text, _weightUnit),
+          note: _noteController.text.trim().isEmpty
+              ? null
               : _noteController.text.trim(),
         );
       }
-      
+
       if (mounted) {
         Navigator.of(context).pop();
       }
@@ -167,7 +191,7 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
       _showError('保存失败: $e');
     }
   }
-  
+
   Future<void> _delete() async {
     showCupertinoDialog(
       context: context,
@@ -184,7 +208,8 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
             child: const Text('删除'),
             onPressed: () async {
               Navigator.of(context).pop();
-              await ref.read(exerciseNotifierProvider.notifier)
+              await ref
+                  .read(exerciseNotifierProvider.notifier)
                   .deleteExercise(widget.exercise!.id);
               if (mounted) {
                 Navigator.of(context).pop();
@@ -270,8 +295,8 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                     child: Text(
                       _selectedCategory ?? '选择分类',
                       style: TextStyle(
-                        color: _selectedCategory == null 
-                            ? CupertinoColors.placeholderText 
+                        color: _selectedCategory == null
+                            ? CupertinoColors.placeholderText
                             : CupertinoColors.label,
                       ),
                     ),
@@ -297,8 +322,9 @@ class _ExerciseFormScreenState extends ConsumerState<ExerciseFormScreen> {
                 CupertinoTextFormFieldRow(
                   controller: _weightController,
                   placeholder: '可选',
-                  prefix: const Text('重量(kg)'),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  prefix: Text('重量($_weightUnit)'),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                 ),
               ],
             ),

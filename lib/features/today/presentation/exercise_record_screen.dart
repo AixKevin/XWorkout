@@ -1,26 +1,28 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show LinearProgressIndicator, Colors, Icons;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:flutter/material.dart'
+    show LinearProgressIndicator, Colors, Icons;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/features/today/presentation/providers/today_provider.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 import 'dart:async';
-import 'dart:ui';
 
 class ExerciseRecordScreen extends ConsumerStatefulWidget {
   final DayExercise dayExercise;
   final String dailyRecordId;
-  
+
   const ExerciseRecordScreen({
-    super.key, 
+    super.key,
     required this.dayExercise,
     required this.dailyRecordId,
   });
 
   @override
-  ConsumerState<ExerciseRecordScreen> createState() => _ExerciseRecordScreenState();
+  ConsumerState<ExerciseRecordScreen> createState() =>
+      _ExerciseRecordScreenState();
 }
 
 class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
@@ -28,21 +30,23 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
   int _restSeconds = 90;
   double? _personalRecord;
   final _noteController = TextEditingController();
-  
+
   @override
   void initState() {
     super.initState();
     _initializeSets();
     _loadHistory();
   }
-  
+
   @override
   void dispose() {
     _noteController.dispose();
     super.dispose();
   }
-  
+
   void _initializeSets() {
+    final defaultUnit =
+        WeightUnitUtils.normalizeUnit(ref.read(weightUnitProvider));
     // Initialize with target sets
     _sets = List.generate(
       widget.dayExercise.targetSets,
@@ -52,15 +56,17 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
         targetWeight: widget.dayExercise.targetWeight ?? 0,
         actualReps: widget.dayExercise.targetReps,
         actualWeight: widget.dayExercise.targetWeight ?? 0,
+        actualWeightUnit: defaultUnit,
         isCompleted: false,
       ),
     );
   }
-  
+
   Future<void> _loadHistory() async {
     // Load PR
     try {
-      final pr = await ref.read(personalRecordProvider(widget.dayExercise.exerciseId).future);
+      final pr = await ref
+          .read(personalRecordProvider(widget.dayExercise.exerciseId).future);
       setState(() {
         _personalRecord = pr;
       });
@@ -70,11 +76,18 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
 
     // Auto-fill from last session
     try {
-      final lastRecord = await ref.read(lastExerciseRecordProvider(widget.dayExercise.exerciseId).future);
+      final lastRecord = await ref.read(
+          lastExerciseRecordProvider(widget.dayExercise.exerciseId).future);
       if (lastRecord != null && mounted) {
-        final lastWeights = lastRecord.actualWeight.split(',').map((w) => double.tryParse(w)).toList();
-        final lastReps = lastRecord.actualReps.split(',').map((r) => int.tryParse(r)).toList();
-        
+        final lastWeights = lastRecord.actualWeight
+            .split(',')
+            .map((w) => double.tryParse(w))
+            .toList();
+        final lastReps = lastRecord.actualReps
+            .split(',')
+            .map((r) => int.tryParse(r))
+            .toList();
+
         if (lastRecord.note != null && lastRecord.note!.isNotEmpty) {
           _noteController.text = lastRecord.note!;
         }
@@ -94,11 +107,12 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
       debugPrint('Error auto-filling: $e');
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final exerciseAsync = ref.watch(exerciseListProvider);
-    
+    final weightUnit = ref.watch(weightUnitProvider);
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: exerciseAsync.when(
@@ -150,22 +164,24 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                       if (widget.dayExercise.targetWeight != null)
                         _InfoItem(
                           label: '目标重量',
-                          value: '${widget.dayExercise.targetWeight}kg',
+                          value:
+                              '${WeightUnitUtils.formatKgToDisplay(widget.dayExercise.targetWeight!, weightUnit)}$weightUnit',
                         ),
                     ],
                   ),
                 ),
-                
+
                 // PR Badge
                 if (_personalRecord != null && _personalRecord! > 0)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
                         const Icon(Icons.star, color: Colors.amber, size: 20),
                         const SizedBox(width: 8),
                         Text(
-                          '历史最佳: ${_personalRecord}kg',
+                          '历史最佳: ${WeightUnitUtils.formatKgToDisplay(_personalRecord!, weightUnit)}$weightUnit',
                           style: const TextStyle(
                             color: Colors.amber,
                             fontWeight: FontWeight.w600,
@@ -174,23 +190,33 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                       ],
                     ),
                   ),
-                
+
                 // Sets list
                 CupertinoListSection.insetGrouped(
                   header: const Text('每组记录'),
                   children: _sets.asMap().entries.map((entry) {
                     final index = entry.key;
                     final set = entry.value;
-                    final isPR = _personalRecord != null && set.actualWeight > _personalRecord!;
-                    
+                    final isPR = _personalRecord != null &&
+                        set.actualWeight > _personalRecord!;
+
                     return _SetItem(
                       setRecord: set,
                       isPR: isPR,
+                      weightUnit: set.actualWeightUnit,
+                      onWeightUnitChanged: (unit) {
+                        setState(() {
+                          _sets[index] = _sets[index].copyWith(
+                            actualWeightUnit:
+                                WeightUnitUtils.normalizeUnit(unit),
+                          );
+                        });
+                      },
                       onChanged: (updated) {
                         setState(() {
                           _sets[index] = updated;
                         });
-                        
+
                         // Check for completion to trigger timer
                         if (updated.isCompleted && !set.isCompleted) {
                           _showRestTimerDialog();
@@ -199,7 +225,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     );
                   }).toList(),
                 ),
-                
+
                 // Add set button
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -223,6 +249,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                           targetWeight: widget.dayExercise.targetWeight ?? 0,
                           actualReps: lastSet.actualReps,
                           actualWeight: lastSet.actualWeight,
+                          actualWeightUnit: lastSet.actualWeightUnit,
                           isCompleted: false,
                         ));
                       });
@@ -232,7 +259,8 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
 
                 // Quick Notes
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: CupertinoTextField(
                     controller: _noteController,
                     placeholder: '添加备注 (例如: 座椅高度5)',
@@ -240,7 +268,8 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                       padding: EdgeInsets.only(left: 8),
                       child: Icon(Icons.edit, color: Colors.grey),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                     decoration: BoxDecoration(
                       color: CupertinoColors.systemBackground,
                       borderRadius: BorderRadius.circular(8),
@@ -248,7 +277,7 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                     ),
                   ),
                 ),
-                
+
                 // Summary
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -269,9 +298,13 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
                       ),
                       const SizedBox(height: 8),
                       LinearProgressIndicator(
-                        value: _sets.isEmpty ? 0 : _sets.where((s) => s.isCompleted).length / _sets.length,
+                        value: _sets.isEmpty
+                            ? 0
+                            : _sets.where((s) => s.isCompleted).length /
+                                _sets.length,
                         backgroundColor: Colors.grey[200],
-                        valueColor: AlwaysStoppedAnimation(_getCompletionColor()),
+                        valueColor:
+                            AlwaysStoppedAnimation(_getCompletionColor()),
                       ),
                     ],
                   ),
@@ -283,14 +316,14 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
       ),
     );
   }
-  
+
   Color _getCompletionColor() {
     final completed = _sets.where((s) => s.isCompleted).length;
     if (completed == 0) return Colors.grey;
     if (completed < _sets.length) return Colors.amber;
     return Colors.green;
   }
-  
+
   void _showRestTimerDialog() {
     showCupertinoDialog(
       context: context,
@@ -307,13 +340,14 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
     if (completedSets.isNotEmpty) {
       HapticFeedback.heavyImpact();
       ref.read(todayNotifierProvider.notifier).saveExerciseRecord(
-        dailyRecordId: widget.dailyRecordId,
-        exerciseId: widget.dayExercise.exerciseId,
-        actualSets: completedSets.length,
-        actualReps: completedSets.map((s) => s.actualReps).toList(),
-        actualWeight: completedSets.map((s) => s.actualWeight.toDouble()).toList(),
-        note: _noteController.text.isNotEmpty ? _noteController.text : null,
-      );
+            dailyRecordId: widget.dailyRecordId,
+            exerciseId: widget.dayExercise.exerciseId,
+            actualSets: completedSets.length,
+            actualReps: completedSets.map((s) => s.actualReps).toList(),
+            actualWeight:
+                completedSets.map((s) => s.actualWeight.toDouble()).toList(),
+            note: _noteController.text.isNotEmpty ? _noteController.text : null,
+          );
     }
     Navigator.of(context).pop();
   }
@@ -322,12 +356,12 @@ class _ExerciseRecordScreenState extends ConsumerState<ExerciseRecordScreen> {
 class _RestTimerDialog extends StatefulWidget {
   final int initialSeconds;
   final VoidCallback onSkip;
-  
+
   const _RestTimerDialog({
     required this.initialSeconds,
     required this.onSkip,
   });
-  
+
   @override
   State<_RestTimerDialog> createState() => _RestTimerDialogState();
 }
@@ -335,14 +369,14 @@ class _RestTimerDialog extends StatefulWidget {
 class _RestTimerDialogState extends State<_RestTimerDialog> {
   late int _remainingSeconds;
   Timer? _timer;
-  
+
   @override
   void initState() {
     super.initState();
     _remainingSeconds = widget.initialSeconds;
     _startTimer();
   }
-  
+
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
@@ -354,13 +388,13 @@ class _RestTimerDialogState extends State<_RestTimerDialog> {
       }
     });
   }
-  
+
   @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return CupertinoAlertDialog(
@@ -417,7 +451,7 @@ class _RestTimerDialogState extends State<_RestTimerDialog> {
       ],
     );
   }
-  
+
   String _formatTime(int seconds) {
     final m = (seconds ~/ 60).toString().padLeft(2, '0');
     final s = (seconds % 60).toString().padLeft(2, '0');
@@ -428,9 +462,9 @@ class _RestTimerDialogState extends State<_RestTimerDialog> {
 class _InfoItem extends StatelessWidget {
   final String label;
   final String value;
-  
+
   const _InfoItem({required this.label, required this.value});
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -458,14 +492,18 @@ class _InfoItem extends StatelessWidget {
 class _SetItem extends StatelessWidget {
   final _SetRecord setRecord;
   final bool isPR;
+  final String weightUnit;
+  final void Function(String) onWeightUnitChanged;
   final Function(_SetRecord) onChanged;
-  
+
   const _SetItem({
-    required this.setRecord, 
+    required this.setRecord,
     this.isPR = false,
+    required this.weightUnit,
+    required this.onWeightUnitChanged,
     required this.onChanged,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -493,75 +531,116 @@ class _SetItem extends StatelessWidget {
       },
       child: CupertinoListTile(
         leading: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: setRecord.isCompleted 
-              ? Colors.green 
-              : Colors.grey[200],
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: Text(
-            '${setRecord.setNumber}',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: setRecord.isCompleted 
-                  ? Colors.white 
-                  : Colors.grey,
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: setRecord.isCompleted ? Colors.green : Colors.grey[200],
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              '${setRecord.setNumber}',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: setRecord.isCompleted ? Colors.white : Colors.grey,
+              ),
             ),
           ),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: CupertinoTextField(
+                placeholder: '次数',
+                keyboardType: TextInputType.number,
+                controller: TextEditingController(
+                    text: setRecord.actualReps.toString()),
+                onChanged: (value) {
+                  onChanged(
+                      setRecord.copyWith(actualReps: int.tryParse(value) ?? 0));
+                },
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text('次'),
+            ),
+            Expanded(
+              child: CupertinoTextField(
+                placeholder: '重量',
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                controller: TextEditingController(
+                    text: WeightUnitUtils.formatKgToDisplay(
+                        setRecord.actualWeight, weightUnit)),
+                onChanged: (value) {
+                  final parsed =
+                      WeightUnitUtils.parseDisplayToKg(value, weightUnit) ?? 0;
+                  onChanged(setRecord.copyWith(actualWeight: parsed));
+                },
+                suffix: isPR
+                    ? const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Icon(Icons.star, color: Colors.amber, size: 16),
+                      )
+                    : null,
+              ),
+            ),
+            CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              minSize: 20,
+              onPressed: () => _showWeightUnitPicker(context),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(weightUnit),
+                  const SizedBox(width: 2),
+                  const Icon(CupertinoIcons.chevron_down, size: 12),
+                ],
+              ),
+            ),
+          ],
+        ),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Icon(
+            setRecord.isCompleted ? Icons.check_circle : Icons.circle_outlined,
+            color: setRecord.isCompleted ? Colors.green : Colors.grey,
+          ),
+          onPressed: () {
+            onChanged(setRecord.copyWith(isCompleted: !setRecord.isCompleted));
+          },
         ),
       ),
-      title: Row(
-        children: [
-          Expanded(
-            child: CupertinoTextField(
-              placeholder: '次数',
-              keyboardType: TextInputType.number,
-              controller: TextEditingController(text: setRecord.actualReps.toString()),
-              onChanged: (value) {
-                onChanged(setRecord.copyWith(actualReps: int.tryParse(value) ?? 0));
-              },
-            ),
+    );
+  }
+
+  void _showWeightUnitPicker(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('选择重量单位'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onWeightUnitChanged('kg');
+            },
+            child: Text('千克 (kg)${weightUnit == 'kg' ? ' ✓' : ''}'),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Text('次'),
-          ),
-          Expanded(
-            child: CupertinoTextField(
-              placeholder: '重量',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              controller: TextEditingController(text: setRecord.actualWeight.toString()),
-              onChanged: (value) {
-                onChanged(setRecord.copyWith(actualWeight: double.tryParse(value) ?? 0));
-              },
-              suffix: isPR ? const Padding(
-                padding: EdgeInsets.only(right: 8.0),
-                child: Icon(Icons.star, color: Colors.amber, size: 16),
-              ) : null,
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Text('kg'),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onWeightUnitChanged('lb');
+            },
+            child: Text('磅 (lb)${weightUnit == 'lb' ? ' ✓' : ''}'),
           ),
         ],
-      ),
-      trailing: CupertinoButton(
-        padding: EdgeInsets.zero,
-        child: Icon(
-          setRecord.isCompleted ? Icons.check_circle : Icons.circle_outlined,
-          color: setRecord.isCompleted 
-              ? Colors.green 
-              : Colors.grey,
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('取消'),
         ),
-        onPressed: () {
-          onChanged(setRecord.copyWith(isCompleted: !setRecord.isCompleted));
-        },
       ),
-    ),
     );
   }
 }
@@ -572,23 +651,26 @@ class _SetRecord {
   final double targetWeight;
   final int actualReps;
   final double actualWeight;
+  final String actualWeightUnit;
   final bool isCompleted;
-  
+
   _SetRecord({
     required this.setNumber,
     required this.targetReps,
     required this.targetWeight,
     required this.actualReps,
     required this.actualWeight,
+    required this.actualWeightUnit,
     required this.isCompleted,
   });
-  
+
   _SetRecord copyWith({
     int? setNumber,
     int? targetReps,
     double? targetWeight,
     int? actualReps,
     double? actualWeight,
+    String? actualWeightUnit,
     bool? isCompleted,
   }) {
     return _SetRecord(
@@ -597,6 +679,7 @@ class _SetRecord {
       targetWeight: targetWeight ?? this.targetWeight,
       actualReps: actualReps ?? this.actualReps,
       actualWeight: actualWeight ?? this.actualWeight,
+      actualWeightUnit: actualWeightUnit ?? this.actualWeightUnit,
       isCompleted: isCompleted ?? this.isCompleted,
     );
   }

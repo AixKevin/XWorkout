@@ -10,6 +10,8 @@ import 'package:xworkout/features/training/presentation/providers/exercise_provi
 import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/shared/widgets/async_value_widget.dart';
 import 'package:xworkout/shared/widgets/empty_state.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -19,7 +21,7 @@ class TodayScreen extends ConsumerWidget {
     final activePlanAsync = ref.watch(todayActivePlanProvider);
     final todayRecordAsync = ref.watch(todayRecordProvider);
     final selectedDate = DateTime.now();
-    
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(formatDate(selectedDate)),
@@ -40,16 +42,14 @@ class TodayScreen extends ConsumerWidget {
                 message: '请先在「训练」页面创建并激活健身计划',
               );
             }
-            
+
             return _buildTodayContent(context, ref, plan, todayRecordAsync);
           },
         ),
       ),
     );
   }
-  
 
-  
   Widget _buildTodayContent(
     BuildContext context,
     WidgetRef ref,
@@ -58,7 +58,7 @@ class TodayScreen extends ConsumerWidget {
   ) {
     final cycleDay = calculateCycleDay(plan);
     final planDaysAsync = ref.watch(planDaysProvider(plan.id));
-    
+
     return AsyncValueWidget<List<PlanDay>>(
       value: planDaysAsync,
       data: (planDays) {
@@ -69,13 +69,13 @@ class TodayScreen extends ConsumerWidget {
             message: '请在计划中添加训练日',
           );
         }
-        
+
         // Get today's plan day - cycleDay is 1-indexed
         final dayIndex = (cycleDay - 1) % planDays.length;
         final todayPlanDay = planDays[dayIndex];
-        
+
         final isRestDay = todayPlanDay.isRestDay;
-        
+
         return ListView(
           padding: const EdgeInsets.only(bottom: 100),
           children: [
@@ -83,13 +83,14 @@ class TodayScreen extends ConsumerWidget {
             if (isRestDay)
               _buildRestDayView(context, ref, todayRecordAsync)
             else
-              _buildTrainingDayView(context, ref, todayPlanDay, todayRecordAsync),
+              _buildTrainingDayView(
+                  context, ref, todayPlanDay, todayRecordAsync),
           ],
         );
       },
     );
   }
-  
+
   Widget _buildPlanHeader(WorkoutPlan plan, int cycleDay, bool isRestDay) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -106,7 +107,7 @@ class TodayScreen extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                   const Icon(Icons.bar_chart),
+                  const Icon(Icons.bar_chart),
                   const SizedBox(width: 8),
                   Text(
                     plan.name,
@@ -131,7 +132,7 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildRestDayView(
     BuildContext context,
     WidgetRef ref,
@@ -139,7 +140,7 @@ class TodayScreen extends ConsumerWidget {
   ) {
     final record = todayRecordAsync.valueOrNull;
     final isSkipped = record?.status == 'skipped';
-    
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -183,19 +184,20 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildTrainingDayView(
     BuildContext context,
     WidgetRef ref,
     PlanDay todayPlanDay,
     AsyncValue<DailyRecord?> todayRecordAsync,
   ) {
-    final exercisesAsync = ref.watch(todayDayExercisesProvider(todayPlanDay.id));
+    final exercisesAsync =
+        ref.watch(todayDayExercisesProvider(todayPlanDay.id));
     final record = todayRecordAsync.valueOrNull;
     final isTraining = record?.status == 'normal';
     final isCompleted = record?.status == 'completed';
     final isSkipped = record?.status == 'skipped';
-    
+
     return Column(
       children: [
         Padding(
@@ -215,9 +217,11 @@ class TodayScreen extends ConsumerWidget {
                   ),
                   if (isCompleted)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: CupertinoColors.activeGreen.withValues(alpha: 0.1),
+                        color:
+                            CupertinoColors.activeGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Text(
@@ -242,7 +246,7 @@ class TodayScreen extends ConsumerWidget {
                       message: '请在计划中添加训练项目',
                     );
                   }
-                  
+
                   return Column(
                     children: exercises.map((de) {
                       return _ExerciseCard(
@@ -269,7 +273,9 @@ class TodayScreen extends ConsumerWidget {
                   onPressed: () {
                     HapticFeedback.selectionClick();
                     if (record != null) {
-                      ref.read(todayNotifierProvider.notifier).undoSkip(record.id);
+                      ref
+                          .read(todayNotifierProvider.notifier)
+                          .undoSkip(record.id);
                     }
                   },
                 ),
@@ -301,7 +307,7 @@ class TodayScreen extends ConsumerWidget {
                   ),
                 ),
               ] else if (isTraining) ...[
-                 // Training in progress - show Complete button
+                // Training in progress - show Complete button
                 Container(
                   width: double.infinity,
                   height: 56,
@@ -310,7 +316,8 @@ class TodayScreen extends ConsumerWidget {
                     color: CupertinoColors.activeGreen,
                     boxShadow: [
                       BoxShadow(
-                        color: CupertinoColors.activeGreen.withValues(alpha: 0.3),
+                        color:
+                            CupertinoColors.activeGreen.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -321,7 +328,8 @@ class TodayScreen extends ConsumerWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.check, color: CupertinoColors.white, size: 28),
+                        Icon(Icons.check,
+                            color: CupertinoColors.white, size: 28),
                         SizedBox(width: 8),
                         Text(
                           '完成训练',
@@ -362,7 +370,8 @@ class TodayScreen extends ConsumerWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: CupertinoColors.activeBlue.withValues(alpha: 0.3),
+                        color:
+                            CupertinoColors.activeBlue.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -373,7 +382,8 @@ class TodayScreen extends ConsumerWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.play_arrow, color: CupertinoColors.white, size: 28),
+                        Icon(Icons.play_arrow,
+                            color: CupertinoColors.white, size: 28),
                         SizedBox(width: 8),
                         Text(
                           '开始训练',
@@ -387,7 +397,8 @@ class TodayScreen extends ConsumerWidget {
                     ),
                     onPressed: () async {
                       HapticFeedback.mediumImpact();
-                      await ref.read(todayNotifierProvider.notifier)
+                      await ref
+                          .read(todayNotifierProvider.notifier)
                           .startTraining(todayPlanDay.id);
                       if (context.mounted) {
                         _showTrainingStarted(context);
@@ -402,8 +413,9 @@ class TodayScreen extends ConsumerWidget {
       ],
     );
   }
-  
-  void _showCompleteDialog(BuildContext context, WidgetRef ref, String planDayId) {
+
+  void _showCompleteDialog(
+      BuildContext context, WidgetRef ref, String planDayId) {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -418,7 +430,9 @@ class TodayScreen extends ConsumerWidget {
             isDefaultAction: true,
             child: const Text('确认完成'),
             onPressed: () async {
-              await ref.read(todayNotifierProvider.notifier).completeTraining(planDayId);
+              await ref
+                  .read(todayNotifierProvider.notifier)
+                  .completeTraining(planDayId);
               if (context.mounted) {
                 Navigator.of(context).pop();
               }
@@ -429,10 +443,9 @@ class TodayScreen extends ConsumerWidget {
     );
   }
 
-  
   void _showSkipDialog(BuildContext context, WidgetRef ref, String? recordId) {
     final reasonController = TextEditingController();
-    
+
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -457,9 +470,9 @@ class TodayScreen extends ConsumerWidget {
             child: const Text('确认'),
             onPressed: () async {
               await ref.read(todayNotifierProvider.notifier).skipTraining(
-                recordId,
-                reasonController.text.trim(),
-              );
+                    recordId,
+                    reasonController.text.trim(),
+                  );
               if (context.mounted) {
                 Navigator.of(context).pop();
               }
@@ -469,7 +482,7 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   void _showTrainingStarted(BuildContext context) {
     showCupertinoDialog(
       context: context,
@@ -491,7 +504,7 @@ class _ExerciseCard extends ConsumerWidget {
   final DayExercise dayExercise;
   final bool isRecording;
   final String? dailyRecordId;
-  
+
   const _ExerciseCard({
     required this.dayExercise,
     required this.isRecording,
@@ -501,7 +514,8 @@ class _ExerciseCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final exerciseAsync = ref.watch(exerciseListProvider);
-    
+    final weightUnit = ref.watch(weightUnitProvider);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -541,7 +555,7 @@ class _ExerciseCard extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${dayExercise.targetSets}组 × ${dayExercise.targetReps}次${dayExercise.targetWeight != null ? ' ${dayExercise.targetWeight}kg' : ''}',
+            '${dayExercise.targetSets}组 × ${dayExercise.targetReps}次${dayExercise.targetWeight != null ? ' ${WeightUnitUtils.formatKgToDisplay(dayExercise.targetWeight!, weightUnit)}$weightUnit' : ''}',
             style: const TextStyle(
               fontSize: 15,
               color: CupertinoColors.systemGrey,

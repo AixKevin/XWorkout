@@ -6,12 +6,15 @@ import 'package:intl/intl.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 import 'package:xworkout/features/workout/data/workout_providers.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 class CalendarHistoryScreen extends ConsumerStatefulWidget {
   const CalendarHistoryScreen({super.key});
 
   @override
-  ConsumerState<CalendarHistoryScreen> createState() => _CalendarHistoryScreenState();
+  ConsumerState<CalendarHistoryScreen> createState() =>
+      _CalendarHistoryScreenState();
 }
 
 class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
@@ -38,10 +41,12 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
     );
   }
 
-  Widget _buildCalendar(List<WorkoutSession> sessions, AsyncValue<List<WorkoutType>> typesAsync) {
+  Widget _buildCalendar(
+      List<WorkoutSession> sessions, AsyncValue<List<WorkoutType>> typesAsync) {
     final sessionMap = <DateTime, List<WorkoutSession>>{};
     for (final session in sessions) {
-      final date = DateTime(session.date.year, session.date.month, session.date.day);
+      final date =
+          DateTime(session.date.year, session.date.month, session.date.day);
       sessionMap.putIfAbsent(date, () => []).add(session);
     }
 
@@ -66,7 +71,8 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
             ),
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focusedDay) {
-                final events = sessionMap[DateTime(day.year, day.month, day.day)] ?? [];
+                final events =
+                    sessionMap[DateTime(day.year, day.month, day.day)] ?? [];
                 if (events.isEmpty) return null;
                 return Container(
                   margin: const EdgeInsets.all(4),
@@ -75,7 +81,8 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                     color: Colors.green,
                     shape: BoxShape.circle,
                   ),
-                  child: Text(day.day.toString(), style: const TextStyle(color: Colors.white)),
+                  child: Text(day.day.toString(),
+                      style: const TextStyle(color: Colors.white)),
                 );
               },
               selectedBuilder: (context, day, focusedDay) {
@@ -86,7 +93,8 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                     color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
-                  child: Text(day.day.toString(), style: const TextStyle(color: Colors.white)),
+                  child: Text(day.day.toString(),
+                      style: const TextStyle(color: Colors.white)),
                 );
               },
               todayBuilder: (context, day, focusedDay) {
@@ -97,7 +105,8 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                     color: Colors.blue.withValues(alpha: 0.3),
                     shape: BoxShape.circle,
                   ),
-                  child: Text(day.day.toString(), style: const TextStyle(color: Colors.blue)),
+                  child: Text(day.day.toString(),
+                      style: const TextStyle(color: Colors.blue)),
                 );
               },
             ),
@@ -115,17 +124,23 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
           ),
         ),
         Expanded(
-          child: _selectedDay != null 
-            ? _buildDayDetail(sessionMap[DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day)] ?? [], typesAsync) 
-            : const Center(child: Text('选择一天查看详情')),
+          child: _selectedDay != null
+              ? _buildDayDetail(
+                  sessionMap[DateTime(_selectedDay!.year, _selectedDay!.month,
+                          _selectedDay!.day)] ??
+                      [],
+                  typesAsync)
+              : const Center(child: Text('选择一天查看详情')),
         ),
       ],
     );
   }
 
-  Widget _buildDayDetail(List<WorkoutSession> sessions, AsyncValue<List<WorkoutType>> typesAsync) {
+  Widget _buildDayDetail(
+      List<WorkoutSession> sessions, AsyncValue<List<WorkoutType>> typesAsync) {
     if (sessions.isEmpty) {
-      return const Center(child: Text('当天无训练记录', style: TextStyle(color: Colors.grey)));
+      return const Center(
+          child: Text('当天无训练记录', style: TextStyle(color: Colors.grey)));
     }
 
     return typesAsync.when(
@@ -161,10 +176,16 @@ class _CalendarHistoryScreenState extends ConsumerState<CalendarHistoryScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(type?.name ?? '训练', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
-                        Text(DateFormat('HH:mm').format(session.date), style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                        Text(type?.name ?? '训练',
+                            style: const TextStyle(
+                                fontSize: 17, fontWeight: FontWeight.w600)),
+                        Text(DateFormat('HH:mm').format(session.date),
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 14)),
                         if (session.note != null && session.note!.isNotEmpty)
-                          Text(session.note!, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                          Text(session.note!,
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 13)),
                       ],
                     ),
                   ),
@@ -197,6 +218,7 @@ class _SessionDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final setsAsync = ref.watch(sessionSetsProvider(session.id));
     final exercisesAsync = ref.watch(exerciseListProvider);
+    final weightUnit = ref.watch(weightUnitProvider);
 
     return Scaffold(
       appBar: const CupertinoNavigationBar(
@@ -217,10 +239,12 @@ class _SessionDetailPage extends ConsumerWidget {
               data: (exercises) => ListView(
                 padding: const EdgeInsets.all(16),
                 children: grouped.entries.map((entry) {
-                  final exercise = exercises.where((e) => e.id == entry.key).firstOrNull;
+                  final exercise =
+                      exercises.where((e) => e.id == entry.key).firstOrNull;
                   return _ExerciseDetailCard(
                     exerciseName: exercise?.name ?? '未知动作',
                     sets: entry.value,
+                    weightUnit: weightUnit,
                   );
                 }).toList(),
               ),
@@ -239,7 +263,13 @@ class _SessionDetailPage extends ConsumerWidget {
 class _ExerciseDetailCard extends StatelessWidget {
   final String exerciseName;
   final List<WorkoutSet> sets;
-  const _ExerciseDetailCard({required this.exerciseName, required this.sets});
+  final String weightUnit;
+
+  const _ExerciseDetailCard({
+    required this.exerciseName,
+    required this.sets,
+    required this.weightUnit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -254,19 +284,37 @@ class _ExerciseDetailCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(exerciseName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+          Text(exerciseName,
+              style:
+                  const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
           const SizedBox(height: 12),
           ...sets.map((set) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                SizedBox(width: 30, child: Text('${set.setNumber}.', style: const TextStyle(color: Colors.grey))),
-                Expanded(child: Text('${set.weight.isEmpty ? "-" : set.weight} × ${set.reps}次', style: const TextStyle(fontSize: 15))),
-              ],
-            ),
-          )),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    SizedBox(
+                        width: 30,
+                        child: Text('${set.setNumber}.',
+                            style: const TextStyle(color: Colors.grey))),
+                    Expanded(
+                      child: Text(
+                        '${_formatWeight(set.weight)} × ${set.reps}次',
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
         ],
       ),
     );
+  }
+
+  String _formatWeight(String raw) {
+    final kg = WeightUnitUtils.parseStoredToKg(raw);
+    if (kg == null) {
+      return '-';
+    }
+    return '${WeightUnitUtils.formatKgToDisplay(kg, weightUnit)}$weightUnit';
   }
 }
