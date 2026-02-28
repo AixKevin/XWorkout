@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:xworkout/features/history/presentation/workout_history_screen.dart';
 import 'package:xworkout/features/history/presentation/calendar_history_screen.dart';
 import 'package:xworkout/features/data/data_management_screen.dart';
@@ -70,15 +70,6 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('设置'),
               children: [
                 CupertinoListTile(
-                  leading: const Icon(Icons.phone_android),
-                  title: const Text('显示设置'),
-                  trailing: Icon(CupertinoIcons.chevron_right,
-                      color: Colors.grey[400], size: 28),
-                  onTap: () {
-                    _showDisplaySettings(context, ref);
-                  },
-                ),
-                CupertinoListTile(
                   leading: const Icon(Icons.settings),
                   title: const Text('通用设置'),
                   trailing: Icon(CupertinoIcons.chevron_right,
@@ -111,6 +102,15 @@ class MoreScreen extends ConsumerWidget {
               header: const Text('应用'),
               children: [
                 CupertinoListTile(
+                  leading: const Icon(Icons.description),
+                  title: const Text('开源许可'),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey[400], size: 28),
+                  onTap: () {
+                    _showLicenses(context);
+                  },
+                ),
+                CupertinoListTile(
                   leading: const Icon(Icons.info),
                   title: const Text('关于'),
                   trailing: Icon(CupertinoIcons.chevron_right,
@@ -124,7 +124,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             const Center(
               child: Text(
-                'XWorkout v4.9.8',
+                'XWorkout v4.9.9',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -134,7 +134,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             const Center(
               child: Text(
-                'Build 8',
+                'Build 9',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -185,6 +185,37 @@ class MoreScreen extends ConsumerWidget {
     );
   }
 
+  void _showLicenses(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('开源许可'),
+        content: const SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 8),
+              Text('XWorkout 基于 MIT 许可证开源。'),
+              SizedBox(height: 8),
+              Text('使用的开源库:'),
+              Text('- Flutter'),
+              Text('- Riverpod'),
+              Text('- Drift'),
+              Text('- fl_chart'),
+              Text('- and more...'),
+            ],
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('确定'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showAbout(BuildContext context) {
     showCupertinoDialog(
       context: context,
@@ -194,16 +225,14 @@ class MoreScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 16),
             const Text('XWorkout'),
-            const Text('版本: 4.9.8 (Build 8)'),
+            const Text('版本: 4.9.9 (Build 9)'),
             const SizedBox(height: 8),
             const Text('轻量级健身记录软件'),
             const Text('简洁、离线、跨平台'),
             const SizedBox(height: 16),
-            const Text('作者: Aixkevin'),
-            const SizedBox(height: 8),
             GestureDetector(
               onTap: () {
-                // TODO: Open project page
+                launchUrl(Uri.parse('https://github.com/AixKevin/XWorkout'));
               },
               child: const Text(
                 'https://github.com/AixKevin/XWorkout',
@@ -213,13 +242,23 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             const Text('基于 Flutter 开发'),
             const SizedBox(height: 16),
-            GestureDetector(
-              onTap: () {
-                // TODO: Open privacy policy
-              },
-              child: const Text(
-                '隐私政策',
-                style: TextStyle(color: CupertinoColors.activeBlue),
+            // 贡献者
+            const Text('贡献者', style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 50,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: const [
+                  _ContributorItem(
+                    avatarUrl: 'https://avatars.githubusercontent.com/u/476?u=',
+                    username: 'Aixkevin',
+                  ),
+                  _ContributorItem(
+                    avatarUrl: 'https://avatars.githubusercontent.com/u/164656536?u=',
+                    username: 'Immortal-Fates',
+                  ),
+                ],
               ),
             ),
           ],
@@ -608,5 +647,55 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
   void _setFirstDay(int day) {
     setState(() => _firstDay = day);
     ref.read(settingsRepositoryProvider).setFirstDayOfWeek(day);
+  }
+}
+
+class _ContributorItem extends StatelessWidget {
+  final String avatarUrl;
+  final String username;
+
+  const _ContributorItem({
+    required this.avatarUrl,
+    required this.username,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipOval(
+            child: Image.network(
+              avatarUrl,
+              width: 32,
+              height: 32,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: CupertinoColors.systemGrey,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.person_fill,
+                    size: 20,
+                    color: CupertinoColors.white,
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            username,
+            style: const TextStyle(fontSize: 10),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
   }
 }

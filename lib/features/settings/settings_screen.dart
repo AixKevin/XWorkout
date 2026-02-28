@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xworkout/features/settings/app_settings_repository.dart';
+import 'package:xworkout/features/more/data/settings_repository.dart';
 import 'package:xworkout/shared/providers/weight_unit_provider.dart';
 
 final appSettingsRepositoryProvider = Provider<AppSettingsRepository>((ref) {
@@ -21,6 +22,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   int _defaultSets = 3;
   int _defaultReps = 10;
   bool _isLoading = true;
+  String _dateFormat = 'yyyy-MM-dd';
+  int _firstDay = 1;
+  final _settingsRepo = SettingsRepository();
 
   @override
   void initState() {
@@ -33,11 +37,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final themeMode = await repo.getThemeMode();
     final defaultSets = await repo.getDefaultSets();
     final defaultReps = await repo.getDefaultReps();
+    final dateFormat = await _settingsRepo.getDateFormat();
+    final firstDay = await _settingsRepo.getFirstDayOfWeek();
 
     setState(() {
       _isDarkMode = themeMode == 'dark';
       _defaultSets = defaultSets;
       _defaultReps = defaultReps;
+      _dateFormat = dateFormat;
+      _firstDay = firstDay;
       _isLoading = false;
     });
   }
@@ -95,17 +103,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             color: Colors.grey[400], size: 28),
                         onTap: () => _showRepsPicker(),
                       ),
-                    ],
-                  ),
-                  CupertinoListSection.insetGrouped(
-                    header: const Text('关于'),
-                    children: [
                       CupertinoListTile(
-                        leading: Icon(Icons.swap_horiz),
-                        title: const Text('开源许可'),
+                        leading: Icon(Icons.calendar_today),
+                        title: const Text('日期格式'),
+                        additionalInfo: Text(_dateFormat),
                         trailing: Icon(CupertinoIcons.chevron_right,
                             color: Colors.grey[400], size: 28),
-                        onTap: () => _showLicenses(),
+                        onTap: () => _showDateFormatPicker(),
+                      ),
+                      CupertinoListTile(
+                        leading: Icon(Icons.calendar_view_week),
+                        title: const Text('每周首日'),
+                        additionalInfo: Text(_firstDay == 1 ? '周一' : '周日'),
+                        trailing: Icon(CupertinoIcons.chevron_right,
+                            color: Colors.grey[400], size: 28),
+                        onTap: () => _showFirstDayPicker(),
                       ),
                     ],
                   ),
@@ -241,34 +253,78 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void _showLicenses() {
-    showCupertinoDialog(
+  void _showDateFormatPicker() {
+    showCupertinoModalPopup(
       context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('开源许可'),
-        content: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 8),
-              Text('XWorkout 基于 MIT 许可证开源。'),
-              SizedBox(height: 8),
-              Text('使用的开源库:'),
-              Text('- Flutter'),
-              Text('- Riverpod'),
-              Text('- Drift'),
-              Text('- fl_chart'),
-              Text('- and more...'),
-            ],
-          ),
-        ),
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('选择日期格式'),
         actions: [
-          CupertinoDialogAction(
-            child: const Text('确定'),
-            onPressed: () => Navigator.of(context).pop(),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              _setDateFormat('yyyy-MM-dd');
+              Navigator.pop(context);
+            },
+            child: const Text('yyyy-MM-dd'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              _setDateFormat('MM/dd/yyyy');
+              Navigator.pop(context);
+            },
+            child: const Text('MM/dd/yyyy'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              _setDateFormat('dd/MM/yyyy');
+              Navigator.pop(context);
+            },
+            child: const Text('dd/MM/yyyy'),
           ),
         ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('取消'),
+        ),
       ),
     );
+  }
+
+  void _setDateFormat(String format) {
+    setState(() => _dateFormat = format);
+    _settingsRepo.setDateFormat(format);
+  }
+
+  void _showFirstDayPicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('选择每周首日'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              _setFirstDay(1);
+              Navigator.pop(context);
+            },
+            child: const Text('周一'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              _setFirstDay(7);
+              Navigator.pop(context);
+            },
+            child: const Text('周日'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('取消'),
+        ),
+      ),
+    );
+  }
+
+  void _setFirstDay(int day) {
+    setState(() => _firstDay = day);
+    _settingsRepo.setFirstDayOfWeek(day);
   }
 }
