@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 class AppSettingsRepository {
   static const String _keyThemeMode = 'theme_mode';
@@ -20,12 +21,14 @@ class AppSettingsRepository {
 
   Future<String> getWeightUnit() async {
     final prefs = await _prefs;
-    return prefs.getString(_keyWeightUnit) ?? 'kg';
+    return WeightUnitUtils.normalizeUnit(
+      prefs.getString(_keyWeightUnit) ?? 'kg',
+    );
   }
 
   Future<void> setWeightUnit(String unit) async {
     final prefs = await _prefs;
-    await prefs.setString(_keyWeightUnit, unit);
+    await prefs.setString(_keyWeightUnit, WeightUnitUtils.normalizeUnit(unit));
   }
 
   Future<int> getDefaultSets() async {

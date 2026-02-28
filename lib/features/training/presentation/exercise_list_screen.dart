@@ -6,6 +6,8 @@ import 'package:xworkout/features/training/presentation/providers/exercise_provi
 import 'package:xworkout/features/training/presentation/exercise_form_screen.dart';
 import 'package:xworkout/features/training/presentation/exercise_detail_screen.dart';
 import 'package:xworkout/core/database/database.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 import 'package:xworkout/shared/widgets/async_value_widget.dart';
 import 'package:xworkout/shared/widgets/empty_state.dart';
 
@@ -20,8 +22,6 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String? _selectedCategory;
-
-
 
   @override
   void dispose() {
@@ -44,7 +44,9 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
             isDestructiveAction: true,
             child: const Text('删除'),
             onPressed: () {
-              ref.read(exerciseNotifierProvider.notifier).deleteExercise(exercise.id);
+              ref
+                  .read(exerciseNotifierProvider.notifier)
+                  .deleteExercise(exercise.id);
               Navigator.of(context).pop();
             },
           ),
@@ -65,8 +67,9 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   Widget build(BuildContext context) {
     final exercisesAsync = ref.watch(exerciseListProvider);
     final workoutTypesAsync = ref.watch(workoutTypesProvider);
+    final weightUnit = ref.watch(weightUnitProvider);
     final categories = _getCategories(workoutTypesAsync);
-    
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('训练项目'),
@@ -109,20 +112,22 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
-                    child: _buildCategoryChip('全部', _selectedCategory == null, () {
+                    child:
+                        _buildCategoryChip('全部', _selectedCategory == null, () {
                       setState(() {
                         _selectedCategory = null;
                       });
                     }),
                   ),
                   ...categories.skip(1).map((category) => Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: _buildCategoryChip(category, _selectedCategory == category, () {
-                      setState(() {
-                        _selectedCategory = category;
-                      });
-                    }),
-                  )),
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: _buildCategoryChip(
+                            category, _selectedCategory == category, () {
+                          setState(() {
+                            _selectedCategory = category;
+                          });
+                        }),
+                      )),
                 ],
               ),
             ),
@@ -131,17 +136,20 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                 value: exercisesAsync,
                 data: (exercises) {
                   final filteredExercises = exercises.where((exercise) {
-                    final matchesSearch = exercise.name.toLowerCase().contains(_searchQuery.toLowerCase());
-                    final matchesCategory = _selectedCategory == null || exercise.category == _selectedCategory;
+                    final matchesSearch = exercise.name
+                        .toLowerCase()
+                        .contains(_searchQuery.toLowerCase());
+                    final matchesCategory = _selectedCategory == null ||
+                        exercise.category == _selectedCategory;
                     return matchesSearch && matchesCategory;
                   }).toList();
 
                   // Sort by category then name
                   filteredExercises.sort((a, b) {
                     if (a.category != b.category) {
-                       if (a.category == null) return 1;
-                       if (b.category == null) return -1;
-                       return a.category!.compareTo(b.category!);
+                      if (a.category == null) return 1;
+                      if (b.category == null) return -1;
+                      return a.category!.compareTo(b.category!);
                     }
                     return a.name.compareTo(b.name);
                   });
@@ -169,14 +177,15 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                       );
                     }
                   }
-                  
+
                   return ListView.builder(
                     itemCount: filteredExercises.length,
                     itemBuilder: (context, index) {
                       final exercise = filteredExercises[index];
                       // Show header if category changes
-                      final bool showHeader = index == 0 || 
-                          exercise.category != filteredExercises[index - 1].category;
+                      final bool showHeader = index == 0 ||
+                          exercise.category !=
+                              filteredExercises[index - 1].category;
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +205,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                           CupertinoListTile(
                             title: Text(exercise.name),
                             subtitle: Text(
-                              '${exercise.defaultSets}组 × ${exercise.defaultReps}次${exercise.defaultWeight != null ? ' ${exercise.defaultWeight}kg' : ''}',
+                              '${exercise.defaultSets}组 × ${exercise.defaultReps}次${exercise.defaultWeight != null ? ' ${WeightUnitUtils.formatKgToDisplay(exercise.defaultWeight!, weightUnit)}$weightUnit' : ''}',
                             ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -208,15 +217,18 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                                     color: Colors.red,
                                     size: 22,
                                   ),
-                                  onPressed: () => _confirmDelete(context, ref, exercise),
+                                  onPressed: () =>
+                                      _confirmDelete(context, ref, exercise),
                                 ),
-                                const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
+                                const Icon(CupertinoIcons.chevron_right,
+                                    color: Colors.grey, size: 28),
                               ],
                             ),
                             onTap: () {
                               Navigator.of(context).push(
                                 CupertinoPageRoute(
-                                  builder: (context) => ExerciseDetailScreen(exercise: exercise),
+                                  builder: (context) =>
+                                      ExerciseDetailScreen(exercise: exercise),
                                 ),
                               );
                             },
@@ -240,7 +252,9 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? CupertinoColors.activeBlue : CupertinoColors.systemGrey6,
+          color: isSelected
+              ? CupertinoColors.activeBlue
+              : CupertinoColors.systemGrey6,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text(

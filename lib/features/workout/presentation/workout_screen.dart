@@ -8,6 +8,8 @@ import 'package:xworkout/features/workout/data/workout_repository.dart';
 import 'package:xworkout/features/training/presentation/providers/exercise_provider.dart';
 import 'package:xworkout/features/training/presentation/exercise_list_screen.dart';
 import 'package:xworkout/features/more/presentation/workout_types_screen.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 import 'package:uuid/uuid.dart';
 
 class WorkoutScreen extends ConsumerStatefulWidget {
@@ -129,7 +131,9 @@ class _TypeSelectionView extends ConsumerWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),
-        ...types.where((type) => type.name != '通用').map((type) => _TypeCard(type: type)),
+        ...types
+            .where((type) => type.name != '通用')
+            .map((type) => _TypeCard(type: type)),
         const SizedBox(height: 24),
         // 类型编辑和动作管理按钮
         Row(
@@ -138,7 +142,8 @@ class _TypeSelectionView extends ConsumerWidget {
               child: CupertinoButton(
                 color: CupertinoColors.systemGrey,
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                child: const Text('类型编辑', style: TextStyle(color: CupertinoColors.white)),
+                child: const Text('类型编辑',
+                    style: TextStyle(color: CupertinoColors.white)),
                 onPressed: () {
                   Navigator.of(context).push(
                     CupertinoPageRoute(
@@ -153,7 +158,8 @@ class _TypeSelectionView extends ConsumerWidget {
               child: CupertinoButton(
                 color: CupertinoColors.systemGrey,
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                child: const Text('动作管理', style: TextStyle(color: CupertinoColors.white)),
+                child: const Text('动作管理',
+                    style: TextStyle(color: CupertinoColors.white)),
                 onPressed: () {
                   Navigator.of(context).push(
                     CupertinoPageRoute(
@@ -202,7 +208,8 @@ class _TypeCard extends ConsumerWidget {
           child: Row(
             children: [
               const SizedBox(width: 20),
-              Icon(_getTypeIcon(type.name), color: CupertinoColors.white, size: 40),
+              Icon(_getTypeIcon(type.name),
+                  color: CupertinoColors.white, size: 40),
               const SizedBox(width: 16),
               Text(
                 type.name,
@@ -256,13 +263,16 @@ class _TypeCard extends ConsumerWidget {
     );
 
     // 获取最后同类型训练并复制组数据
-    final lastSession = await workoutSessionRepositoryProvider.getLastSessionByType(type.id);
+    final lastSession =
+        await workoutSessionRepositoryProvider.getLastSessionByType(type.id);
     if (lastSession != null) {
-      await workoutSetRepositoryProvider.copySetsFromLastSession(lastSession.id, sessionId);
+      await workoutSetRepositoryProvider.copySetsFromLastSession(
+          lastSession.id, sessionId);
     }
 
     // 获取新创建的会话
-    final session = await workoutSessionRepositoryProvider.getSessionById(sessionId);
+    final session =
+        await workoutSessionRepositoryProvider.getSessionById(sessionId);
     if (session != null) {
       ref.read(currentSessionProvider.notifier).state = session;
     }
@@ -275,7 +285,8 @@ class _WorkoutRecordingView extends ConsumerStatefulWidget {
   const _WorkoutRecordingView({required this.session});
 
   @override
-  ConsumerState<_WorkoutRecordingView> createState() => _WorkoutRecordingViewState();
+  ConsumerState<_WorkoutRecordingView> createState() =>
+      _WorkoutRecordingViewState();
 }
 
 class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
@@ -293,7 +304,12 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
         // 训练动作列表（包含顶部内容）
         Expanded(
           child: setsAsync.when(
-            data: (sets) => _buildExerciseList(sets, exercisesAsync, workoutTypesAsync),
+            data: (sets) => _buildExerciseList(
+              sets,
+              exercisesAsync,
+              workoutTypesAsync,
+              ref.watch(weightUnitProvider),
+            ),
             loading: () => const Center(child: CupertinoActivityIndicator()),
             error: (e, _) => Center(child: Text('错误: $e')),
           ),
@@ -307,39 +323,48 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
             border: Border(top: BorderSide(color: CupertinoColors.systemGrey5)),
           ),
           child: Row(
-  children: [
-    Expanded(
-      child: CupertinoButton(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        color: CupertinoColors.activeBlue,
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add, color: Colors.white, size: 18),
-            SizedBox(width: 4),
-            Text('添加动作', style: TextStyle(color: CupertinoColors.white, fontSize: 14)),
-          ],
-        ),
-        onPressed: () => _showAddExerciseDialog(context, exercisesAsync),
-      ),
-    ),
-    const SizedBox(width: 12),
-    Expanded(
-      child: CupertinoButton(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        color: CupertinoColors.activeGreen,
-        child: const Text('完成训练', style: TextStyle(color: CupertinoColors.white, fontSize: 14)),
-        onPressed: () => _completeWorkout(context),
-      ),
-    ),
-  ],
-),
+            children: [
+              Expanded(
+                child: CupertinoButton(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  color: CupertinoColors.activeBlue,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add, color: Colors.white, size: 18),
+                      SizedBox(width: 4),
+                      Text('添加动作',
+                          style: TextStyle(
+                              color: CupertinoColors.white, fontSize: 14)),
+                    ],
+                  ),
+                  onPressed: () =>
+                      _showAddExerciseDialog(context, exercisesAsync),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: CupertinoButton(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  color: CupertinoColors.activeGreen,
+                  child: const Text('完成训练',
+                      style: TextStyle(
+                          color: CupertinoColors.white, fontSize: 14)),
+                  onPressed: () => _completeWorkout(context),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildExerciseList(List<WorkoutSet> sets, AsyncValue<List<Exercise>> exercisesAsync, AsyncValue<List<WorkoutType>> workoutTypesAsync) {
+  Widget _buildExerciseList(
+      List<WorkoutSet> sets,
+      AsyncValue<List<Exercise>> exercisesAsync,
+      AsyncValue<List<WorkoutType>> workoutTypesAsync,
+      String weightUnit) {
     // 按动作分组
     final groupedSets = <String, List<WorkoutSet>>{};
     for (final set in sets) {
@@ -358,8 +383,12 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
               children: [
                 workoutTypesAsync.when(
                   data: (types) {
-                    final type = types.where((t) => t.id == widget.session.typeId).firstOrNull;
-                    return Text(type?.name ?? '训练', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold));
+                    final type = types
+                        .where((t) => t.id == widget.session.typeId)
+                        .firstOrNull;
+                    return Text(type?.name ?? '训练',
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold));
                   },
                   loading: () => const Text('加载中...'),
                   error: (_, __) => const Text('训练'),
@@ -373,7 +402,8 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
             ),
           ),
           // 上次训练参考
-          _LastTrainingReference(sessionId: widget.session.id),
+          _LastTrainingReference(
+              sessionId: widget.session.id, weightUnit: weightUnit),
           // 空状态提示
           const Center(
             child: Padding(
@@ -402,8 +432,12 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
                 children: [
                   workoutTypesAsync.when(
                     data: (types) {
-                      final type = types.where((t) => t.id == widget.session.typeId).firstOrNull;
-                      return Text(type?.name ?? '训练', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold));
+                      final type = types
+                          .where((t) => t.id == widget.session.typeId)
+                          .firstOrNull;
+                      return Text(type?.name ?? '训练',
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold));
                     },
                     loading: () => const Text('加载中...'),
                     error: (_, __) => const Text('训练'),
@@ -419,12 +453,14 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
           }
           if (index == 1) {
             // 上次训练参考
-            return _LastTrainingReference(sessionId: widget.session.id);
+            return _LastTrainingReference(
+                sessionId: widget.session.id, weightUnit: weightUnit);
           }
           // 动作列表
           final exerciseId = groupedSets.keys.elementAt(index - 2);
           final exerciseSets = groupedSets[exerciseId]!;
-          final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
+          final exercise =
+              exercises.where((e) => e.id == exerciseId).firstOrNull;
 
           return _ExerciseCard(
             exerciseName: exercise?.name ?? '未知动作',
@@ -432,7 +468,9 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
             sets: exerciseSets,
             onAddSet: () => _addSet(exerciseId),
             onDeleteSet: (setId) => _deleteSet(setId),
-            onUpdateSet: (setId, weight, reps) => _updateSet(setId, weight, reps),
+            onUpdateSet: (setId, weight, reps, unit) =>
+                _updateSet(setId, weight, reps, unit),
+            initialWeightUnit: weightUnit,
           );
         },
       ),
@@ -443,9 +481,12 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
 
   Future<void> _addSet(String exerciseId) async {
     // 获取当前最大组号
-    final sets = ref.read(sessionSetsProvider(widget.session.id)).valueOrNull ?? [];
+    final sets =
+        ref.read(sessionSetsProvider(widget.session.id)).valueOrNull ?? [];
     final exerciseSets = sets.where((s) => s.exerciseId == exerciseId).toList();
-    final maxSetNumber = exerciseSets.isEmpty ? 0 : exerciseSets.map((s) => s.setNumber).reduce((a, b) => a > b ? a : b);
+    final maxSetNumber = exerciseSets.isEmpty
+        ? 0
+        : exerciseSets.map((s) => s.setNumber).reduce((a, b) => a > b ? a : b);
 
     await workoutSetRepositoryProvider.addSet(
       sessionId: widget.session.id,
@@ -458,11 +499,17 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
     await workoutSetRepositoryProvider.deleteSet(setId);
   }
 
-  Future<void> _updateSet(String setId, String weight, int reps) async {
-    await workoutSetRepositoryProvider.updateSet(setId, weight: weight, reps: reps);
+  Future<void> _updateSet(
+      String setId, String weight, int reps, String unit) async {
+    final kg = WeightUnitUtils.parseDisplayToKg(weight, unit);
+    final normalizedWeight =
+        kg == null ? '' : WeightUnitUtils.formatStoredWeight(kg, unit);
+    await workoutSetRepositoryProvider.updateSet(setId,
+        weight: normalizedWeight, reps: reps);
   }
 
-  void _showAddExerciseDialog(BuildContext context, AsyncValue<List<Exercise>> exercisesAsync) {
+  void _showAddExerciseDialog(
+      BuildContext context, AsyncValue<List<Exercise>> exercisesAsync) {
     // Get the workout type name from workoutTypesAsync
     final workoutTypesAsync = ref.read(workoutTypesProvider);
     final category = workoutTypesAsync.valueOrNull
@@ -479,7 +526,6 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
       ),
     );
   }
-
 
   void _completeWorkout(BuildContext context) {
     final noteController = TextEditingController();
@@ -509,7 +555,9 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
               Navigator.pop(context);
               await workoutSessionRepositoryProvider.completeSession(
                 widget.session.id,
-                note: noteController.text.trim().isEmpty ? null : noteController.text.trim(),
+                note: noteController.text.trim().isEmpty
+                    ? null
+                    : noteController.text.trim(),
               );
               ref.read(currentSessionProvider.notifier).state = null;
             },
@@ -522,15 +570,18 @@ class _WorkoutRecordingViewState extends ConsumerState<_WorkoutRecordingView> {
 
 class _LastTrainingReference extends ConsumerWidget {
   final String sessionId;
+  final String weightUnit;
 
-  const _LastTrainingReference({required this.sessionId});
+  const _LastTrainingReference(
+      {required this.sessionId, required this.weightUnit});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(currentSessionProvider);
     if (session == null) return const SizedBox.shrink();
 
-    final lastSessionAsync = ref.watch(lastSessionByTypeProvider(session.typeId));
+    final lastSessionAsync =
+        ref.watch(lastSessionByTypeProvider(session.typeId));
     final exercisesAsync = ref.watch(exerciseListProvider);
 
     return lastSessionAsync.when(
@@ -547,7 +598,8 @@ class _LastTrainingReference extends ConsumerWidget {
               children: [
                 Icon(Icons.info_outline, color: Colors.grey),
                 SizedBox(width: 8),
-                Text('暂无同类型历史记录', style: TextStyle(color: CupertinoColors.systemGrey)),
+                Text('暂无同类型历史记录',
+                    style: TextStyle(color: CupertinoColors.systemGrey)),
               ],
             ),
           );
@@ -558,7 +610,8 @@ class _LastTrainingReference extends ConsumerWidget {
 
         return setsAsync.when(
           data: (sets) => exercisesAsync.when(
-            data: (exercises) => _buildReferenceCard(lastSession, sets, exercises),
+            data: (exercises) =>
+                _buildReferenceCard(lastSession, sets, exercises),
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
           ),
@@ -571,7 +624,8 @@ class _LastTrainingReference extends ConsumerWidget {
     );
   }
 
-  Widget _buildReferenceCard(WorkoutSession session, List<WorkoutSet> sets, List<Exercise> exercises) {
+  Widget _buildReferenceCard(
+      WorkoutSession session, List<WorkoutSet> sets, List<Exercise> exercises) {
     // 按动作分组
     final groupedSets = <String, List<WorkoutSet>>{};
     for (final set in sets) {
@@ -583,7 +637,8 @@ class _LastTrainingReference extends ConsumerWidget {
       decoration: BoxDecoration(
         color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: CupertinoColors.systemBlue.withValues(alpha: 0.3)),
+        border: Border.all(
+            color: CupertinoColors.systemBlue.withValues(alpha: 0.3)),
       ),
       child: _ExpandableSection(
         title: '上次训练参考',
@@ -591,9 +646,10 @@ class _LastTrainingReference extends ConsumerWidget {
         children: [
           ...groupedSets.entries.map((entry) {
             final exerciseId = entry.key;
-            final exercise = exercises.where((e) => e.id == exerciseId).firstOrNull;
+            final exercise =
+                exercises.where((e) => e.id == exerciseId).firstOrNull;
             final exerciseName = exercise?.name ?? '未知动作';
-            
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Column(
@@ -604,8 +660,15 @@ class _LastTrainingReference extends ConsumerWidget {
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                   Text(
-                    entry.value.map((s) => '${s.setNumber}. ${s.weight.isEmpty ? "-" : s.weight} × ${s.reps}次').join(' | '),
-                    style: const TextStyle(fontSize: 13, color: CupertinoColors.systemGrey),
+                    entry.value.map((s) {
+                      final kg = WeightUnitUtils.parseStoredToKg(s.weight);
+                      final weightText = kg == null
+                          ? '-'
+                          : WeightUnitUtils.formatKgToDisplay(kg, weightUnit);
+                      return '${s.setNumber}. $weightText × ${s.reps}次';
+                    }).join(' | '),
+                    style: const TextStyle(
+                        fontSize: 13, color: CupertinoColors.systemGrey),
                   ),
                   Container(height: 0.5, color: CupertinoColors.separator),
                 ],
@@ -659,7 +722,8 @@ class _ExpandableSection extends StatefulWidget {
   State<_ExpandableSection> createState() => _ExpandableSectionState();
 }
 
-class _ExpandableSectionState extends State<_ExpandableSection> with SingleTickerProviderStateMixin {
+class _ExpandableSectionState extends State<_ExpandableSection>
+    with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
 
   @override
@@ -699,15 +763,16 @@ class _ExpandableSectionState extends State<_ExpandableSection> with SingleTicke
               ),
               const Spacer(),
               Icon(
-                _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                _isExpanded
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down,
                 color: CupertinoColors.systemBlue,
                 size: 20,
               ),
             ],
           ),
         ),
-        if (_isExpanded)
-          Column(children: widget.children),
+        if (_isExpanded) Column(children: widget.children),
       ],
     );
   }
@@ -719,7 +784,8 @@ class _ExerciseCard extends StatefulWidget {
   final List<WorkoutSet> sets;
   final VoidCallback onAddSet;
   final Function(String) onDeleteSet;
-  final Function(String, String, int) onUpdateSet;
+  final Function(String, String, int, String) onUpdateSet;
+  final String initialWeightUnit;
 
   const _ExerciseCard({
     required this.exerciseName,
@@ -728,6 +794,7 @@ class _ExerciseCard extends StatefulWidget {
     required this.onAddSet,
     required this.onDeleteSet,
     required this.onUpdateSet,
+    required this.initialWeightUnit,
   });
 
   @override
@@ -737,6 +804,12 @@ class _ExerciseCard extends StatefulWidget {
 class _ExerciseCardState extends State<_ExerciseCard> {
   final Map<String, TextEditingController> _weightControllers = {};
   final Map<String, TextEditingController> _repsControllers = {};
+  final Map<String, String> _setUnits = {};
+
+  String _unitOf(String setId) {
+    return _setUnits[setId] ??
+        WeightUnitUtils.normalizeUnit(widget.initialWeightUnit);
+  }
 
   @override
   void dispose() {
@@ -766,14 +839,16 @@ class _ExerciseCardState extends State<_ExerciseCard> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: CupertinoColors.systemGrey6,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
             ),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     widget.exerciseName,
-                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.w600),
                   ),
                 ),
                 CupertinoButton(
@@ -794,17 +869,43 @@ class _ExerciseCardState extends State<_ExerciseCard> {
                   // 表头
                   const Row(
                     children: [
-                      SizedBox(width: 40, child: Text('组', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
-                      Expanded(child: Text('重量', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
-                      Expanded(child: Text('次数', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13))),
+                      SizedBox(
+                          width: 40,
+                          child: Text('组',
+                              style: TextStyle(
+                                  color: CupertinoColors.systemGrey,
+                                  fontSize: 13))),
+                      Expanded(
+                          child: Text('重量',
+                              style: TextStyle(
+                                  color: CupertinoColors.systemGrey,
+                                  fontSize: 13))),
+                      Expanded(
+                          child: Text('次数',
+                              style: TextStyle(
+                                  color: CupertinoColors.systemGrey,
+                                  fontSize: 13))),
                       SizedBox(width: 40),
                     ],
                   ),
                   const SizedBox(height: 8),
                   // 组数据
                   ...widget.sets.map((set) {
-                    _weightControllers.putIfAbsent(set.id, () => TextEditingController(text: set.weight));
-                    _repsControllers.putIfAbsent(set.id, () => TextEditingController(text: set.reps.toString()));
+                    _setUnits.putIfAbsent(set.id, () {
+                      return WeightUnitUtils.parseStoredUnit(set.weight) ??
+                          WeightUnitUtils.normalizeUnit(
+                              widget.initialWeightUnit);
+                    });
+                    _weightControllers.putIfAbsent(set.id, () {
+                      final kg = WeightUnitUtils.parseStoredToKg(set.weight);
+                      final unit = _unitOf(set.id);
+                      final value = kg == null
+                          ? ''
+                          : WeightUnitUtils.formatKgToDisplay(kg, unit);
+                      return TextEditingController(text: value);
+                    });
+                    _repsControllers.putIfAbsent(set.id,
+                        () => TextEditingController(text: set.reps.toString()));
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
@@ -812,23 +913,37 @@ class _ExerciseCardState extends State<_ExerciseCard> {
                         children: [
                           SizedBox(
                             width: 40,
-                            child: Text('${set.setNumber}', style: const TextStyle(fontWeight: FontWeight.w500)),
+                            child: Text('${set.setNumber}',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500)),
                           ),
                           Expanded(
                             child: CupertinoTextField(
                               controller: _weightControllers[set.id],
                               placeholder: '重量',
                               suffix: CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                minSize: 24,
-                                child: const Text('kg', style: TextStyle(fontSize: 12)),
-                                onPressed: () {
-                                  final current = _weightControllers[set.id]!.text;
-                                  _weightControllers[set.id]!.text = current.endsWith('kg') ? current : '$current kg';
-                                  widget.onUpdateSet(set.id, _weightControllers[set.id]!.text, int.tryParse(_repsControllers[set.id]!.text) ?? 0);
-                                },
+                                padding: const EdgeInsets.only(right: 8),
+                                minSize: 22,
+                                onPressed: () =>
+                                    _showWeightUnitPicker(context, set.id),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(_unitOf(set.id),
+                                        style: const TextStyle(fontSize: 12)),
+                                    const SizedBox(width: 2),
+                                    const Icon(CupertinoIcons.chevron_down,
+                                        size: 12),
+                                  ],
+                                ),
                               ),
-                              onChanged: (value) => widget.onUpdateSet(set.id, value, int.tryParse(_repsControllers[set.id]!.text) ?? 0),
+                              onChanged: (value) => widget.onUpdateSet(
+                                  set.id,
+                                  value,
+                                  int.tryParse(
+                                          _repsControllers[set.id]!.text) ??
+                                      0,
+                                  _unitOf(set.id)),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -837,7 +952,11 @@ class _ExerciseCardState extends State<_ExerciseCard> {
                               controller: _repsControllers[set.id],
                               placeholder: '次数',
                               keyboardType: TextInputType.number,
-                              onChanged: (value) => widget.onUpdateSet(set.id, _weightControllers[set.id]!.text, int.tryParse(value) ?? 0),
+                              onChanged: (value) => widget.onUpdateSet(
+                                  set.id,
+                                  _weightControllers[set.id]!.text,
+                                  int.tryParse(value) ?? 0,
+                                  _unitOf(set.id)),
                             ),
                           ),
                           SizedBox(
@@ -845,7 +964,8 @@ class _ExerciseCardState extends State<_ExerciseCard> {
                             child: CupertinoButton(
                               padding: EdgeInsets.zero,
                               minSize: 24,
-                              child: Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                              child: Icon(Icons.delete_outline,
+                                  color: Colors.red, size: 20),
                               onPressed: () => widget.onDeleteSet(set.id),
                             ),
                           ),
@@ -861,6 +981,58 @@ class _ExerciseCardState extends State<_ExerciseCard> {
       ),
     );
   }
+
+  void _showWeightUnitPicker(BuildContext context, String setId) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('选择重量单位'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _changeSetUnit(setId, 'kg');
+            },
+            child: Text('千克 (kg)${_unitOf(setId) == 'kg' ? ' ✓' : ''}'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _changeSetUnit(setId, 'lb');
+            },
+            child: Text('磅 (lb)${_unitOf(setId) == 'lb' ? ' ✓' : ''}'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('取消'),
+        ),
+      ),
+    );
+  }
+
+  void _changeSetUnit(String setId, String nextUnitRaw) {
+    final nextUnit = WeightUnitUtils.normalizeUnit(nextUnitRaw);
+    final currentUnit = _unitOf(setId);
+    if (nextUnit == currentUnit) {
+      return;
+    }
+
+    final controller = _weightControllers[setId];
+    if (controller != null && controller.text.trim().isNotEmpty) {
+      final kg = WeightUnitUtils.parseDisplayToKg(controller.text, currentUnit);
+      controller.text =
+          kg == null ? '' : WeightUnitUtils.formatKgToDisplay(kg, nextUnit);
+    }
+
+    setState(() {
+      _setUnits[setId] = nextUnit;
+    });
+
+    final reps = int.tryParse(_repsControllers[setId]?.text ?? '') ?? 0;
+    widget.onUpdateSet(
+        setId, _weightControllers[setId]?.text ?? '', reps, nextUnit);
+  }
 }
 
 class _AddExerciseSheet extends ConsumerStatefulWidget {
@@ -868,7 +1040,8 @@ class _AddExerciseSheet extends ConsumerStatefulWidget {
   final AsyncValue<List<Exercise>> exercisesAsync;
   final String? category;
 
-  const _AddExerciseSheet({required this.sessionId, required this.exercisesAsync, this.category});
+  const _AddExerciseSheet(
+      {required this.sessionId, required this.exercisesAsync, this.category});
 
   @override
   ConsumerState<_AddExerciseSheet> createState() => _AddExerciseSheetState();
@@ -892,7 +1065,9 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('添加动作', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                const Text('添加动作',
+                    style:
+                        TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   child: const Text('关闭'),
@@ -914,11 +1089,14 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
               data: (exercises) {
                 final filtered = exercises
                     .where((e) =>
-                        e.name.toLowerCase().contains(_searchText.toLowerCase()) &&
-                        (widget.category == null || e.category == null || e.category == widget.category || e.category == '通用'))
+                        e.name
+                            .toLowerCase()
+                            .contains(_searchText.toLowerCase()) &&
+                        (widget.category == null ||
+                            e.category == null ||
+                            e.category == widget.category ||
+                            e.category == '通用'))
                     .toList();
-
-
 
                 if (filtered.isEmpty) {
                   return Center(
@@ -942,7 +1120,9 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
                     final exercise = filtered[index];
                     return CupertinoListTile(
                       title: Text(exercise.name),
-                      subtitle: exercise.category != null ? Text(exercise.category!) : null,
+                      subtitle: exercise.category != null
+                          ? Text(exercise.category!)
+                          : null,
                       trailing: const Icon(Icons.add),
                       onTap: () => _addExercise(exercise.id),
                     );
@@ -999,12 +1179,12 @@ class _AddExerciseSheetState extends ConsumerState<_AddExerciseSheet> {
                 final exerciseId = const Uuid().v4();
                 final now = DateTime.now();
                 await databaseProvider.into(databaseProvider.exercises).insert(
-                  ExercisesCompanion.insert(
-                    id: exerciseId,
-                    name: nameController.text.trim(),
-                    createdAt: now,
-                  ),
-                );
+                      ExercisesCompanion.insert(
+                        id: exerciseId,
+                        name: nameController.text.trim(),
+                        createdAt: now,
+                      ),
+                    );
                 if (mounted) {
                   Navigator.pop(context);
                   // 添加新创建的动作到训练

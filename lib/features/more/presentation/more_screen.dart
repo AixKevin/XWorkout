@@ -9,6 +9,7 @@ import 'package:xworkout/features/settings/settings_screen.dart';
 import 'package:xworkout/features/more/data/settings_repository.dart';
 import 'package:xworkout/features/more/presentation/workout_types_screen.dart';
 import 'package:xworkout/core/database/database_provider.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -30,7 +31,8 @@ class MoreScreen extends ConsumerWidget {
                   leading: const Icon(Icons.calendar_today),
                   title: const Text('日历视图'),
                   subtitle: const Text('按日期查看训练'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -43,7 +45,8 @@ class MoreScreen extends ConsumerWidget {
                   leading: const Icon(Icons.save),
                   title: const Text('数据管理'),
                   subtitle: const Text('导出、备份数据'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -55,7 +58,8 @@ class MoreScreen extends ConsumerWidget {
                 CupertinoListTile(
                   leading: const Icon(Icons.refresh),
                   title: const Text('重置设置'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showResetSettingsDialog(context, ref);
                   },
@@ -68,7 +72,8 @@ class MoreScreen extends ConsumerWidget {
                 CupertinoListTile(
                   leading: const Icon(Icons.phone_android),
                   title: const Text('显示设置'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showDisplaySettings(context, ref);
                   },
@@ -76,7 +81,8 @@ class MoreScreen extends ConsumerWidget {
                 CupertinoListTile(
                   leading: const Icon(Icons.settings),
                   title: const Text('通用设置'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -89,7 +95,8 @@ class MoreScreen extends ConsumerWidget {
                   leading: const Icon(Icons.category),
                   title: const Text('训练类型'),
                   subtitle: const Text('管理训练分类'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey[400], size: 28),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -106,7 +113,8 @@ class MoreScreen extends ConsumerWidget {
                 CupertinoListTile(
                   leading: const Icon(Icons.info),
                   title: const Text('关于'),
-                  trailing: Icon(CupertinoIcons.chevron_right, color: Colors.grey[400], size: 28),
+                  trailing: Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey[400], size: 28),
                   onTap: () {
                     _showAbout(context);
                   },
@@ -116,7 +124,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             const Center(
               child: Text(
-                'XWorkout v4.9.6',
+                'XWorkout v4.9.7',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -126,7 +134,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             const Center(
               child: Text(
-                'Build 6',
+                'Build 7',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -176,7 +184,7 @@ class MoreScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   void _showAbout(BuildContext context) {
     showCupertinoDialog(
       context: context,
@@ -186,7 +194,7 @@ class MoreScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 16),
             const Text('XWorkout'),
-            const Text('版本: 4.9.6 (Build 6)'),
+            const Text('版本: 4.9.7 (Build 7)'),
             const SizedBox(height: 8),
             const Text('轻量级健身记录软件'),
             const Text('简洁、离线、跨平台'),
@@ -229,10 +237,12 @@ class MoreScreen extends ConsumerWidget {
 
 class _RestTimerSettingsSheet extends ConsumerStatefulWidget {
   @override
-  ConsumerState<_RestTimerSettingsSheet> createState() => _RestTimerSettingsSheetState();
+  ConsumerState<_RestTimerSettingsSheet> createState() =>
+      _RestTimerSettingsSheetState();
 }
 
-class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet> {
+class _RestTimerSettingsSheetState
+    extends ConsumerState<_RestTimerSettingsSheet> {
   int _duration = 60;
   bool _autoStart = true;
   bool _sound = true;
@@ -296,7 +306,8 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
                     CupertinoListTile(
                       title: const Text('默认时长'),
                       additionalInfo: Text('$_duration 秒'),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(CupertinoIcons.chevron_right,
+                          color: Colors.grey),
                       onTap: () => _showDurationPicker(),
                     ),
                   ],
@@ -310,7 +321,9 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
                         value: _autoStart,
                         onChanged: (v) {
                           setState(() => _autoStart = v);
-                          ref.read(settingsRepositoryProvider).setAutoStartTimer(v);
+                          ref
+                              .read(settingsRepositoryProvider)
+                              .setAutoStartTimer(v);
                         },
                       ),
                     ),
@@ -320,7 +333,9 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
                         value: _sound,
                         onChanged: (v) {
                           setState(() => _sound = v);
-                          ref.read(settingsRepositoryProvider).setSoundEnabled(v);
+                          ref
+                              .read(settingsRepositoryProvider)
+                              .setSoundEnabled(v);
                         },
                       ),
                     ),
@@ -330,7 +345,9 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
                         value: _vibration,
                         onChanged: (v) {
                           setState(() => _vibration = v);
-                          ref.read(settingsRepositoryProvider).setVibrationEnabled(v);
+                          ref
+                              .read(settingsRepositoryProvider)
+                              .setVibrationEnabled(v);
                         },
                       ),
                     ),
@@ -370,7 +387,9 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
                 onSelectedItemChanged: (index) {
                   final val = [60, 90, 120, 180][index];
                   setState(() => _duration = val);
-                  ref.read(settingsRepositoryProvider).setRestTimerDuration(val);
+                  ref
+                      .read(settingsRepositoryProvider)
+                      .setRestTimerDuration(val);
                 },
                 children: const [
                   Text('60 秒'),
@@ -389,7 +408,8 @@ class _RestTimerSettingsSheetState extends ConsumerState<_RestTimerSettingsSheet
 
 class _DisplaySettingsSheet extends ConsumerStatefulWidget {
   @override
-  ConsumerState<_DisplaySettingsSheet> createState() => _DisplaySettingsSheetState();
+  ConsumerState<_DisplaySettingsSheet> createState() =>
+      _DisplaySettingsSheetState();
 }
 
 class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
@@ -405,7 +425,7 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
 
   Future<void> _loadSettings() async {
     final repo = ref.read(settingsRepositoryProvider);
-    final weightUnit = await repo.getWeightUnit();
+    final weightUnit = ref.read(weightUnitProvider);
     final dateFormat = await repo.getDateFormat();
     final firstDay = await repo.getFirstDayOfWeek();
     if (mounted) {
@@ -452,19 +472,22 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
                     CupertinoListTile(
                       title: const Text('重量单位'),
                       additionalInfo: Text(_weightUnit.toUpperCase()),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(CupertinoIcons.chevron_right,
+                          color: Colors.grey),
                       onTap: () => _showWeightUnitPicker(),
                     ),
                     CupertinoListTile(
                       title: const Text('日期格式'),
                       additionalInfo: Text(_dateFormat),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(CupertinoIcons.chevron_right,
+                          color: Colors.grey),
                       onTap: () => _showDateFormatPicker(),
                     ),
                     CupertinoListTile(
                       title: const Text('每周首日'),
                       additionalInfo: Text(_firstDay == 1 ? '周一' : '周日'),
-                      trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(CupertinoIcons.chevron_right,
+                          color: Colors.grey),
                       onTap: () => _showFirstDayPicker(),
                     ),
                   ],
@@ -492,10 +515,10 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
           ),
           CupertinoActionSheetAction(
             onPressed: () {
-              _setWeightUnit('lbs');
+              _setWeightUnit('lb');
               Navigator.pop(context);
             },
-            child: const Text('磅 (lbs)'),
+            child: const Text('磅 (lb)'),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
@@ -507,8 +530,9 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
   }
 
   void _setWeightUnit(String unit) {
-    setState(() => _weightUnit = unit);
-    ref.read(settingsRepositoryProvider).setWeightUnit(unit);
+    final normalized = unit == 'lbs' ? 'lb' : unit;
+    setState(() => _weightUnit = normalized);
+    ref.read(weightUnitProvider.notifier).setWeightUnit(normalized);
   }
 
   void _showDateFormatPicker() {
@@ -586,4 +610,3 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
     ref.read(settingsRepositoryProvider).setFirstDayOfWeek(day);
   }
 }
-

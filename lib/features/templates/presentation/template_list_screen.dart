@@ -11,6 +11,8 @@ import 'package:xworkout/core/database/database.dart';
 import 'package:xworkout/core/database/database_provider.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:uuid/uuid.dart';
+import 'package:xworkout/shared/providers/weight_unit_provider.dart';
+import 'package:xworkout/shared/utils/weight_unit_utils.dart';
 
 final workoutPlanRepositoryProvider = Provider<WorkoutPlanRepository>((ref) {
   return WorkoutPlanRepository(databaseProvider);
@@ -20,7 +22,8 @@ final exerciseRepositoryProvider = Provider<ExerciseRepository>((ref) {
   return ExerciseRepository(databaseProvider);
 });
 
-final userTemplatesProvider = StateNotifierProvider<UserTemplatesNotifier, List<PlanTemplate>>((ref) {
+final userTemplatesProvider =
+    StateNotifierProvider<UserTemplatesNotifier, List<PlanTemplate>>((ref) {
   final repo = ref.watch(userTemplateRepositoryProvider);
   return UserTemplatesNotifier(repo);
 });
@@ -79,13 +82,14 @@ class TemplateListScreen extends ConsumerWidget {
                       ),
                     ),
                     title: Text(template.name),
-                    subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                    trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
+                    subtitle: Text(
+                        '${template.cycleDays}天循环 · ${template.description}'),
+                    trailing: const Icon(CupertinoIcons.chevron_right,
+                        color: Colors.grey, size: 28),
                     onTap: () => _showTemplateDetail(context, ref, template),
                   );
                 }).toList(),
               ),
-            
             CupertinoListSection.insetGrouped(
               header: const Text('推荐模板'),
               children: planTemplates.map((template) {
@@ -102,8 +106,10 @@ class TemplateListScreen extends ConsumerWidget {
                     ),
                   ),
                   title: Text(template.name),
-                  subtitle: Text('${template.cycleDays}天循环 · ${template.description}'),
-                  trailing: const Icon(CupertinoIcons.chevron_right, color: Colors.grey, size: 28),
+                  subtitle: Text(
+                      '${template.cycleDays}天循环 · ${template.description}'),
+                  trailing: const Icon(CupertinoIcons.chevron_right,
+                      color: Colors.grey, size: 28),
                   onTap: () => _showTemplateDetail(context, ref, template),
                 );
               }).toList(),
@@ -114,7 +120,9 @@ class TemplateListScreen extends ConsumerWidget {
     );
   }
 
-  void _showTemplateDetail(BuildContext context, WidgetRef ref, PlanTemplate template) {
+  void _showTemplateDetail(
+      BuildContext context, WidgetRef ref, PlanTemplate template) {
+    final weightUnit = ref.read(weightUnitProvider);
     showCupertinoModalPopup(
       context: context,
       builder: (context) => Container(
@@ -137,7 +145,8 @@ class TemplateListScreen extends ConsumerWidget {
                   ),
                   Text(
                     template.name,
-                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.w600),
                   ),
                   CupertinoButton(
                     padding: EdgeInsets.zero,
@@ -152,7 +161,8 @@ class TemplateListScreen extends ConsumerWidget {
             ),
             if (template.isCustom)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     Expanded(
@@ -161,7 +171,7 @@ class TemplateListScreen extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: const Text('删除模板'),
                         onPressed: () {
-                           showCupertinoDialog(
+                          showCupertinoDialog(
                             context: context,
                             builder: (ctx) => CupertinoAlertDialog(
                               title: const Text('确认删除'),
@@ -170,7 +180,9 @@ class TemplateListScreen extends ConsumerWidget {
                                 CupertinoDialogAction(
                                   isDestructiveAction: true,
                                   onPressed: () {
-                                    ref.read(userTemplatesProvider.notifier).deleteTemplate(template.id);
+                                    ref
+                                        .read(userTemplatesProvider.notifier)
+                                        .deleteTemplate(template.id);
                                     Navigator.pop(ctx); // Close dialog
                                     Navigator.pop(context); // Close modal
                                   },
@@ -206,20 +218,23 @@ class TemplateListScreen extends ConsumerWidget {
                       ),
                       CupertinoListTile(
                         title: const Text('训练日'),
-                        additionalInfo: Text('${template.days.where((d) => !d.isRestDay).length}天'),
+                        additionalInfo: Text(
+                            '${template.days.where((d) => !d.isRestDay).length}天'),
                       ),
                       CupertinoListTile(
                         title: const Text('休息日'),
-                        additionalInfo: Text('${template.days.where((d) => d.isRestDay).length}天'),
+                        additionalInfo: Text(
+                            '${template.days.where((d) => d.isRestDay).length}天'),
                       ),
                     ],
                   ),
                   ...template.days.map((day) {
                     return CupertinoListSection.insetGrouped(
-                      header: Text(day.isRestDay ? '休息日' : '训练日 ${day.dayIndex + 1}'),
+                      header: Text(
+                          day.isRestDay ? '休息日' : '训练日 ${day.dayIndex + 1}'),
                       children: day.isRestDay
                           ? [
-                                const CupertinoListTile(
+                              const CupertinoListTile(
                                 title: Text('休息'),
                                 leading: Icon(Icons.hotel),
                               ),
@@ -228,7 +243,7 @@ class TemplateListScreen extends ConsumerWidget {
                               return CupertinoListTile(
                                 title: Text(exercise.name),
                                 subtitle: Text(
-                                  '${exercise.targetSets}组 × ${exercise.targetReps}次${exercise.targetWeight != null ? ' × ${exercise.targetWeight}kg' : ''}',
+                                  '${exercise.targetSets}组 × ${exercise.targetReps}次${exercise.targetWeight != null ? ' × ${WeightUnitUtils.formatKgToDisplay(exercise.targetWeight!, weightUnit)}$weightUnit' : ''}',
                                 ),
                                 leading: const Icon(Icons.grid_view),
                               );
@@ -244,10 +259,11 @@ class TemplateListScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _applyTemplate(BuildContext context, WidgetRef ref, PlanTemplate template) async {
+  Future<void> _applyTemplate(
+      BuildContext context, WidgetRef ref, PlanTemplate template) async {
     try {
       final exerciseList = await ref.read(exerciseListProvider.future);
-      
+
       final exerciseMap = <String, Exercise>{};
       for (var e in exerciseList) {
         exerciseMap[e.name] = e;
@@ -289,10 +305,10 @@ class TemplateListScreen extends ConsumerWidget {
                 defaultWeight: Value(exTemplate.targetWeight),
                 createdAt: Value(DateTime.now()),
               );
-              
+
               final exerciseRepo = ref.read(exerciseRepositoryProvider);
               await exerciseRepo.insertExercise(newExercise);
-              
+
               exercise = Exercise(
                 id: exerciseId,
                 name: exTemplate.name,

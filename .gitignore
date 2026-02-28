@@ -46,3 +46,9 @@ coverage/
 PROMPT.md
 setup-windows.bat
 .gitattributes
+
+# Local development toolchains and caches
+.toolchain/
+.android-sdk/
+.home/
+.pub-cache/
