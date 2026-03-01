@@ -7,7 +7,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-green)
-![Version](https://img.shields.io/badge/version-4.9.9-brightgreen)
+![Version](https://img.shields.io/badge/version-4.9.10-brightgreen)
 
 </div>
 
@@ -212,6 +212,9 @@ lib/
 - improve: 移除显示设置独立入口，合并至通用设置
 - feat: 通用设置新增日期格式和每周首日选项
 - improve: 将开源许可移至更多应用设置中
+
+### v4.9.10 (2026-03-01)
+- improve: 修改应用包名为 io.github.aixkevin.xworkout
 
 ### v4.9.8 (2026-02-28)
 - merge: PR #1 - 支持每组独立重量单位切换

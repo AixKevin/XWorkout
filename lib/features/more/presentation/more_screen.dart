@@ -124,7 +124,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             const Center(
               child: Text(
-                'XWorkout v4.9.9',
+                'XWorkout v4.9.10',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -134,7 +134,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             const Center(
               child: Text(
-                'Build 9',
+                'Build 10',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -225,7 +225,7 @@ class MoreScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 16),
             const Text('XWorkout'),
-            const Text('版本: 4.9.9 (Build 9)'),
+            const Text('版本: 4.9.10 (Build 10)'),
             const SizedBox(height: 8),
             const Text('轻量级健身记录软件'),
             const Text('简洁、离线、跨平台'),
@@ -245,20 +245,22 @@ class MoreScreen extends ConsumerWidget {
             // 贡献者
             const Text('贡献者', style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            SizedBox(
-              height: 50,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: const [
-                  _ContributorItem(
-                    avatarUrl: 'https://avatars.githubusercontent.com/u/476?u=',
-                    username: 'Aixkevin',
-                  ),
-                  _ContributorItem(
-                    avatarUrl: 'https://avatars.githubusercontent.com/u/164656536?u=',
-                    username: 'Immortal-Fates',
-                  ),
-                ],
+            Center(
+              child: SizedBox(
+                height: 60,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _ContributorItem(
+                      avatarUrl: 'https://avatars.githubusercontent.com/u/73382534?v=4',
+                      username: 'Aixkevin',
+                    ),
+                    _ContributorItem(
+                      avatarUrl: 'https://avatars.githubusercontent.com/u/114860230?v=4',
+                      username: 'Immortal-Fates',
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
