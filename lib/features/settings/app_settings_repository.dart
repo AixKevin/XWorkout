@@ -1,5 +1,11 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xworkout/shared/utils/weight_unit_utils.dart';
+
+final appSettingsRepositoryProvider = Provider<AppSettingsRepository>((ref) {
+  return AppSettingsRepository();
+});
 
 class AppSettingsRepository {
   static const String _keyThemeMode = 'theme_mode';
@@ -17,6 +23,20 @@ class AppSettingsRepository {
   Future<void> setThemeMode(String mode) async {
     final prefs = await _prefs;
     await prefs.setString(_keyThemeMode, mode);
+  }
+
+  /// Convert theme mode string to CupertinoThemeBrightness
+  Future<Brightness?> getThemeBrightness() async {
+    final mode = await getThemeMode();
+    switch (mode) {
+      case 'light':
+        return Brightness.light;
+      case 'dark':
+        return Brightness.dark;
+      case 'system':
+      default:
+        return null; // null means follow system
+    }
   }
 
   Future<String> getWeightUnit() async {
@@ -58,5 +78,28 @@ class AppSettingsRepository {
       'defaultSets': await getDefaultSets(),
       'defaultReps': await getDefaultReps(),
     };
+  }
+}
+
+// Theme mode provider
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, String>((ref) {
+  return ThemeModeNotifier(ref.read(appSettingsRepositoryProvider));
+});
+
+class ThemeModeNotifier extends StateNotifier<String> {
+  final AppSettingsRepository _settingsRepository;
+
+  ThemeModeNotifier(this._settingsRepository) : super('system') {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final mode = await _settingsRepository.getThemeMode();
+    state = mode;
+  }
+
+  Future<void> setThemeMode(String mode) async {
+    await _settingsRepository.setThemeMode(mode);
+    state = mode;
   }
 }

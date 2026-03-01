@@ -124,7 +124,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             const Center(
               child: Text(
-                'XWorkout v4.9.10',
+                'XWorkout v4.9.11',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -134,7 +134,7 @@ class MoreScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             const Center(
               child: Text(
-                'Build 10',
+                'Build 11',
                 style: TextStyle(
                   fontSize: 13,
                   color: CupertinoColors.systemGrey,
@@ -225,7 +225,7 @@ class MoreScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 16),
             const Text('XWorkout'),
-            const Text('版本: 4.9.10 (Build 10)'),
+            const Text('版本: 4.9.11 (Build 11)'),
             const SizedBox(height: 8),
             const Text('轻量级健身记录软件'),
             const Text('简洁、离线、跨平台'),
@@ -512,7 +512,7 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
                   children: [
                     CupertinoListTile(
                       title: const Text('重量单位'),
-                      additionalInfo: Text(_weightUnit.toUpperCase()),
+                      additionalInfo: Text(_weightUnit == '片' ? '片' : _weightUnit.toUpperCase()),
                       trailing: const Icon(CupertinoIcons.chevron_right,
                           color: Colors.grey),
                       onTap: () => _showWeightUnitPicker(),
@@ -552,14 +552,24 @@ class _DisplaySettingsSheetState extends ConsumerState<_DisplaySettingsSheet> {
               _setWeightUnit('kg');
               Navigator.pop(context);
             },
-            child: const Text('千克 (kg)'),
+            child: Text(
+                '千克 (kg)${_weightUnit == 'kg' ? ' ✓' : ''}'),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               _setWeightUnit('lb');
               Navigator.pop(context);
             },
-            child: const Text('磅 (lb)'),
+            child: Text(
+                '磅 (lb)${_weightUnit == 'lb' ? ' ✓' : ''}'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              _setWeightUnit('片');
+              Navigator.pop(context);
+            },
+            child: Text(
+                '片 (plate)${_weightUnit == '片' ? ' ✓' : ''}'),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(

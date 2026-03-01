@@ -6,15 +6,32 @@ class WeightUnitUtils {
     if (normalized == 'lbs') {
       return 'lb';
     }
+    if (normalized == '片' || normalized == 'plate') {
+      return '片';
+    }
     return normalized == 'lb' ? 'lb' : 'kg';
   }
 
   static double kgToDisplay(double kg, String unit) {
-    return normalizeUnit(unit) == 'lb' ? kg * _kgToLb : kg;
+    final normalized = normalizeUnit(unit);
+    if (normalized == 'lb') {
+      return kg * _kgToLb;
+    }
+    if (normalized == '片') {
+      return kg;
+    }
+    return kg;
   }
 
   static double displayToKg(double value, String unit) {
-    return normalizeUnit(unit) == 'lb' ? value / _kgToLb : value;
+    final normalized = normalizeUnit(unit);
+    if (normalized == 'lb') {
+      return value / _kgToLb;
+    }
+    if (normalized == '片') {
+      return value;
+    }
+    return value;
   }
 
   static double? parseNumber(String raw) {
@@ -50,7 +67,7 @@ class WeightUnitUtils {
     if (trimmed.contains('|')) {
       final unitPart = trimmed.split('|').last.trim();
       final normalized = normalizeUnit(unitPart);
-      if (normalized == 'kg' || normalized == 'lb') {
+      if (normalized == 'kg' || normalized == 'lb' || normalized == '片') {
         return normalized;
       }
     }
@@ -60,6 +77,9 @@ class WeightUnitUtils {
     }
     if (trimmed.endsWith('lb') || trimmed.endsWith('lbs')) {
       return 'lb';
+    }
+    if (trimmed.endsWith('片')) {
+      return '片';
     }
     return null;
   }

@@ -5,10 +5,6 @@ import 'package:xworkout/features/settings/app_settings_repository.dart';
 import 'package:xworkout/features/more/data/settings_repository.dart';
 import 'package:xworkout/shared/providers/weight_unit_provider.dart';
 
-final appSettingsRepositoryProvider = Provider<AppSettingsRepository>((ref) {
-  return AppSettingsRepository();
-});
-
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -32,6 +28,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _loadSettings();
   }
 
+  String _themeMode = 'system'; // Add state for theme mode
+
   Future<void> _loadSettings() async {
     final repo = ref.read(appSettingsRepositoryProvider);
     final themeMode = await repo.getThemeMode();
@@ -41,6 +39,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final firstDay = await _settingsRepo.getFirstDayOfWeek();
 
     setState(() {
+      _themeMode = themeMode;
       _isDarkMode = themeMode == 'dark';
       _defaultSets = defaultSets;
       _defaultReps = defaultReps;
@@ -67,12 +66,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     header: const Text('外观'),
                     children: [
                       CupertinoListTile(
-                        leading: Icon(Icons.dark_mode),
-                        title: const Text('深色模式'),
-                        trailing: CupertinoSwitch(
-                          value: _isDarkMode,
-                          onChanged: (value) => _setDarkMode(value),
-                        ),
+                        leading: const Icon(Icons.dark_mode),
+                        title: const Text('主题模式'),
+                        additionalInfo: Text(_getThemeModeText()),
+                        trailing: const Icon(CupertinoIcons.chevron_right,
+                            color: Colors.grey),
+                        onTap: () => _showThemeModePicker(),
                       ),
                     ],
                   ),
@@ -135,6 +134,56 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
   }
 
+  String _getThemeModeText() {
+    switch (_themeMode) {
+      case 'dark':
+        return '深色';
+      case 'light':
+        return '浅色';
+      case 'system':
+      default:
+        return '跟随系统';
+    }
+  }
+
+  void _showThemeModePicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('选择主题模式'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () => _setThemeMode('light'),
+            child: Text('浅色${_themeMode == 'light' ? ' ✓' : ''}'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () => _setThemeMode('dark'),
+            child: Text('深色${_themeMode == 'dark' ? ' ✓' : ''}'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () => _setThemeMode('system'),
+            child: Text('跟随系统${_themeMode == 'system' ? ' ✓' : ''}'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('取消'),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _setThemeMode(String mode) async {
+    // Use the provider to trigger rebuild
+    await ref.read(themeModeProvider.notifier).setThemeMode(mode);
+    setState(() {
+      _themeMode = mode;
+      _isDarkMode = mode == 'dark';
+    });
+    if (mounted) Navigator.of(context).pop();
+  }
+
   void _showWeightUnitPicker() {
     showCupertinoModalPopup(
       context: context,
@@ -150,6 +199,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () => _setWeightUnit('lb'),
             child: Text(
                 '磅 (lb)${ref.read(weightUnitProvider) == 'lb' ? ' ✓' : ''}'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () => _setWeightUnit('片'),
+            child: Text(
+                '片 (plate)${ref.read(weightUnitProvider) == '片' ? ' ✓' : ''}'),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
