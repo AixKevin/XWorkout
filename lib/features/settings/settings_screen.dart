@@ -181,7 +181,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _themeMode = mode;
       _isDarkMode = mode == 'dark';
     });
-    if (mounted) Navigator.of(context).pop();
+    // Note: CupertinoActionSheet auto-dismisses on selection, no need to call pop()
   }
 
   void _showWeightUnitPicker() {

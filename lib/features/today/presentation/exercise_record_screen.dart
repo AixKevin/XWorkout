@@ -635,6 +635,13 @@ class _SetItem extends StatelessWidget {
             },
             child: Text('磅 (lb)${weightUnit == 'lb' ? ' ✓' : ''}'),
           ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onWeightUnitChanged('片');
+            },
+            child: Text('片 (plate)${weightUnit == '片' ? ' ✓' : ''}'),
+          ),
         ],
         cancelButton: CupertinoActionSheetAction(
           onPressed: () => Navigator.of(context).pop(),

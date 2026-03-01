@@ -318,10 +318,20 @@ class _SessionDetailScreen extends ConsumerWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(DateFormat('MM月dd日', 'zh_CN').format(session.date)),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: const Icon(Icons.delete),
-          onPressed: () => _showDeleteDialog(context, ref),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: const Icon(Icons.edit),
+              onPressed: () => _showEditDialog(context, ref),
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: const Icon(Icons.delete),
+              onPressed: () => _showDeleteDialog(context, ref),
+            ),
+          ],
         ),
       ),
       child: SafeArea(
@@ -382,6 +392,42 @@ class _SessionDetailScreen extends ConsumerWidget {
               if (context.mounted) {
                 Navigator.pop(context);
               }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, WidgetRef ref) {
+    final noteController = TextEditingController(text: session.note ?? '');
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('编辑备注'),
+        content: Column(
+          children: [
+            const SizedBox(height: 12),
+            CupertinoTextField(
+              controller: noteController,
+              placeholder: '添加备注',
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            child: const Text('保存'),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await workoutSessionRepositoryProvider.updateNote(
+                session.id,
+                noteController.text.trim(),
+              );
             },
           ),
         ],

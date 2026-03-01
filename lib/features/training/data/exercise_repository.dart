@@ -36,47 +36,108 @@ class ExerciseRepository {
     return (_db.delete(_db.exercises)..where((e) => e.id.equals(id))).go();
   }
   
+  /// Get exercise history from both ExerciseRecords (new system) and WorkoutSets (old system)
   Future<List<ExerciseHistory>> getExerciseHistory(String exerciseId, {int limit = 5}) async {
-    final query = _db.select(_db.exerciseRecords).join([
-      innerJoin(_db.dailyRecords, _db.dailyRecords.id.equalsExp(_db.exerciseRecords.dailyRecordId))
-    ])
-      ..where(_db.exerciseRecords.exerciseId.equals(exerciseId))
-      ..orderBy([OrderingTerm.desc(_db.dailyRecords.date)])
-      ..limit(limit);
-
-    final result = await query.get();
+    final results = <ExerciseHistory>[];
     
-    return result.map((row) {
-      final record = row.readTable(_db.exerciseRecords);
-      final daily = row.readTable(_db.dailyRecords);
-      return ExerciseHistory(
-        date: daily.date,
-        sets: record.actualSets,
-        reps: record.actualReps,
-        weight: record.actualWeight,
-        note: record.note,
-      );
-    }).toList();
+    // Query from ExerciseRecords (new system - 今日训练)
+    try {
+      final newQuery = _db.select(_db.exerciseRecords).join([
+        innerJoin(_db.dailyRecords, _db.dailyRecords.id.equalsExp(_db.exerciseRecords.dailyRecordId))
+      ])
+        ..where(_db.exerciseRecords.exerciseId.equals(exerciseId))
+        ..orderBy([OrderingTerm.desc(_db.dailyRecords.date)])
+        ..limit(limit);
+
+      final newResult = await newQuery.get();
+      for (final row in newResult) {
+        final record = row.readTable(_db.exerciseRecords);
+        final daily = row.readTable(_db.dailyRecords);
+        results.add(ExerciseHistory(
+          date: daily.date,
+          sets: record.actualSets,
+          reps: record.actualReps,
+          weight: record.actualWeight,
+          note: record.note,
+        ));
+      }
+    } catch (e) {
+      // Ignore errors from this table
+    }
+    
+    // Query from WorkoutSets (old system - 训练历史)
+    try {
+      final oldQuery = _db.select(_db.workoutSets).join([
+        innerJoin(_db.workoutSessions, _db.workoutSessions.id.equalsExp(_db.workoutSets.sessionId))
+      ])
+        ..where(_db.workoutSets.exerciseId.equals(exerciseId))
+        ..orderBy([OrderingTerm.desc(_db.workoutSessions.date)])
+        ..limit(limit);
+
+      final oldResult = await oldQuery.get();
+      for (final row in oldResult) {
+        final set = row.readTable(_db.workoutSets);
+        final session = row.readTable(_db.workoutSessions);
+        results.add(ExerciseHistory(
+          date: session.date,
+          sets: 1,
+          reps: set.reps.toString(),
+          weight: set.weight,
+          note: null,
+        ));
+      }
+    } catch (e) {
+      // Ignore errors from this table
+    }
+    
+    // Sort by date descending and limit
+    results.sort((a, b) => b.date.compareTo(a.date));
+    return results.take(limit).toList();
   }
 
+  /// Get max weight from both ExerciseRecords and WorkoutSets
   Future<double?> getMaxWeight(String exerciseId) async {
-    final query = _db.select(_db.exerciseRecords)
-      ..where((t) => t.exerciseId.equals(exerciseId));
-    
-    final records = await query.get();
     double maxWeight = 0;
     bool found = false;
     
-    for (final record in records) {
-      // Parse weights (handling comma separated or single values)
-      final weights = record.actualWeight.split(RegExp(r'[,，]'));
-      for (final w in weights) {
-        final val = double.tryParse(w.trim());
-        if (val != null) {
-          if (val > maxWeight) maxWeight = val;
-          found = true;
+    // Check ExerciseRecords (new system)
+    try {
+      final newQuery = _db.select(_db.exerciseRecords)
+        ..where((t) => t.exerciseId.equals(exerciseId));
+      
+      final newRecords = await newQuery.get();
+      for (final record in newRecords) {
+        final weights = record.actualWeight.split(RegExp(r'[,，]'));
+        for (final w in weights) {
+          final val = double.tryParse(w.trim());
+          if (val != null && val > 0) {
+            if (val > maxWeight) maxWeight = val;
+            found = true;
+          }
         }
       }
+    } catch (e) {
+      // Ignore errors
+    }
+    
+    // Check WorkoutSets (old system)
+    try {
+      final oldQuery = _db.select(_db.workoutSets)
+        ..where((t) => t.exerciseId.equals(exerciseId));
+      
+      final oldRecords = await oldQuery.get();
+      for (final set in oldRecords) {
+        final weights = set.weight.split(RegExp(r'[,，]'));
+        for (final w in weights) {
+          final val = double.tryParse(w.trim());
+          if (val != null && val > 0) {
+            if (val > maxWeight) maxWeight = val;
+            found = true;
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore errors
     }
     
     return found ? maxWeight : null;

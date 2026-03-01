@@ -7,7 +7,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-green)
-![Version](https://img.shields.io/badge/version-4.9.11-brightgreen)
+![Version](https://img.shields.io/badge/version-4.9.12-brightgreen)
 
 </div>
 
@@ -220,6 +220,13 @@ lib/
 - feat: 新增重量单位"片"(plate)选项
 - feat: 设置中支持主题模式切换(浅色/深色/跟随系统)
 - improve: 代码优化和bug修复
+
+### v4.9.12 (2026-03-01)
+- feat: 训练中添加"片"重量单位选项
+- feat: 训练历史详情页添加编辑功能
+- feat: 动作管理页面显示最近记录和最佳表现(同时支持新旧系统数据)
+- feat: 数据导出支持新旧系统(WorkoutSessions/WorkoutSets和DailyRecords/ExerciseRecords)
+- fix: 修复主题模式选择后页面导航异常问题
 
 ### v4.9.8 (2026-02-28)
 - merge: PR #1 - 支持每组独立重量单位切换

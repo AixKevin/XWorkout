@@ -56,6 +56,7 @@ class DataExportRepository {
       dayExercises = await _db.select(_db.dayExercises).get();
     }
 
+    // Export from new system (DailyRecords + ExerciseRecords)
     List<DailyRecord> dailyRecords = [];
     List<ExerciseRecord> exerciseRecords = [];
     if (includeRecords) {
@@ -78,6 +79,32 @@ class DataExportRepository {
         }
         
         exerciseRecords = await recordQuery.get();
+      }
+    }
+    
+    // Export from old system (WorkoutSessions + WorkoutSets)
+    List<WorkoutSession> workoutSessions = [];
+    List<WorkoutSet> workoutSets = [];
+    if (includeRecords) {
+      var sessionQuery = _db.select(_db.workoutSessions);
+      if (startDate != null) {
+        sessionQuery = sessionQuery..where((t) => t.date.isBiggerOrEqualValue(startDate));
+      }
+      if (endDate != null) {
+        sessionQuery = sessionQuery..where((t) => t.date.isSmallerOrEqualValue(endDate));
+      }
+      workoutSessions = await sessionQuery.get();
+
+      // Fetch related workout sets
+      if (workoutSessions.isNotEmpty) {
+        final sessionIds = workoutSessions.map((e) => e.id).toList();
+        var setsQuery = _db.select(_db.workoutSets)..where((t) => t.sessionId.isIn(sessionIds));
+        
+        if (exerciseIds != null) {
+          setsQuery = setsQuery..where((t) => t.exerciseId.isIn(exerciseIds));
+        }
+        
+        workoutSets = await setsQuery.get();
       }
     }
     
@@ -137,6 +164,24 @@ class DataExportRepository {
         'isCompleted': r.isCompleted,
         'note': r.note,
       }).toList(),
+      // Old system data (WorkoutSessions + WorkoutSets)
+      'workoutSessions': workoutSessions.map((s) => {
+        'id': s.id,
+        'typeId': s.typeId,
+        'date': s.date.toIso8601String(),
+        'note': s.note,
+        'status': s.status,
+        'createdAt': s.createdAt.toIso8601String(),
+      }).toList(),
+      'workoutSets': workoutSets.map((s) => {
+        'id': s.id,
+        'sessionId': s.sessionId,
+        'exerciseId': s.exerciseId,
+        'setNumber': s.setNumber,
+        'weight': s.weight,
+        'reps': s.reps,
+        'isCompleted': s.isCompleted,
+      }).toList(),
     };
   }
   
@@ -153,6 +198,8 @@ class DataExportRepository {
     final exercises = (data['exercises'] as List).cast<Map<String, dynamic>>();
     final dailyRecords = (data['dailyRecords'] as List).cast<Map<String, dynamic>>();
     final exerciseRecords = (data['exerciseRecords'] as List).cast<Map<String, dynamic>>();
+    final workoutSessions = (data['workoutSessions'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final workoutSets = (data['workoutSets'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
     final buffer = StringBuffer();
     
@@ -173,8 +220,8 @@ class DataExportRepository {
     }
     buffer.writeln('\n');
 
-    // Daily Records Section
-    buffer.writeln('--- DAILY RECORDS ---');
+    // Daily Records Section (new system)
+    buffer.writeln('--- DAILY RECORDS (New System) ---');
     List<List<dynamic>> dailyRows = [];
     dailyRows.add(['ID', 'Date', 'Plan Day ID', 'Status', 'Skip Reason', 'Note']);
     for (var r in dailyRecords) {
@@ -187,8 +234,8 @@ class DataExportRepository {
     }
     buffer.writeln('\n');
 
-    // Exercise Records Section
-    buffer.writeln('--- EXERCISE LOGS ---');
+    // Exercise Records Section (new system)
+    buffer.writeln('--- EXERCISE LOGS (New System) ---');
     List<List<dynamic>> logRows = [];
     logRows.add(['ID', 'Daily Record ID', 'Exercise ID', 'Sets', 'Reps', 'Weight', 'Completed', 'Note']);
     for (var r in exerciseRecords) {
@@ -197,6 +244,34 @@ class DataExportRepository {
       ]);
     }
     for (var row in logRows) {
+      buffer.writeln(row.map((e) => '"${e.toString().replaceAll('"', '""')}"').join(','));
+    }
+    buffer.writeln('\n');
+
+    // Workout Sessions Section (old system)
+    buffer.writeln('--- WORKOUT SESSIONS (Old System) ---');
+    List<List<dynamic>> sessionRows = [];
+    sessionRows.add(['ID', 'Type ID', 'Date', 'Note', 'Status', 'Created']);
+    for (var s in workoutSessions) {
+      sessionRows.add([
+        s['id'], s['typeId'], s['date'], s['note'] ?? '', s['status'], s['createdAt']
+      ]);
+    }
+    for (var row in sessionRows) {
+      buffer.writeln(row.map((e) => '"${e.toString().replaceAll('"', '""')}"').join(','));
+    }
+    buffer.writeln('\n');
+
+    // Workout Sets Section (old system)
+    buffer.writeln('--- WORKOUT SETS (Old System) ---');
+    List<List<dynamic>> setRows = [];
+    setRows.add(['ID', 'Session ID', 'Exercise ID', 'Set Number', 'Weight', 'Reps', 'Completed']);
+    for (var s in workoutSets) {
+      setRows.add([
+        s['id'], s['sessionId'], s['exerciseId'], s['setNumber'], s['weight'], s['reps'], s['isCompleted']
+      ]);
+    }
+    for (var row in setRows) {
       buffer.writeln(row.map((e) => '"${e.toString().replaceAll('"', '""')}"').join(','));
     }
     

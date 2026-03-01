@@ -1003,6 +1003,13 @@ class _ExerciseCardState extends State<_ExerciseCard> {
             },
             child: Text('磅 (lb)${_unitOf(setId) == 'lb' ? ' ✓' : ''}'),
           ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _changeSetUnit(setId, '片');
+            },
+            child: Text('片 (plate)${_unitOf(setId) == '片' ? ' ✓' : ''}'),
+          ),
         ],
         cancelButton: CupertinoActionSheetAction(
           onPressed: () => Navigator.of(context).pop(),
