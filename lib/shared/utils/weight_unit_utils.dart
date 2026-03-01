@@ -1,4 +1,5 @@
 class WeightUnitUtils {
+  // No conversion between units - display raw value with selected unit
   static const double _kgToLb = 2.2046226218;
 
   static String normalizeUnit(String unit) {
@@ -12,28 +13,17 @@ class WeightUnitUtils {
     return normalized == 'lb' ? 'lb' : 'kg';
   }
 
+  // No conversion - return the kg value as-is
   static double kgToDisplay(double kg, String unit) {
-    final normalized = normalizeUnit(unit);
-    if (normalized == 'lb') {
-      return kg * _kgToLb;
-    }
-    if (normalized == '片') {
-      return kg;
-    }
     return kg;
   }
 
+  // No conversion - return the value as-is (stored in kg), floor to integer
   static double displayToKg(double value, String unit) {
-    final normalized = normalizeUnit(unit);
-    if (normalized == 'lb') {
-      return value / _kgToLb;
-    }
-    if (normalized == '片') {
-      return value;
-    }
-    return value;
+    return value.floorToDouble();
   }
 
+  // Parse number and floor to integer
   static double? parseNumber(String raw) {
     final cleaned = raw.trim();
     if (cleaned.isEmpty) {
@@ -43,7 +33,8 @@ class WeightUnitUtils {
     if (match == null) {
       return null;
     }
-    return double.tryParse(match.group(0)!);
+    final parsed = double.tryParse(match.group(0)!);
+    return parsed?.floorToDouble();
   }
 
   static double? parseDisplayToKg(String raw, String unit) {
@@ -88,14 +79,10 @@ class WeightUnitUtils {
     return '${formatNumber(kg)}|${normalizeUnit(unit)}';
   }
 
+  // Always floor to integer (no decimals)
   static String formatNumber(double value) {
-    if (value == value.roundToDouble()) {
-      return value.toStringAsFixed(0);
-    }
-    return value
-        .toStringAsFixed(2)
-        .replaceFirst(RegExp(r'0+$'), '')
-        .replaceFirst(RegExp(r'\.$'), '');
+    final floored = value.floorToDouble();
+    return floored.toStringAsFixed(0);
   }
 
   static String formatKgToDisplay(double kg, String unit) {

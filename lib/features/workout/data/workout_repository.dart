@@ -160,8 +160,8 @@ class WorkoutSessionRepository {
 final workoutSetRepositoryProvider = WorkoutSetRepository();
 
 class WorkoutSetRepository {
-  // 添加训练组
-  Future<void> addSet({
+  // 添加训练组 - returns the new set ID
+  Future<String> addSet({
     required String sessionId,
     required String exerciseId,
     required int setNumber,
@@ -179,6 +179,7 @@ class WorkoutSetRepository {
         reps: Value(reps),
       ),
     );
+    return id;
   }
 
   // 更新训练组

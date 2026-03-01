@@ -285,11 +285,13 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
         .split(',')
         .where((w) => w.trim().isNotEmpty)
         .map((w) {
+          // Get the unit stored with this weight (e.g., "10|kg" -> "kg")
+          final storedUnit = WeightUnitUtils.parseStoredUnit(w) ?? weightUnit;
           final kg = WeightUnitUtils.parseStoredToKg(w);
           if (kg == null) {
             return '';
           }
-          return '${WeightUnitUtils.formatKgToDisplay(kg, weightUnit)}$weightUnit';
+          return '${WeightUnitUtils.formatKgToDisplay(kg, storedUnit)}$storedUnit';
         })
         .where((w) => w.isNotEmpty)
         .join(' / ');

@@ -7,7 +7,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-green)
-![Version](https://img.shields.io/badge/version-4.9.12-brightgreen)
+![Version](https://img.shields.io/badge/version-4.9.15-brightgreen)
 
 </div>
 
@@ -227,6 +227,17 @@ lib/
 - feat: 动作管理页面显示最近记录和最佳表现(同时支持新旧系统数据)
 - feat: 数据导出支持新旧系统(WorkoutSessions/WorkoutSets和DailyRecords/ExerciseRecords)
 - fix: 修复主题模式选择后页面导航异常问题
+
+### v4.9.13 (2026-03-01)
+- fix: 修复训练历史中重量单位显示错误的问题(正确显示kg/lb/片)
+
+### v4.9.14 (2026-03-01)
+- feat: 重量单位不自动转换,保留原始数值
+- feat: 所有重量数值向下取整为整数
+
+### v4.9.15 (2026-03-01)
+- feat: 训练历史中显示备注内容
+- feat: 训练历史编辑功能增强(可编辑重量、次数、单位,增删训练组)
 
 ### v4.9.8 (2026-02-28)
 - merge: PR #1 - 支持每组独立重量单位切换

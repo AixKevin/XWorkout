@@ -311,10 +311,12 @@ class _ExerciseDetailCard extends StatelessWidget {
   }
 
   String _formatWeight(String raw) {
+    // Get the unit stored with the weight (e.g., "10|kg" -> "kg")
+    final storedUnit = WeightUnitUtils.parseStoredUnit(raw) ?? weightUnit;
     final kg = WeightUnitUtils.parseStoredToKg(raw);
     if (kg == null) {
       return '-';
     }
-    return '${WeightUnitUtils.formatKgToDisplay(kg, weightUnit)}$weightUnit';
+    return '${WeightUnitUtils.formatKgToDisplay(kg, storedUnit)}$storedUnit';
   }
 }
